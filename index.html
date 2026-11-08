@@ -258,6 +258,15 @@ header .title{font-size:29px;font-weight:700;letter-spacing:-1.2px;line-height:1
 .peopleCardFoot{border-top-color:#dfe7ff !important}
 .section{border:2px solid #a9c2ff !important}
 .secHead{border-bottom-color:#dfe7ff !important}
+.personName.noPermit,.nameBtn .nm.noPermit{color:#e07000 !important;font-weight:800}
+.permitChips{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:8px}
+.permitChips button{padding:10px 3px;border-radius:9px;border:1px solid #e4e8f0;background:#fff;font-family:inherit;font-size:12px;font-weight:700;color:#8b96a8;line-height:1.3}
+.permitChips button.on[data-v=no]{background:#fff3e6;border-color:#f3b46a;color:#e07000}
+.permitChips button.on[data-v=yes]{background:#e7f5ef;border-color:#9fd6bf;color:#168364}
+.permitChips button.on[data-v=local]{background:#eef1f6;border-color:#c9d1de;color:#4a5872}
+.moveBox{border:1px dashed #a9c2ff;background:#f7f9ff;border-radius:10px;padding:10px}
+.moveBox select{width:100%;padding:11px;border-radius:9px;border:1px solid #c7d7ff;background:#fff;font-family:inherit;font-size:14px;color:#1c2333}
+.moveBox small{display:block;margin-top:6px;color:#697b9d;font-size:11px;line-height:1.5}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 
 
@@ -309,6 +318,13 @@ header .title{font-size:29px;font-weight:700;letter-spacing:-1.2px;line-height:1
     </div>
     <datalist id="roleList"><option>부장</option><option>차장</option><option>실장</option><option>과장</option><option>조리장</option><option>주임</option><option>매니저</option><option>사원</option><option>알바</option><option>스끼</option><option>파출</option></datalist>
     <div class="field">
+      <label>📦 위치 이동 (잘못 넣었을 때)</label>
+      <div class="moveBox">
+        <select id="mMove"></select>
+        <small>다른 파트·매장을 고르고 저장하면 그 자리로 옮겨져요. 원래 자리는 빈 칸으로 남아요.</small>
+      </div>
+    </div>
+    <div class="field">
       <label>구분 (하나만 선택)</label>
       <div class="typeChips" id="mType">
         <button class="ins" onclick="setMType('ins')">근로자<small>4대보험</small></button>
@@ -331,6 +347,12 @@ header .title{font-size:29px;font-weight:700;letter-spacing:-1.2px;line-height:1
       <div class="contactBtns"><a class="call" id="mCall" href="#">📞 전화</a><a class="sms" id="mSms" href="#">💬 문자</a></div>
     </div>
     <div class="field">
+      <label>워킹퍼밋</label>
+      <div class="permitChips" id="mPermitSt">
+        <button type="button" data-v="no" onclick="setPermitSt('no')">🟠 준비 안 됨</button>
+        <button type="button" data-v="yes" onclick="setPermitSt('yes')">✅ 준비됨</button>
+        <button type="button" data-v="local" onclick="setPermitSt('local')">내국인<br><small>필요 없음</small></button>
+      </div>
       <label>워킹퍼밋 만료일</label>
       <input type="date" id="mPermitExp" onchange="updDday()">
       <div class="dday" id="mDday"></div>
@@ -459,14 +481,14 @@ function renderPeopleOverview(){
     const button=document.createElement('button');button.className='personQuick';button.title=p.name ? p.name+' 상세 정보' : '직원 정보 등록';
     const dot=document.createElement('span');dot.className='personDot'+(isOffToday(p)?' resting':isIn(p)?' working':'');button.append(dot);
     if(p.role){const role=document.createElement('span');role.className='personRole';role.textContent=p.role;button.append(role);}
-    const nm=document.createElement('span');nm.className='personName'+(!p.name?' blank':'');nm.textContent=p.name||'미등록';button.append(nm);
+    const nm=document.createElement('span');nm.className='personName'+(!p.name?' blank':'')+(permitNotReady(p)?' noPermit':'');nm.textContent=p.name||'미등록';button.append(nm);
     button.onclick=()=>{switchStore(st.id);openMemo(sec.id,i);};part.append(button);
    });
    if(!part.querySelector('button')){const none=document.createElement('div');none.className='emptyPart';none.textContent='등록된 직원 없음';part.append(none);}card.append(part);
   });
   const foot=document.createElement('button');foot.className='peopleCardFoot';foot.textContent='상세 관리 →';foot.onclick=()=>openStorePeople(st.id);card.append(foot);grid.append(card);
  });
- const hint=document.createElement('p');hint.className='overviewHint';hint.textContent='● 초록: 출근 · 보라: 오늘 휴무 · 회색: 출근 미체크 또는 미등록';area.append(hint);
+ const hint=document.createElement('p');hint.className='overviewHint';hint.innerHTML='● 초록: 출근 · 보라: 오늘 휴무 · 회색: 출근 미체크 또는 미등록<br><b style="color:#e07000">주황 이름</b>: 워킹퍼밋 준비 안 됨 (내국인은 상세 정보에서 "내국인" 선택)';area.append(hint);
 }
 
 const KEY = 'cwy_staff_all_v1';
@@ -673,6 +695,11 @@ function calToggle(ds){
   renderCal();
 }
 function daysLeft(d){ if(!d) return null; const a=new Date(today()+'T00:00:00'), b=new Date(d+'T00:00:00'); return Math.round((b-a)/86400000); }
+/* 퍼밋 준비 안 됨: 이름이 있고, 재직 중이고, 내국인이 아니며, 퍼밋 체크가 없거나 만료됨 */
+function permitNotReady(p){
+  if(!p.name || isLeft(p) || p.local) return false;
+  return !p.permit || (p.permitExp && daysLeft(p.permitExp) < 0);
+}
 function permitTag(p){
   const n = daysLeft(p.permitExp); if(n===null || isLeft(p)) return '';
   if(n < 0) return '<span class="tag exp">만료</span>';
@@ -1146,7 +1173,7 @@ function render(){
           <button class="io ${p.leaveDate?'out':(p.joinDate?'in':'')}" onclick="openIo('${s.id}',${i})">${p.leaveDate ? '퇴사<br>'+fmtD(p.leaveDate) : (p.joinDate ? '입사<br>'+fmtD(p.joinDate) : '입·퇴')}</button>
           ${isOffToday(p) ? `<button class="att offday" disabled>휴무</button>` : `<button class="att ${isIn(p)?'on':''}" ${isLeft(p)?'disabled':''} onclick="toggleAtt('${s.id}',${i})">${isIn(p)?'✓<br>출근':'출근'}</button>`}
           <button class="nameBtn" onclick="openMemo('${s.id}',${i})">
-            ${p.role && !(p.daily && p.role==='일용') ? `<span class="role">${esc(p.role)}</span>` : ''}<span class="nm ${p.name?'':'empty'}">${p.name ? esc(p.name) : '이름'}</span>
+            ${p.role && !(p.daily && p.role==='일용') ? `<span class="role">${esc(p.role)}</span>` : ''}<span class="nm ${p.name?'':'empty'} ${permitNotReady(p)?'noPermit':''}">${p.name ? esc(p.name) : '이름'}</span>
             ${permitTag(p)}${p.leaveDate && p.leaveDate > today() ? '<span class="tag out">예정</span>' : ''}
             ${p.memo ? '<span class="memoTag">📝</span>' : ''}
           </button>
@@ -1179,7 +1206,16 @@ function addStaff(sec, kind){
   openMemo(sec, data[sec].length-1);
 }
 
-let cur = null;
+let cur = null, mPermitSt = 'no', origRole = '';
+function setPermitSt(v){
+  mPermitSt = v;
+  document.querySelectorAll('#mPermitSt button').forEach(b=>b.classList.toggle('on', b.dataset.v===v));
+}
+function fillMove(){
+  const sel = document.getElementById('mMove');
+  sel.innerHTML = STORES.map(st=>`<optgroup label="${esc(st.name)}점">` + st.sections.map(sec=>`<option value="${st.id}|${sec.id}">${esc(st.name)}점 · ${esc(sec.name)}${st.id===storeId && sec.id===cur.sec ? ' (지금 위치)' : ''}</option>`).join('') + '</optgroup>').join('');
+  sel.value = storeId + '|' + cur.sec;
+}
 function openMemo(sec, i){
   cur = {sec, i};
   const s = SECTIONS.find(x=>x.id===sec), p = data[sec][i];
@@ -1187,6 +1223,9 @@ function openMemo(sec, i){
   document.getElementById('mTitle').textContent = s.name + ' · ' + (p.role ? p.role + ' ' : '') + (p.name || '새 직원');
   document.getElementById('mName').value = p.name;
   document.getElementById('mRole').value = p.role || '';
+  origRole = p.role || '';
+  fillMove();
+  setPermitSt(p.local ? 'local' : (p.permit ? 'yes' : 'no'));
   const rr = document.getElementById('mRrn'); rr.value = p.rrn || ''; rr.classList.add('rrnHide');
   document.getElementById('rrnEye').textContent = '👁 보기'; fmtRrn(rr);
   document.getElementById('mMemo').value = p.memo;
@@ -1219,6 +1258,7 @@ function saveMemo(){
   p.memo = document.getElementById('mMemo').value;
   p.phone = document.getElementById('mPhone').value.trim();
   p.permitExp = document.getElementById('mPermitExp').value;
+  p.local = (mPermitSt==='local'); p.permit = (mPermitSt==='yes');
   p.wage = document.getElementById('mWage').value;
   p.hours = document.getElementById('mHours').value.trim();
   p.dayHours = document.getElementById('mDayHours').value;
@@ -1241,7 +1281,34 @@ function saveMemo(){
   p.off = calOff.filter(d=>d >= cutS).sort();
   logs().forEach(x=>{ if(x.staffId===p.id) x.name = p.name; });
   p.memoAt = Date.now(); touch(p);
-  if(persist()){ toast('저장되었습니다'); closeMemo(); render(); }
+  const moved = moveStaffIfNeeded(p);
+  if(persist()){ toast(moved ? moved + '(으)로 옮겼어요' : '저장되었습니다'); closeMemo(); render(); }
+}
+/* 위치 이동: 새 자리로 옮기고, 원래 자리는 빈 칸으로 둠 */
+function moveStaffIfNeeded(p){
+  const dest = document.getElementById('mMove').value;
+  if(!dest || dest === storeId + '|' + cur.sec) return '';
+  const [dst, dsec] = dest.split('|');
+  const fromStore = storeId, fromSec = cur.sec;
+  // 원래 자리는 같은 직급의 빈 칸으로
+  allData[fromStore][fromSec][cur.i] = blank(origRole);
+  // 두 폰 합치기에서 중복되지 않게 새 번호로 옮김
+  const oldId = p.id;
+  allData.__del = allData.__del || {}; allData.__del[oldId] = Date.now();
+  p.id = uid(); touch(p);
+  const arr = allData[dst][dsec] = allData[dst][dsec] || [];
+  let k = arr.findIndex(q=>isEmptyStaff(q) && (q.role||'')===(p.role||''));
+  if(k < 0) k = arr.findIndex(q=>isEmptyStaff(q) && !q.role);
+  if(k >= 0) arr[k] = p; else arr.push(p);
+  // 입·퇴사 기록도 함께 옮김
+  allData.__log = allData.__log || {};
+  const secName = STORES.find(x=>x.id===dst).sections.find(x=>x.id===dsec).name;
+  const fromL = allData.__log[fromStore] || [];
+  const mine = fromL.filter(x=>x.staffId===oldId);
+  allData.__log[fromStore] = fromL.filter(x=>x.staffId!==oldId);
+  allData.__log[dst] = (allData.__log[dst] || []).concat(mine.map(x=>Object.assign(x, {staffId:p.id, sec:secName})));
+  const stName = STORES.find(x=>x.id===dst).name;
+  return stName + '점 ' + secName;
 }
 function deleteStaff(){
   if(!cur) return;
