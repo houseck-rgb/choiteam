@@ -488,7 +488,7 @@ function renderPeopleOverview(){
   });
   const foot=document.createElement('button');foot.className='peopleCardFoot';foot.textContent='상세 관리 →';foot.onclick=()=>openStorePeople(st.id);card.append(foot);grid.append(card);
  });
- const hint=document.createElement('p');hint.className='overviewHint';hint.innerHTML='● 초록: 출근 · 보라: 오늘 휴무 · 회색: 출근 미체크 또는 미등록<br><b style="color:#e07000">주황 이름</b>: 워킹퍼밋 준비 안 됨 (내국인은 상세 정보에서 "내국인" 선택)';area.append(hint);
+ const hint=document.createElement('p');hint.className='overviewHint';hint.innerHTML='● 초록: 출근 · 보라: 오늘 휴무 · 회색: 출근 미체크 또는 미등록<br><b style="color:#e07000">주황 이름</b>: 2대보험인데 워킹퍼밋이 안 적힘';area.append(hint);
 }
 
 const KEY = 'cwy_staff_all_v1';
@@ -695,10 +695,11 @@ function calToggle(ds){
   renderCal();
 }
 function daysLeft(d){ if(!d) return null; const a=new Date(today()+'T00:00:00'), b=new Date(d+'T00:00:00'); return Math.round((b-a)/86400000); }
-/* 퍼밋 준비 안 됨: 이름이 있고, 재직 중이고, 내국인이 아니며, 퍼밋 체크가 없거나 만료됨 */
+/* 주황 이름: 2대보험 직원인데 워킹퍼밋(준비됨 체크 또는 만료일)이 안 적혀 있거나 만료됨 */
 function permitNotReady(p){
-  if(!p.name || isLeft(p) || p.local) return false;
-  return !p.permit || (p.permitExp && daysLeft(p.permitExp) < 0);
+  if(!p.name || isLeft(p) || p.local || staffType(p)!=='ins2') return false;
+  const expired = p.permitExp && daysLeft(p.permitExp) < 0;
+  return expired || (!p.permit && !p.permitExp);
 }
 function permitTag(p){
   const n = daysLeft(p.permitExp); if(n===null || isLeft(p)) return '';
