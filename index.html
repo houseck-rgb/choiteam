@@ -29,7 +29,7 @@
   .storeTabs::-webkit-scrollbar{display:none;}
   .storeTab{flex:1 0 auto;min-width:62px;padding:12px 8px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-family:inherit;font-size:15px;font-weight:900;color:#9a9182;}
   .storeTab.on{background:var(--red);border-color:var(--red);color:#fff;}
-  .summary{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:10px 14px 14px;}
+  .summary{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin:10px 14px 14px;}
   .sumBox{background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 2px;text-align:center;font-family:inherit;color:inherit;}
   .sumBox:not([disabled]){border-color:#e3d3a8;box-shadow:0 1px 0 rgba(201,162,74,.35);}
   .sumBox.on{background:var(--red);border-color:var(--red);}
@@ -179,10 +179,11 @@
   .addRow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 14px 14px;}
   .addRow .addBtn{width:auto;margin:0;}
   .addRow .addBtn.daily{border-color:#e0a24a;color:#c06a00;background:rgba(214,120,20,.06);}
-  .typeChips{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+  .typeChips{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
   .typeChips button{padding:11px 4px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font-family:inherit;font-size:13px;font-weight:900;color:#9a9182;line-height:1.25;}
   .typeChips button small{display:block;font-size:10.5px;font-weight:700;}
   .typeChips button.on.ins{background:#2f7d4f;border-color:#2f7d4f;color:#fff;}
+  .typeChips button.on.ins2{background:#0f8a8a;border-color:#0f8a8a;color:#fff;}
   .typeChips button.on.tax{background:#1f6fb2;border-color:#1f6fb2;color:#fff;}
   .typeChips button.on.daily{background:#c06a00;border-color:#c06a00;color:#fff;}
   .day.work{background:#c06a00;border-color:#c06a00;color:#fff;font-weight:900;}
@@ -192,9 +193,15 @@
   .chk{padding:8px 5px !important;font-size:11.5px !important;}
   .chk .box{display:none !important;}
   .chk.on{background:var(--green) !important;color:#fff !important;border-color:var(--green) !important;}
+  .chk.ins2.on{background:#0f8a8a !important;border-color:#0f8a8a !important;}
   .chk.tax.on{background:#1f6fb2 !important;border-color:#1f6fb2 !important;}
   .chk.daily.on{background:#c06a00 !important;border-color:#c06a00 !important;color:#fff !important;}
   .chk.permit.on{background:#6b4f9a !important;border-color:#6b4f9a !important;}
+  .payChips{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+  .payChips button{padding:11px;border-radius:9px;border:1px solid #e4e8f0;background:#fff;font-family:inherit;font-size:13px;font-weight:700;color:#8b96a8;}
+  .payChips button.on{background:#315bf5;border-color:#315bf5;color:#fff;}
+  .monthlyOnly{display:none;} .isMonthly .monthlyOnly{display:block;} .isMonthly .hourlyOnly{display:none;}
+  .isDaily .monthlyOnly{display:none !important;}
   .addBtn{display:block;width:calc(100% - 28px);margin:10px 14px 14px;padding:11px;border-radius:10px;border:1.5px dashed var(--gold);background:rgba(201,162,74,.08);color:var(--red);font-family:inherit;font-weight:800;font-size:13.5px;}
 
   .modalOverlay{position:fixed;inset:0;background:rgba(30,10,10,.6);z-index:100;display:none;align-items:center;justify-content:center;padding:16px;}
@@ -236,7 +243,7 @@ header .title{font-size:29px;font-weight:700;letter-spacing:-1.2px;line-height:1
 .toolRow.two{margin:0 0 20px;display:flex;gap:8px;justify-content:flex-end}.toolRow button{width:auto;font-size:12px;padding:10px 15px;border:1px solid var(--line);color:#515e77;background:#fff;font-weight:600;border-radius:9px;min-height:42px}.toolRow button:first-child{background:#eaf0ff;border-color:#dfe7fc;color:var(--red)}
 .listLabel{display:flex;justify-content:space-between;align-items:baseline;margin:24px 0 12px}.listLabel h2{margin:0;font-size:18px;font-weight:700}.listLabel span{font-size:11px;color:var(--sub)}
 #sections{display:grid;grid-template-columns:1fr;gap:16px}.section{margin:0;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 3px 10px #24324b02}.secHead{padding:17px 18px;background:#fff;border-bottom:1px solid var(--line);gap:8px}.secHead .emo{display:none}.secHead:before{content:'';width:4px;height:16px;border-radius:2px;background:var(--red)}.secHead .name{font-size:15px;color:var(--ink);font-weight:700}.secHead .cnt{font-size:11px;font-weight:500;background:#f3f5f9;color:#7d889b;border:0;padding:4px 9px}
-.row{display:grid;grid-template-columns:46px 44px minmax(0,1fr);gap:8px;padding:13px 16px;border-bottom:1px solid #f0f2f6;align-items:center}.nameBtn{padding:5px 0;gap:6px;min-height:40px}.nameBtn .nm{font-size:14px;font-weight:600;min-width:0}.nameBtn .nm.empty{color:#a5aebd}.role{color:#60729b;background:#edf1fa;font-weight:500;font-size:10px;padding:3px 6px;border-radius:4px}.checks{grid-column:1/-1;display:flex;gap:6px;justify-content:flex-end}.chk{padding:7px 10px!important;font-size:11px!important;min-height:34px;border:1px solid #e4e8f0;background:#f8f9fb;color:#8b96a8;font-weight:500;border-radius:6px}.chk.on{background:#e7f5ef!important;color:#168364!important;border-color:#cfebdf!important}.chk.tax.on{background:#eaf0ff!important;color:#315bf5!important;border-color:#dbe5ff!important}.chk.daily.on{background:#fff2e5!important;color:#ad691d!important;border-color:#f6e1c4!important}.chk.permit.on{background:#f1edff!important;color:#7a5bb5!important;border-color:#e5ddfa!important}
+.row{display:grid;grid-template-columns:46px 44px minmax(0,1fr);gap:8px;padding:13px 16px;border-bottom:1px solid #f0f2f6;align-items:center}.nameBtn{padding:5px 0;gap:6px;min-height:40px}.nameBtn .nm{font-size:14px;font-weight:600;min-width:0}.nameBtn .nm.empty{color:#a5aebd}.role{color:#60729b;background:#edf1fa;font-weight:500;font-size:10px;padding:3px 6px;border-radius:4px}.checks{grid-column:1/-1;display:flex;gap:6px;justify-content:flex-end}.chk{padding:7px 10px!important;font-size:11px!important;min-height:34px;border:1px solid #e4e8f0;background:#f8f9fb;color:#8b96a8;font-weight:500;border-radius:6px}.chk.on{background:#e7f5ef!important;color:#168364!important;border-color:#cfebdf!important}.chk.ins2.on{background:#e3f6f6!important;color:#0f7a7a!important;border-color:#c6ebeb!important}.chk.tax.on{background:#eaf0ff!important;color:#315bf5!important;border-color:#dbe5ff!important}.chk.daily.on{background:#fff2e5!important;color:#ad691d!important;border-color:#f6e1c4!important}.chk.permit.on{background:#f1edff!important;color:#7a5bb5!important;border-color:#e5ddfa!important}
 .io,.att{width:100%;height:40px;border:1px solid #e6eaf1;border-radius:7px;font-size:10px;font-weight:500;color:#8a95a8;background:#fafbfd}.att.on{background:#edf3ff;color:#315bf5;border-color:#dbe6ff}.io.in{background:#edf3ff;color:#315bf5;border-color:#dbe6ff}.io.out{background:#fff0f1;color:#c15c69;border-color:#f8dce0}.att.offday{background:#f2eff9;color:#8b76b0;border-color:#e8e2f1}.addRow{margin:10px 16px 15px;gap:8px}.addRow .addBtn{padding:10px;border:1px dashed #d8e0f3;background:#f6f8ff;border-radius:8px;font-size:12px;color:#315bf5;font-weight:600;min-height:42px}.addRow .addBtn.daily{border-color:#dfe3eb;color:#7c8799;background:#fafbfd}
 .historyPanel{margin-top:20px;border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}.historyPanel>summary{cursor:pointer;padding:17px 18px;color:#58647a;font-size:13px;font-weight:600;list-style:none;display:flex;justify-content:space-between;align-items:center}.historyPanel>summary:after{content:'＋';color:#95a0b3;font-size:17px}.historyPanel[open]>summary:after{content:'−'}.historyPanel>summary::-webkit-details-marker{display:none}.monthBox,.logBox{margin:0 16px 16px;border-color:var(--line);border-radius:10px}.monthHead,.logHead{background:#f7f8fb;padding:12px;color:#536079}.monthHead .ttl{color:#536079;font-size:13px}.monthHead button{color:#66748b;border-color:var(--line);font-weight:500}.monthCol h4,.logHead{font-weight:600}.monthCol .none{color:#a3adbe}
 .alertBar,.backupBar{margin:10px 0;border-radius:10px;font-weight:500}.filterBar{margin:0 0 14px;background:#eaf0ff;color:#315bf5;font-weight:500}.searchRes{margin:6px 0 15px}
@@ -245,6 +252,12 @@ header .title{font-size:29px;font-weight:700;letter-spacing:-1.2px;line-height:1
 @media(min-width:780px){#sections{grid-template-columns:1fr 1fr;align-items:start}.section:first-child{grid-column:1/-1}.section:first-child .row{grid-template-columns:46px 44px minmax(150px,1fr) auto}.section:first-child .checks{grid-column:auto}.summary{gap:14px}.sumBox{padding:20px}.sumBox b{font-size:30px}header{padding:30px 24px}.appMain{padding-top:26px}.historyPanel{margin-top:24px}}
 @media(max-width:480px){header{padding:22px 20px}.brandLine{margin-bottom:23px}header .title{font-size:26px}header .sub{font-size:12px}.appMain{padding:18px 16px}.introTools{flex-wrap:wrap;gap:10px}.searchWrap{flex:1 0 100%;max-width:none}.shareRow.three{width:100%;justify-content:flex-end}.shareRow button{flex:1;padding:8px;min-height:38px;font-size:11px}.storeTab{padding:10px 8px;font-size:13px;min-width:52px}.summary{gap:6px;margin-bottom:16px}.sumBox{padding:12px 2px;border-radius:11px}.sumBox b{font-size:21px}.sumBox span{font-size:10px}.dateBar{font-size:11px;margin-top:16px}.saveBar{padding:12px 18px calc(12px + env(safe-area-inset-bottom));border-radius:16px 16px 0 0}.saveBtn{flex-basis:45%;font-size:13px}.listLabel span{font-size:10px}.modalBox{padding:20px 16px}.tag{font-size:9px}.row{padding:12px;gap:7px}}
 #backupArea:not(:empty),#alertArea:not(:empty){margin-bottom:14px}
+/* 매장별 연한 파란 테두리 */
+.peopleCard{border:2px solid #a9c2ff !important;box-shadow:0 2px 8px rgba(49,91,245,.06)}
+.peopleCardTop{border-bottom-color:#dfe7ff !important;background:#f7f9ff}
+.peopleCardFoot{border-top-color:#dfe7ff !important}
+.section{border:2px solid #a9c2ff !important}
+.secHead{border-bottom-color:#dfe7ff !important}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 
 
@@ -299,6 +312,7 @@ header .title{font-size:29px;font-weight:700;letter-spacing:-1.2px;line-height:1
       <label>구분 (하나만 선택)</label>
       <div class="typeChips" id="mType">
         <button class="ins" onclick="setMType('ins')">근로자<small>4대보험</small></button>
+        <button class="ins2" onclick="setMType('ins2')">근로자<small>2대보험</small></button>
         <button class="tax" onclick="setMType('tax')">소득세<small>3.3%</small></button>
         <button class="daily" onclick="setMType('daily')">일용직<small>단기·하루</small></button>
       </div>
@@ -322,15 +336,23 @@ header .title{font-size:29px;font-weight:700;letter-spacing:-1.2px;line-height:1
       <div class="dday" id="mDday"></div>
     </div>
     <div class="field dailyOnly"><label>일당 (원)</label><input type="number" id="mDayWage" inputmode="numeric" placeholder="예) 130000" oninput="updPay()"></div>
-    <div class="field twoCol notDaily">
+    <div class="field notDaily">
+      <label>급여 방식</label>
+      <div class="payChips" id="mPayType">
+        <button type="button" data-t="hourly" onclick="setPayType('hourly')">⏱ 시급제</button>
+        <button type="button" data-t="monthly" onclick="setPayType('monthly')">📅 월급제</button>
+      </div>
+    </div>
+    <div class="field monthlyOnly"><label>월급 (원)</label><input type="number" id="mMonthly" inputmode="numeric" placeholder="예) 2800000" oninput="updPay()"></div>
+    <div class="field twoCol notDaily hourlyOnly">
       <div><label>시급 (원)</label><input type="number" id="mWage" inputmode="numeric" placeholder="예) 10030" oninput="updPay()"></div>
       <div><label>하루 근무시간 (시간)</label><input type="number" id="mDayHours" inputmode="decimal" step="0.5" placeholder="예) 9" oninput="updPay()"></div>
     </div>
     <div class="field"><label>근무 시간대 메모</label><input type="text" id="mHours" placeholder="예) 10~22시, 브레이크 15~17시"></div>
     <div class="field"><label>💰 월 급여 예상 (참고용)</label><div class="payBox" id="mPay"></div></div>
     <div class="field dates">
-      <div><label>입사일</label><input type="date" id="mIn"></div>
-      <div><label>퇴사일 (퇴사 시 입력)</label><input type="date" id="mOut"></div>
+      <div><label>입사일</label><input type="date" id="mIn" onchange="updPay()"></div>
+      <div><label>퇴사일 (퇴사 시 입력)</label><input type="date" id="mOut" onchange="updPay()"></div>
     </div>
     <div class="field">
       <label id="calLabel">휴무일 (날짜를 누르면 휴무 체크)</label>
@@ -480,12 +502,13 @@ let SECTIONS = [];
 const CHECKS = [
   {id:'permit', label:'퍼밋', full:'워킹퍼밋'},
   {id:'ins',    label:'4대', full:'4대보험'},
+  {id:'ins2',   label:'2대', full:'2대보험'},
   {id:'tax',    label:'3.3', full:'3.3%'},
   {id:'daily',  label:'일용', full:'일용직'}
 ];
-const TYPES = ['ins','tax','daily'];   // 근로자 / 소득세 / 일용직 — 한 사람에 하나만
-const TYPE_NAME = {ins:'근로자명단 (4대보험)', tax:'소득세명단 (3.3%)', daily:'일용직명단', none:'구분 안 된 직원'};
-function staffType(p){ return p.daily ? 'daily' : (p.ins ? 'ins' : (p.tax ? 'tax' : 'none')); }
+const TYPES = ['ins','ins2','tax','daily'];   // 근로자 / 소득세 / 일용직 — 한 사람에 하나만
+const TYPE_NAME = {ins:'근로자명단 (4대보험)', ins2:'2대보험명단 (고용·산재)', tax:'소득세명단 (3.3%)', daily:'일용직명단', none:'구분 안 된 직원'};
+function staffType(p){ return p.daily ? 'daily' : (p.ins ? 'ins' : (p.ins2 ? 'ins2' : (p.tax ? 'tax' : 'none'))); }
 let listFilter = '';
 
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
@@ -608,7 +631,13 @@ function setLog(p, secName, type, date){
 let lastAction = '';
 function isOffToday(p){ return Array.isArray(p.off) && p.off.includes(today()); }
 function offInMonth(p, ym){ return (p.off||[]).filter(d=>d.slice(0,7)===ym).length; }
-let calMonth = '', calOff = [], calWork = [], mType = 'none';
+let calMonth = '', calOff = [], calWork = [], mType = 'none', mPayType = 'hourly';
+function setPayType(t){
+  mPayType = t;
+  document.querySelectorAll('#mPayType button').forEach(b=>b.classList.toggle('on', b.dataset.t===t));
+  document.getElementById('memoModal').classList.toggle('isMonthly', t==='monthly');
+  updPay();
+}
 function setMType(t){
   mType = (mType===t ? 'none' : t);
   document.querySelectorAll('#mType button').forEach(b=>b.classList.toggle('on', b.classList.contains(mType)));
@@ -845,12 +874,22 @@ function workDays(p, ym, offList){
   }
   return n;
 }
+function activeDays(p, ym){
+  const [y,m] = ym.split('-').map(Number), days = new Date(y, m, 0).getDate();
+  let n = 0;
+  for(let d=1; d<=days; d++){ if(staffActiveOn(p, ym + '-' + String(d).padStart(2,'0'))) n++; }
+  return {n, days};
+}
 function calcPay(p, ym, offList){
   const wage = Number(p.wage)||0, hrs = Number(p.dayHours)||0;
   const wd = workDays(p, ym, offList);
-  const gross = Math.round(wage * hrs * wd);
+  let gross, monthly = 0, act = null;
+  if(p.payType==='monthly'){
+    monthly = Number(p.monthly)||0; act = activeDays(p, ym);
+    gross = act.n===act.days ? monthly : Math.floor(monthly * act.n / act.days / 10) * 10;
+  } else gross = Math.round(wage * hrs * wd);
   const tax = p.tax ? Math.floor(gross * 0.03 / 10) * 10 + Math.floor(gross * 0.003 / 10) * 10 : 0;
-  return {wage, hrs, wd, gross, tax, net: gross - tax};
+  return {wage, hrs, wd, gross, tax, net: gross - tax, monthly, act, isMonthly: p.payType==='monthly'};
 }
 /* 일용근로소득세: (일당 − 15만원) × 6% × 45%(세액공제 후), 1,000원 미만은 안 냄(소액부징수) · 지방세 10% */
 function dailyTax(dayWage){
@@ -873,6 +912,8 @@ function updPay(){
   const tmp = Object.assign({}, p, {
     wage: document.getElementById('mWage').value,
     dayHours: document.getElementById('mDayHours').value,
+    monthly: document.getElementById('mMonthly').value,
+    payType: mPayType,
     joinDate: document.getElementById('mIn').value,
     leaveDate: document.getElementById('mOut').value
   });
@@ -887,13 +928,23 @@ function updPay(){
       `<small>일용근로소득세 = (일당−15만원)×6%×45%, 하루 1,000원 미만은 안 냄 · 매일 지급 기준</small>`;
     return;
   }
-  tmp.tax = (mType==='tax'); tmp.ins = (mType==='ins');
+  tmp.tax = (mType==='tax'); tmp.ins = (mType==='ins'); tmp.ins2 = (mType==='ins2');
   const r = calcPay(tmp, ym, calOff);
-  if(!r.wage || !r.hrs){ box.innerHTML = '시급과 하루 근무시간을 넣으면 ' + mm + '월 예상 급여가 계산돼요.'; return; }
-  box.innerHTML = `${mm}월 근무 <b>${r.wd}일</b> × ${r.hrs}시간 × ${won(r.wage)}<br>예상 급여 <b>${won(r.gross)}</b>` +
+  let head;
+  if(r.isMonthly){
+    if(!r.monthly){ box.innerHTML = '월급을 넣으면 ' + mm + '월 지급액이 계산돼요.'; return; }
+    head = r.act.n===r.act.days ? `월급 <b>${won(r.monthly)}</b> (${mm}월 전체 근무)`
+      : `월급 ${won(r.monthly)} × ${r.act.n}/${r.act.days}일 (입·퇴사 달 일할계산)<br>${mm}월 지급 <b>${won(r.gross)}</b>`;
+    if(r.act.n===0){ box.innerHTML = mm + '월에는 재직 기간이 아니에요.'; return; }
+  } else {
+    if(!r.wage || !r.hrs){ box.innerHTML = '시급과 하루 근무시간을 넣으면 ' + mm + '월 예상 급여가 계산돼요.'; return; }
+    head = `${mm}월 근무 <b>${r.wd}일</b> × ${r.hrs}시간 × ${won(r.wage)}<br>예상 급여 <b>${won(r.gross)}</b>`;
+  }
+  box.innerHTML = head +
     (tmp.tax ? `<br>3.3% 공제 −${won(r.tax)} → 실지급 <b>${won(r.net)}</b>` : '') +
     (tmp.ins ? `<br>4대보험 공제는 따로 계산하세요` : '') +
-    `<small>휴무일·입퇴사일을 뺀 날로 계산 · 주휴수당·연장/야간수당은 포함 안 됨</small>`;
+    (tmp.ins2 ? `<br>고용보험(근로자 부담분) 공제는 따로 계산하세요 · 산재보험은 사업주만 부담` : '') +
+    (r.isMonthly ? `<small>월급제는 휴무일을 빼지 않아요 · 입사·퇴사한 달만 달력 날짜로 나눠 계산</small>` : `<small>휴무일·입퇴사일을 뺀 날로 계산 · 주휴수당·연장/야간수당은 포함 안 됨</small>`);
 }
 
 /* ---------- 전 매장 검색 ---------- */
@@ -968,6 +1019,7 @@ function buildXlsx(sheets){
   sheets.forEach((sh,i)=>files.push(f(`xl/worksheets/sheet${i+1}.xml`, sheetXml(sh.rows, sh.widths))));
   return makeZip(files);
 }
+function payCols(p){ const m = p.payType==='monthly'; return [m?'월급제':'시급제', m?num(p.monthly):'', m?'':num(p.wage), m?'':num(p.dayHours)]; }
 function num(v){ const n = Number(v); return v!=='' && v!=null && isFinite(n) && n ? n : ''; }
 function activeInMonth(p, ym){
   const first = ym + '-01', last = ym + '-' + String(new Date(+ym.slice(0,4), +ym.slice(5,7), 0).getDate()).padStart(2,'0');
@@ -979,8 +1031,9 @@ async function exportExcel(){
   const R = withRrn ? ['주민등록번호'] : [];
   const rr = p => withRrn ? [p.rrn||''] : [];
   const status = p => isLeft(p) ? '퇴사' : (p.leaveDate ? '퇴사예정' : '재직');
-  const ins = [['매장','파트','직급','이름',...R,'상태','연락처','입사일','퇴사일','워킹퍼밋','퍼밋 만료일','시급','하루 근무시간',mm+'월 근무일',mm+'월 예상급여(참고)','메모']];
-  const tax = [['매장','파트','직급','이름',...R,'상태','연락처','입사일','퇴사일','워킹퍼밋','시급','하루 근무시간',mm+'월 근무일',mm+'월 지급액(참고)','소득세 3%','지방세 0.3%','실지급','메모']];
+  const ins = [['매장','파트','직급','이름',...R,'상태','연락처','입사일','퇴사일','워킹퍼밋','퍼밋 만료일','급여방식','월급','시급','하루 근무시간',mm+'월 근무일',mm+'월 예상급여(참고)','메모']];
+  const ins2 = ins.map(r=>r.slice());
+  const tax = [['매장','파트','직급','이름',...R,'상태','연락처','입사일','퇴사일','워킹퍼밋','급여방식','월급','시급','하루 근무시간',mm+'월 근무일',mm+'월 지급액(참고)','소득세 3%','지방세 0.3%','실지급','메모']];
   const day = [['매장','파트','이름',...R,'연락처','워킹퍼밋','일당',mm+'월 근무일수','근무한 날',mm+'월 총지급액','소득세','지방세','실지급','메모']];
   const none = [['매장','파트','직급','이름',...R,'상태','연락처','입사일','퇴사일','메모']];
   const memo = p => (p.memo||'').replace(/\n/g,' / ');
@@ -995,26 +1048,29 @@ async function exportExcel(){
     }
     if(!activeInMonth(p, ym)) return;
     const r = calcPay(p, ym);
-    if(t==='ins') ins.push([st.name, sec.name, p.role||'', p.name, ...rr(p), status(p), p.phone||'', p.joinDate||'', p.leaveDate||'', p.permit?'O':'', p.permitExp||'', num(p.wage), num(p.dayHours), r.wd, num(r.gross), memo(p)]);
+    if(t==='ins') ins.push([st.name, sec.name, p.role||'', p.name, ...rr(p), status(p), p.phone||'', p.joinDate||'', p.leaveDate||'', p.permit?'O':'', p.permitExp||'', ...payCols(p), r.wd, num(r.gross), memo(p)]);
+    else if(t==='ins2') ins2.push([st.name, sec.name, p.role||'', p.name, ...rr(p), status(p), p.phone||'', p.joinDate||'', p.leaveDate||'', p.permit?'O':'', p.permitExp||'', ...payCols(p), r.wd, num(r.gross), memo(p)]);
     else if(t==='tax'){
       const it = Math.floor(r.gross*0.03/10)*10, lt = Math.floor(r.gross*0.003/10)*10;
-      tax.push([st.name, sec.name, p.role||'', p.name, ...rr(p), status(p), p.phone||'', p.joinDate||'', p.leaveDate||'', p.permit?'O':'', num(p.wage), num(p.dayHours), r.wd, num(r.gross), r.gross?it:'', r.gross?lt:'', r.gross? r.gross-it-lt : '', memo(p)]);
+      tax.push([st.name, sec.name, p.role||'', p.name, ...rr(p), status(p), p.phone||'', p.joinDate||'', p.leaveDate||'', p.permit?'O':'', ...payCols(p), r.wd, num(r.gross), r.gross?it:'', r.gross?lt:'', r.gross? r.gross-it-lt : '', memo(p)]);
     }
     else none.push([st.name, sec.name, p.role||'', p.name, ...rr(p), status(p), p.phone||'', p.joinDate||'', p.leaveDate||'', memo(p)]);
   })));
   // 합계 줄
   const sumCol = (rows, idxs)=>{ if(rows.length<2) return; const t = rows[0].map(()=>''); t[0]='합계'; t[3 - (rows===day?1:0)] = (rows.length-1)+'명'; idxs.forEach(i=>{ t[i] = rows.slice(1).reduce((a,r)=>a+(Number(r[i])||0),0); }); rows.push(t); };
   const o = withRrn ? 1 : 0;
-  sumCol(ins, [13+o]);
-  sumCol(tax, [12+o, 13+o, 14+o, 15+o]);
+  sumCol(ins, [15+o]);
+  sumCol(ins2, [15+o]);
+  sumCol(tax, [14+o, 15+o, 16+o, 17+o]);
   sumCol(day, [6+o, 8+o, 9+o, 10+o, 11+o]);
   const io = [['매장','구분','이름','파트','날짜']];
   STORES.forEach(st=>((allData.__log||{})[st.id]||[]).filter(x=>x.date && x.date.slice(0,7)===ym).sort((a,b)=>a.date<b.date?-1:1)
     .forEach(x=>io.push([st.name, x.type==='join'?'입사':'퇴사', x.name||'', x.sec||'', x.date])));
   const W = (base)=>base.slice(0,4).concat(withRrn?[16]:[]).concat(base.slice(4));
   const sheets = [
-    {name:'근로자명단(4대보험)', rows:ins, widths:W([8,9,7,10,7,14,11,11,8,11,9,10,9,14,30])},
-    {name:'소득세명단(3.3%)', rows:tax, widths:W([8,9,7,10,7,14,11,11,8,9,10,9,14,11,11,12,30])},
+    {name:'근로자명단(4대보험)', rows:ins, widths:W([8,9,7,10,7,14,11,11,8,11,8,12,9,10,9,14,30])},
+    {name:'2대보험명단(고용·산재)', rows:ins2, widths:W([8,9,7,10,7,14,11,11,8,11,8,12,9,10,9,14,30])},
+    {name:'소득세명단(3.3%)', rows:tax, widths:W([8,9,7,10,7,14,11,11,8,8,12,9,10,9,14,11,11,12,30])},
     {name:'일용직명단', rows:day, widths:(withRrn?[8,9,10,16]:[8,9,10]).concat([14,8,10,10,30,13,10,10,13,30])},
     {name:'입퇴사기록', rows:io, widths:[8,7,10,10,12]}
   ];
@@ -1065,7 +1121,8 @@ function render(){
   const named = all.filter(p=>p.name);
   document.getElementById('summary').innerHTML = [
     ['', '출근', all.filter(isIn).length + '/' + all.filter(p=>!isOffToday(p)).length],
-    ['ins', '근로자', named.filter(p=>staffType(p)==='ins').length],
+    ['ins', '4대보험', named.filter(p=>staffType(p)==='ins').length],
+    ['ins2', '2대보험', named.filter(p=>staffType(p)==='ins2').length],
     ['tax', '소득세', named.filter(p=>staffType(p)==='tax').length],
     ['daily', '일용직', named.filter(p=>staffType(p)==='daily').length],
     ['permit', '퍼밋', named.filter(p=>p.permit).length]
@@ -1140,10 +1197,12 @@ function openMemo(sec, i){
   document.getElementById('mWage').value = p.wage || '';
   document.getElementById('mHours').value = p.hours || '';
   document.getElementById('mDayHours').value = p.dayHours || '';
+  document.getElementById('mMonthly').value = p.monthly || '';
   updContact(); updDday();
   calMonth = viewMonth; calOff = (p.off||[]).slice(); calWork = (p.workDays||[]).slice();
   document.getElementById('mDayWage').value = p.dayWage || '';
   mType = 'x'; setMType(staffType(p));
+  setPayType(p.payType==='monthly' ? 'monthly' : 'hourly');
   updPay();
   document.getElementById('mSaved').textContent = p.memoAt ? '마지막 저장: ' + new Date(p.memoAt).toLocaleString('ko-KR') : '';
   document.getElementById('memoModal').classList.add('show');
@@ -1163,6 +1222,8 @@ function saveMemo(){
   p.wage = document.getElementById('mWage').value;
   p.hours = document.getElementById('mHours').value.trim();
   p.dayHours = document.getElementById('mDayHours').value;
+  p.monthly = document.getElementById('mMonthly').value;
+  p.payType = mPayType;
   p.dayWage = document.getElementById('mDayWage').value;
   TYPES.forEach(t=>{ p[t] = (mType===t); });
   if(mType==='daily' && !p.role) p.role = '일용';
@@ -1271,7 +1332,7 @@ function importData(input){
   r.readAsText(f);
 }
 function closeImp(){ document.getElementById('impModal').classList.remove('show'); pendingImport = null; }
-function isEmptyStaff(p){ return !p.name && !p.memo && !p.phone && !p.joinDate && !p.leaveDate && !(p.off||[]).length && !p.permit && !p.tax && !p.ins && !p.wage && !p.permitExp && !p.rrn && !p.daily && !(p.workDays||[]).length; }
+function isEmptyStaff(p){ return !p.name && !p.memo && !p.phone && !p.joinDate && !p.leaveDate && !(p.off||[]).length && !p.permit && !p.tax && !p.ins && !p.ins2 && !p.wage && !p.monthly && !p.permitExp && !p.rrn && !p.daily && !(p.workDays||[]).length; }
 function stamp2(p){ return Number(p.updatedAt || p.memoAt || 0); }
 /* 합치기: 직원마다 더 최근에 고친 쪽을 남김 */
 function mergeData(mine, theirs){
