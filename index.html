@@ -292,6 +292,12 @@ header .title{font-size:29px;font-weight:700;letter-spacing:-1.2px;line-height:1
 .dailyBar button.pay{grid-column:1/-1;border-color:#b7e0cc;background:#effaf4;color:#168364}.dailyBar button.pay small{color:#4f9a7c}
 .dlAmt::-webkit-inner-spin-button,.dlAmt::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.dlAmt{-moz-appearance:textfield}
 .dlDays{font-size:12px;color:#55627a;padding:6px 4px 0;display:flex;align-items:center;gap:5px;flex-wrap:wrap}.dlDays input{width:52px;padding:6px!important;font-size:14px!important;text-align:center}.dlDays.need{color:#c06a00}.dlDays.need input{background:#fff2cc!important;border-color:#e3b366!important}
+.callBox{border:1px solid #d6def3;background:#f6f8ff;border-radius:11px;padding:8px 10px;margin:0 0 10px}.callBox.empty{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:#727c8e}.callBox button{border:1px solid #c9d5fb;background:#fff;color:#315bf5;border-radius:8px;padding:6px 9px;font-family:inherit;font-size:12px;font-weight:700}
+.callHead{display:flex;align-items:center;gap:6px;font-weight:800;font-size:13.5px;color:#2545ca;margin-bottom:4px}.callHead small{font-weight:500;color:#7d8fc9;flex:1}
+.callDay{display:grid;grid-template-columns:auto 1fr auto;gap:6px;align-items:center;padding:7px 4px;border-top:1px solid #e3e9fa;font-size:12.5px;cursor:pointer}.callDay.cur{background:#e7edff;border-radius:7px}.callDay .cd{font-weight:700;color:#1c2434;white-space:nowrap}.callDay .cw{color:#55627a}.callDay .cw i{font-style:normal;color:#b23b3b;margin:0 4px 0 2px;padding:0 3px}
+.callDay .cs{font-size:11px;font-weight:700;padding:3px 7px;border-radius:20px;white-space:nowrap}.cs.ok{background:#e7f5ef;color:#168364}.cs.plan{background:#eef1f6;color:#727c8e}.cs.todo{background:#fff2cc;color:#8a4b00}.cs.bad{background:#fde8e8;color:#b23b3b}
+.callAlert{border:1px solid #f3c2c2;background:#fff5f5;border-radius:12px;padding:11px 12px;margin:0 0 12px}.callAlert b{color:#b23b3b;font-size:13.5px}.callAlert div{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}.callAlert button{border:1px solid #f3c2c2;background:#fff;color:#b23b3b;border-radius:20px;padding:6px 10px;font-family:inherit;font-size:12.5px;font-weight:700}.callAlert small{color:#a26b6b;font-size:11.5px}
+.callGrp{border:1px solid #e4e8f0;border-radius:10px;padding:8px 10px;margin-top:8px}.callGrp b{font-size:13.5px}.callRow{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;font-size:13px;padding:5px 0;border-top:1px solid #f0f2f6;color:#55627a}
 .dlNote{font-size:11.5px;color:#8a4b00;padding:4px 4px 0}
 .dlClip{display:block;width:100%;padding:14px;border-radius:12px;border:0;background:#315bf5;color:#fff;font-family:inherit;font-size:16px;font-weight:800;margin-bottom:10px}.dlClip small{display:block;font-size:11.5px;font-weight:500;opacity:.85;margin-top:2px}
 .dlRegHead{font-size:12.5px;font-weight:700;color:#1c2434;margin:2px 0 6px}.dlRegHead small{font-weight:500;color:#8a95a7;margin-left:4px}
@@ -359,6 +365,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
 <div id="searchRes"></div>
 <div class="quickHeading">자주 쓰는 업무</div><div id="backupArea"></div>
 <div id="alertArea"></div>
+<div id="callAlert"></div>
 <div class="dailyBar"><button onclick="openDaily()">🧾 일용직 오늘 등록<small>명단 붙여넣기 · 반/풀 체크</small></button><button onclick="openDailyMonth()">📅 일용직 한 달 리스트<small>매장별 인원·금액·공유</small></button><button class="pay" onclick="openPay()">💰 일용직 입금 기록<small>입금한 날짜와 명단</small></button></div>
 <button class="bkOpen" onclick="openBackup()">백업 · 다른 기기로 옮기기</button>
 <div id="peopleOverview"></div><div class="detailPane">
@@ -540,6 +547,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
     <div class="dlDateRow"><button onclick="dlMoveDate(-1)">◀</button><input type="date" id="dlDate" onchange="if(this.value){dlDate=this.value;renderDaily()}"><button onclick="dlMoveDate(1)">▶</button></div>
     <div class="dlDayName" id="dlDayName"></div>
     <label class="dlPrem"><input type="checkbox" id="dlPrem" onchange="dlTogglePrem(this.checked)"><span id="dlPremTxt"></span></label>
+    <div id="dlCalls"></div>
     <button class="dlClip" onclick="dlClipboard()">📋 복사한 명단 바로 넣기<small>카톡에서 명단 복사 → 이 버튼 한 번</small></button>
     <div id="dlRegulars"></div>
     <div id="dlBulk"></div>
@@ -556,6 +564,19 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
 </div>
 
 
+
+<!-- 업체 호출 붙여넣기 -->
+<div class="modalOverlay" id="callModal">
+  <div class="modalBox">
+    <h2>📞 업체 호출 붙여넣기</h2>
+    <div class="cfgHint">업체에 보낸 호출 카톡을 복사해 붙여넣으세요. 여러 메시지를 한꺼번에 붙여도 돼요.<br>예) "영등포점 이번주 금요일 홀 풀타임 1명", "구로 화수목금 주방1분씩"</div>
+    <button class="dlClip" style="margin-top:10px" onclick="callClipboard()">📋 복사한 호출 바로 넣기</button>
+    <textarea id="callBox" style="width:100%;min-height:110px;box-sizing:border-box" placeholder="여기에 붙여넣기" oninput="callPreview()"></textarea>
+    <div class="field" style="margin-top:8px"><label>"이번주" 기준 (월요일)</label><input type="date" id="callWeek" onchange="callPreview()"><div class="cfgHint" id="callWeekTxt"></div></div>
+    <div id="callPrev"></div>
+    <div class="btnRow" style="margin-top:12px"><button class="bGray" onclick="closeCalls()">닫기</button><button class="bRed" id="callSaveBtn" onclick="saveCalls()">저장</button></div>
+  </div>
+</div>
 
 <!-- 매장 전체 휴무표 -->
 <div class="modalOverlay bigModal" id="offModal">
@@ -1306,6 +1327,7 @@ function closeDaily(){
   document.getElementById('dailyModal').classList.remove('show');
   if(document.getElementById('dmModal').classList.contains('show')) renderDailyMonth();
   if(document.getElementById('payModal').classList.contains('show')) renderPay();
+  renderCallAlert();
   taxReopen();
 }
 function dlMoveDate(n){ const d = new Date(dlDate+'T00:00:00'); d.setDate(d.getDate()+n); dlDate = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); renderDaily(); }
@@ -1322,6 +1344,7 @@ function renderDaily(){
     regs.map(r=>`<button data-n="${esc(r.name)}" onclick="dlAddRegular(this.dataset.n)">${esc(r.name)}<small>${DL_NAME[r.type]||''}</small></button>`).join('') + `</div>` : '';
   const unset = list.filter(x=>dlNorm(x.name) && !x.type && !x.amt).length;
   document.getElementById('dlBulk').innerHTML = unset ? `<div class="dlBulk"><span>금액 안 넣은 ${unset}명</span><button onclick="dlSetAll('half')">모두 반타임</button><button onclick="dlSetAll('full')">모두 풀타임</button></div>` : '';
+  renderWeekCalls();
   document.getElementById('dlList').innerHTML = list.length ? list.map((x,k)=>`
     <div class="dlCard${x.guess ? ' guess' : ''}">
       <div class="dlRow">
@@ -1633,6 +1656,149 @@ function taxFixDaily(sid, name){
   taxReturn = true;
   openDaily(sid, ds || today());
   toast(name + ' 등록번호를 넣어 주세요');
+}
+
+/* ---------- 업체 호출(파출 요청) — 주간 호출 리스트 · 입금 놓침 알림 ---------- */
+const DAYS7 = '월화수목금토일';
+function ymdOf(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function addDays(ds, n){ const d = new Date(ds+'T00:00:00'); d.setDate(d.getDate()+n); return ymdOf(d); }
+function mondayOf(ds){ const d = new Date(ds+'T00:00:00'); d.setDate(d.getDate() - (d.getDay()+6)%7); return ymdOf(d); }
+/* "이번주": 일요일에 보낸 호출은 다음날(월)부터의 주, 그 외에는 그 주 */
+function callWeekFor(ds){ return new Date(ds+'T00:00:00').getDay()===0 ? addDays(ds, 1) : mondayOf(ds); }
+function callsAll(){ allData.__calls = allData.__calls || []; return allData.__calls; }
+function callPart(t){ return /홀|서빙/.test(t) ? '홀' : /설거지|세척/.test(t) ? '설거지' : /주방|스끼|조리/.test(t) ? '주방' : ''; }
+function callType(t){ return /풀\s*타임|종일|(^|[^가-힣])풀([^가-힣]|$)/.test(t) ? 'full' : /반\s*타임|(^|[^가-힣])반([^가-힣]|$)/.test(t) ? 'half' : ''; }
+function callNote(t){ const m = t.match(/오전|오후|저녁|점심|마감|미들/); return m ? m[0] : ''; }
+function callCnt(t){ const m = t.match(/(\d+)\s*(명|분|인)/); return m ? Number(m[1]) : 0; }
+function expandDays(g){
+  const tk = g.replace(/요일/g,'').match(/[월화수목금토일]|[~\-]/g) || [], out = [];
+  for(let i=0;i<tk.length;i++){
+    if((tk[i]==='~' || tk[i]==='-') && out.length && tk[i+1] && DAYS7.includes(tk[i+1])){
+      let a = DAYS7.indexOf(out[out.length-1]), b = DAYS7.indexOf(tk[i+1]);
+      for(let k=a+1;k<b;k++) out.push(DAYS7[k]);
+      continue;
+    }
+    if(DAYS7.includes(tk[i]) && !out.includes(tk[i])) out.push(tk[i]);
+  }
+  return out;
+}
+function parseCalls(text, baseWeek){
+  const out = [];
+  let store = '', msgWeek = baseWeek, ctxWeek = baseWeek, pend = [];
+  const dayRe = /(^|[^가-힣\d])([월화수목금토일](?:요일)?(?:\s*[,·\/~\-]?\s*[월화수목금토일](?:요일)?)*)(?![가-힣])/g;
+  String(text||'').replace(/\r/g,'').split('\n').forEach(raw=>{
+    let t = raw.trim();
+    if(!t){ store = ''; pend = []; ctxWeek = msgWeek; return; }
+    // 날짜 머리줄: "2026년 11월 8일 일요일", "--- 2026년 11월 8일 일요일 ---"
+    let m = t.match(/(\d{4})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일/);
+    if(m && /^[\s\-=]*\d{4}\s*년[^가-힣]*월[^가-힣]*일\s*[월화수목금토일]?요일?[\s\-=>]*$/.test(t)){
+      msgWeek = ctxWeek = callWeekFor(m[1]+'-'+m[2].padStart(2,'0')+'-'+m[3].padStart(2,'0')); store = ''; pend = []; return;
+    }
+    // 카톡 내보내기 머리: "[이름] [오후 4:04] 내용", "2026. 11. 8. 오후 4:04, 이름 : 내용"
+    m = t.match(/^(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})\.\s*(오전|오후)?\s*\d{1,2}:\d{2},\s*[^:]{1,30}:\s*/);
+    if(m){ msgWeek = ctxWeek = callWeekFor(m[1]+'-'+m[2].padStart(2,'0')+'-'+m[3].padStart(2,'0')); t = t.slice(m[0].length); store = ''; pend = []; }
+    const k = t.match(/^\[[^\]]{1,30}\]\s*\[(오전|오후)\s*\d{1,2}:\d{2}\]\s*/);
+    if(k){ t = t.slice(k[0].length); store = ''; pend = []; ctxWeek = msgWeek; }
+    const st = STORES.find(s=>t.includes(s.name)); if(st) store = st.id;
+    if(/다음\s*주/.test(t)) ctxWeek = addDays(msgWeek, 7); else if(/이번\s*주/.test(t)) ctxWeek = msgWeek;
+    const groups = []; let g; dayRe.lastIndex = 0;
+    while((g = dayRe.exec(t))){ const start = g.index + g[1].length; groups.push({start, end: start + g[2].length, days: expandDays(g[2])}); }
+    if(!groups.length){
+      // 요일이 앞줄에 있고 내용(홀 풀타임 1명)이 다음 줄에 온 경우
+      if(pend.length){ const p = callPart(t), ty = callType(t), no = callNote(t), c = callCnt(t); pend.forEach(e=>{ if(!e.part && p) e.part = p; if(!e.type && ty) e.type = ty; if(!e.note && no) e.note = no; if(!e.cntSet && c){ e.cnt = c; e.cntSet = true; } }); }
+      return;
+    }
+    pend = [];
+    const pre = t.slice(0, groups[0].start);
+    groups.forEach((gr, i)=>{
+      const spec = t.slice(gr.end, i+1 < groups.length ? groups[i+1].start : t.length);
+      const part = callPart(spec) || callPart(pre), type = callType(spec) || callType(pre), note = callNote(spec) || callNote(pre), c = callCnt(spec) || callCnt(pre);
+      gr.days.forEach(d=>{
+        const e = {store, date: addDays(ctxWeek, DAYS7.indexOf(d)), part, type, note, cnt: c || 1, cntSet: !!c};
+        out.push(e); pend.push(e);
+      });
+    });
+  });
+  return out.map(e=>({store:e.store, date:e.date, part:e.part, type:e.type, note:e.note, cnt:e.cnt}));
+}
+let callParsed = [];
+function openCalls(){
+  document.getElementById('callBox').value = '';
+  document.getElementById('callWeek').value = callWeekFor(today());
+  callPreview(); document.getElementById('callModal').classList.add('show');
+}
+function closeCalls(){ document.getElementById('callModal').classList.remove('show'); }
+async function callClipboard(){
+  let t = ''; try{ t = await navigator.clipboard.readText(); }catch(e){}
+  if(!t || !t.trim()){ document.getElementById('callBox').focus(); toast('아래 칸에 길게 눌러 붙여넣기 하세요'); return; }
+  document.getElementById('callBox').value = t; callPreview();
+}
+function callLabel(c){ return [c.part, DL_NAME[c.type] || '', c.note].filter(Boolean).join(' ') || '파출'; }
+function callPreview(){
+  const wk = document.getElementById('callWeek').value || callWeekFor(today());
+  document.getElementById('callWeekTxt').textContent = `이번주 = ${fmtD(wk)}(월) ~ ${fmtD(addDays(wk,6))}(일)`;
+  callParsed = parseCalls(document.getElementById('callBox').value, wk);
+  const ok = callParsed.filter(c=>c.store), bad = callParsed.length - ok.length;
+  const by = {}; ok.forEach(c=>{ (by[c.store] = by[c.store] || []).push(c); });
+  document.getElementById('callPrev').innerHTML = callParsed.length ? Object.keys(by).map(sid=>{
+    const st = STORES.find(x=>x.id===sid);
+    return `<div class="callGrp"><b>${esc(st.name)}점</b>${by[sid].sort((a,b)=>a.date<b.date?-1:1).map(c=>`<div class="callRow"><span>${dlDayName(c.date)}</span><span>${esc(callLabel(c))}</span><span>${c.cnt}명</span></div>`).join('')}</div>`;
+  }).join('') + (bad ? `<div class="warn" style="margin-top:6px">⚠ 매장 이름이 없는 호출 ${bad}건은 빼요 (메시지에 매장 이름을 넣어 주세요)</div>` : '')
+    : '<div class="dlEmpty">카톡에서 업체에 보낸 호출 메시지를 복사해 붙여넣으세요.<br>여러 메시지를 한꺼번에 붙여도 돼요.</div>';
+  document.getElementById('callSaveBtn').textContent = ok.length ? `호출 ${ok.reduce((a,c)=>a+c.cnt,0)}명 저장` : '저장';
+}
+function saveCalls(){
+  const ok = callParsed.filter(c=>c.store);
+  if(!ok.length){ toast('저장할 호출이 없어요'); return; }
+  const C = callsAll(), now = Date.now();
+  ok.forEach(c=>{
+    const key = [c.store, c.date, c.part, c.type, c.note].join('|');
+    const ex = C.find(x=>!x.del && [x.store, x.date, x.part, x.type, x.note].join('|')===key);
+    if(ex){ ex.cnt = c.cnt; ex.at = now; }                 // 같은 메시지를 다시 붙여도 두 번 쌓이지 않음
+    else C.push(Object.assign({id:uid(), at:now}, c));
+  });
+  persist(); closeCalls(); renderCallAlert();
+  if(document.getElementById('dailyModal').classList.contains('show')) renderDaily();
+  toast(`호출 ${ok.length}건 저장 · 매일 일용직 등록 화면 위에 보여요`);
+}
+function callDel(id){
+  const c = callsAll().find(x=>x.id===id); if(!c) return;
+  if(!confirm(`${dlDayName(c.date)} ${callLabel(c)} ${c.cnt}명 호출을 지울까요?`)) return;
+  c.del = true; c.at = Date.now(); persist(); renderDaily(); renderCallAlert();
+}
+/* 호출한 날의 상태: 명단 입력·입금 여부 */
+function callStatus(sid, ds, cnt){
+  const d = dlDay(sid, ds, false), n = d ? d.list.filter(x=>dlNorm(x.name)).length : 0, paid = !!(d && d.paid), td = today();
+  if(paid) return {cls:'ok', txt:'✓ 입금'};
+  if(ds > td) return {cls:'plan', txt:'예정'};
+  if(!n) return {cls: ds < td ? 'bad' : 'todo', txt: ds < td ? '명단·입금 없음' : '명단 입력'};
+  if(n < cnt) return {cls:'todo', txt:`명단 ${n}/${cnt}명`};
+  return {cls: ds < td ? 'bad' : 'todo', txt: ds < td ? '입금 기록 없음' : '입금 전'};
+}
+function renderWeekCalls(){
+  const el = document.getElementById('dlCalls'); if(!el) return;
+  const wk = mondayOf(dlDate), end = addDays(wk, 6);
+  const L = callsAll().filter(c=>!c.del && c.store===dlStore && c.date>=wk && c.date<=end).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
+  const st = STORES.find(x=>x.id===dlStore);
+  if(!L.length){ el.innerHTML = `<div class="callBox empty">📞 ${esc(st.name)}점 이번 주 호출 없음 <button onclick="openCalls()">호출 붙여넣기</button></div>`; return; }
+  const byDate = {}; L.forEach(c=>{ (byDate[c.date] = byDate[c.date] || []).push(c); });
+  el.innerHTML = `<div class="callBox"><div class="callHead">📞 ${esc(st.name)}점 이번 주 호출 <small>${fmtD(wk)}~${fmtD(end)}</small><button onclick="openCalls()">+ 붙여넣기</button></div>` +
+    Object.keys(byDate).map(ds=>{
+      const cs = byDate[ds], cnt = cs.reduce((a,c)=>a+c.cnt,0), s = callStatus(dlStore, ds, cnt);
+      return `<div class="callDay ${ds===dlDate?'cur':''}" onclick="dlDate='${ds}';renderDaily()"><span class="cd">${dlDayName(ds)}</span><span class="cw">${cs.map(c=>`${esc(callLabel(c))} ${c.cnt}명<i onclick="event.stopPropagation();callDel('${c.id}')">✕</i>`).join(', ')}</span><span class="cs ${s.cls}">${s.txt}</span></div>`;
+    }).join('') + `</div>`;
+}
+/* 첫 화면 경고: 지난 14일 동안 호출했는데 입금 기록이 없는 날 */
+function renderCallAlert(){
+  const el = document.getElementById('callAlert'); if(!el) return;
+  const td = today(), from = addDays(td, -14), miss = new Map();
+  callsAll().filter(c=>!c.del && c.date < td && c.date >= from).forEach(c=>{
+    const d = dlDay(c.store, c.date, false); if(d && d.paid) return;
+    const k = c.store + '|' + c.date; miss.set(k, (miss.get(k) || 0) + c.cnt);
+  });
+  if(!miss.size){ el.innerHTML = ''; return; }
+  const items = [...miss.entries()].sort().map(([k,n])=>{ const [sid, ds] = k.split('|'), st = STORES.find(x=>x.id===sid) || {name:sid}; return `<button onclick="openDaily('${sid}','${ds}')">${esc(st.name)} ${dlDayName(ds)} ${n}명</button>`; });
+  el.innerHTML = `<div class="callAlert"><b>⚠ 호출했는데 입금 기록이 없어요 (${miss.size}일)</b><div>${items.join('')}</div><small>눌러서 명단을 넣고 💰 입금 완료를 누르세요</small></div>`;
 }
 
 /* ---------- 세무사 전달 자료 ---------- */
@@ -1949,7 +2115,7 @@ function switchStore(id){
   viewMonth = today().slice(0,7); render(); window.scrollTo(0,0);
 }
 function render(){
-  renderPeopleOverview();
+  renderPeopleOverview(); try{ renderCallAlert(); }catch(e){}
   const st = STORES.find(x=>x.id===storeId);
   document.getElementById('hTitle').textContent = document.querySelector('.appMain').classList.contains('overviewMode') ? '매장과 직원, 한눈에' : st.name + '점 직원 리스트';
   document.getElementById('storeTabs').innerHTML = STORES.map(x=>`<button class="storeTab ${x.id===storeId?'on':''}" onclick="switchStore('${x.id}')">${esc(x.name)}</button>`).join('');
@@ -2347,6 +2513,8 @@ function mergeData(mine, theirs){
   const pdel = Object.assign({}, mine.__payDel||{}, theirs.__payDel||{}); out.__payDel = pdel;
   const pm = new Map(); [...(mine.__pay||[]), ...(theirs.__pay||[])].forEach(r=>{ const o = pm.get(r.id); if(!o || (r.edited||r.at) > (o.edited||o.at)) pm.set(r.id, r); });
   out.__pay = [...pm.values()].filter(r=>!pdel[r.id]);
+  const cm = new Map(); [...(mine.__calls||[]), ...(theirs.__calls||[])].forEach(c=>{ const o = cm.get(c.id); if(!o || (c.at||0) > (o.at||0)) cm.set(c.id, c); });
+  out.__calls = [...cm.values()];
   out.__mig = Object.assign({}, theirs.__mig||{}, mine.__mig||{});
   return {out, added, updated};
 }
