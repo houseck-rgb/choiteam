@@ -453,7 +453,9 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
         <button type="button" data-v="yes" onclick="setPermitSt('yes')">✅ 준비됨</button>
         <button type="button" data-v="local" onclick="setPermitSt('local')">내국인<br><small>필요 없음</small></button>
       </div>
-      <label>워킹퍼밋 만료일</label>
+      <label>워킹퍼밋 허가일 <small style="font-weight:500;color:#8a95a7">— 2대보험 입사일로 세무사 엑셀에 들어가요</small></label>
+      <input type="date" id="mPermitFrom">
+      <label style="margin-top:8px">워킹퍼밋 만료일</label>
       <input type="date" id="mPermitExp" onchange="updDday()">
       <div class="dday" id="mDday"></div>
     </div>
@@ -2034,13 +2036,11 @@ function taxEntries(ym, sid){
     if(t==='daily'){ e.d = calcDaily(p, ym); if(!e.d.n) return; }
     else { if(!activeInMonth(p, ym)) return; e.r = calcPay(p, ym); }
     if(t==='none') e.miss.push('신고구분');
-    if(rrnDigits(p).length!==13) e.miss.push('주민(외국인)등록번호');
-    if(t!=='daily' && !p.joinDate) e.miss.push('입사일');
-    if(t==='daily' ? !e.d.w : !e.r.gross) e.miss.push(t==='daily' ? '일당' : '급여액');
-    if(!p.bank) e.miss.push('은행');
-    if(!(p.acct||'').replace(/\D/g,'')) e.miss.push('계좌번호');
-    if(e.nat==='외국인' && !p.visa) e.miss.push('체류자격');
-    if(!e.nat) e.miss.push('내·외국인');
+    if(t==='none') e.miss[e.miss.length-1] = '신고구분 없음 (엑셀 "구분없음" 시트로 감)';
+    if(rrnDigits(p).length!==13) e.miss.push('등록번호');
+    if(t==='ins' && !p.joinDate) e.miss.push('입사일');
+    if(t==='ins2' && !p.permitFrom) e.miss.push('워킹퍼밋 허가일(2대보험 입사일)');
+    if(t==='daily' ? !e.d.gross : !e.r.gross) e.miss.push('급여');
     out.push(e);
   })));
   // 일용직 일일 등록(붙여넣기) 기록 — 이름이 같은 직원 카드가 있으면 주민번호·계좌를 거기서 가져옴
@@ -2126,154 +2126,79 @@ function fillFromMemo(){
 
 function makeTaxFile(ym, sid, withRrn){ const b = makeTaxBook(ym, sid, withRrn); const blob = buildXlsx(b.sheets); return new File([blob], b.name, {type: blob.type}); }
 function makeTaxBook(ym, sid, withRrn){
+  /* 세무사 전달용: 4대보험 · 소득세 · 일용직 3개 시트, 시트 안에서 매장별로 나눔. 성함 · 등록번호 · 급여 중심 */
   const [yy, mm] = ym.split('-').map(Number), SL = storeList(sid);
-  const COMPANY = COMPANY_NAME + (sid ? ' ' + SL[0].name + '점' : ' (전 매장)');
+  const COMPANY = COMPANY_NAME + (sid ? ' ' + SL[0].name + '점' : '');
   const E = taxEntries(ym, sid), made = today();
   const C = (v, s)=>({v, s});
-  const miss = (v, need)=> (v===''||v==null) ? C('', need && withRrn!==false ? XS.miss : XS.txt) : C(v, XS.txt);
-  const missN = (v)=> (v===''||v==null||v===0) ? C('', XS.missNum) : C(v, XS.num);
-  const rrnCell = e=> withRrn ? (rrnDigits(e.p).length===13 ? C(e.p.rrn, XS.ctr) : C(e.p.rrn||'', XS.miss)) : C('(제외)', XS.ctr);
-  const acctCells = e=> withRrn ? [miss(e.p.bank||'', true), miss(e.p.acct||'', true)] : [C('(제외)', XS.ctr), C('(제외)', XS.ctr)];
-  const natCell = e=> e.nat ? C(e.nat, XS.ctr) : C('', XS.miss);
-  const visaCell = e=> e.nat==='외국인' ? miss(e.p.visa||'', true) : C(e.p.visa||'', XS.ctr);
+  const rrnC = p=> !withRrn ? C('(제외)', XS.ctr) : (rrnDigits(p).length===13 ? C(p.rrn, XS.ctr) : C(p.rrn||'', XS.miss));
+  const pay = v=> v ? C(v, XS.num) : C('', XS.missNum);
+  const showName = n=>String(n||'').replace(/\s*\(/, ' (');
   const note = e=>{
     const p = e.p, a = [];
-    if(p.joinDate && p.joinDate.slice(0,7)===ym) a.push(fmtD(p.joinDate) + ' 입사');
-    if(p.leaveDate && p.leaveDate.slice(0,7)===ym) a.push(fmtD(p.leaveDate) + ' 퇴사');
-    if(e.r && e.r.isMonthly && e.r.act && e.r.act.n < e.r.act.days) a.push('일할계산 ' + e.r.act.n + '/' + e.r.act.days + '일');
-    if(p.permitExp) a.push('퍼밋 만료 ' + p.permitExp);
-    const ms = markSummary(p, ym); if(ms.absent) a.push('결근 ' + ms.absent + '일'); if(ms.half) a.push('반타임 ' + ms.half + '회');
+    if(e.t!=='daily'){
+      if(p.joinDate && p.joinDate.slice(0,7)===ym) a.push(fmtD(p.joinDate) + ' 입사');
+      if(p.leaveDate && p.leaveDate.slice(0,7)===ym) a.push(fmtD(p.leaveDate) + ' 퇴사');
+      if(e.r && e.r.isMonthly && e.r.act && e.r.act.n < e.r.act.days) a.push('일할 ' + e.r.act.n + '/' + e.r.act.days + '일');
+    }
     return a.join(' · ');
   };
-  const title = (t, n)=>[[C(`${yy}년 ${mm}월 ${t} — ${COMPANY}`, XS.title)], [C(`귀속월 ${yy}-${String(mm).padStart(2,'0')} · 작성일 ${made} · ${n}명 · 노란 칸은 비어 있어 확인이 필요해요`, XS.note)]];
-  const head = cols => cols.map(c=>C(c, XS.head));
-  const totalRow = (len, nameCol, sumCols, first, last)=>{
-    const r = Array.from({length:len}, ()=>C('', XS.totTxt));
-    r[0] = C('합계', XS.totTxt); r[nameCol] = C((last-first+1>0 ? last-first+1 : 0) + '명', XS.totTxt);
-    sumCols.forEach(([ci, val])=>{ const L = colName(ci); r[ci] = last>=first ? {f:`SUM(${L}${first}:${L}${last})`, v:val, s:XS.totNum} : C(0, XS.totNum); });
-    return r;
-  };
-  const sheets = [], summary = {};
-  // 근로자 시트 (4대 / 2대 / 미분류)
-  const WCOLS = ['번호','매장','파트','직급','성명','주민(외국인)등록번호','내·외국인','체류자격','입사일(취득일)','퇴사일(상실일)','급여형태','월급','시급','하루 근무시간','근무일수','세전 지급액','은행','계좌번호','연락처','비고'];
-  const WW = [5,7,8,7,16,17,8,8,12,12,8,11,9,8,8,12,11,18,14,26];
-  ['ins','ins2','none'].forEach(t=>{
-    const L = E.filter(e=>e.t===t); if(t==='none' && !L.length) return;
-    const cols = t==='none' ? WCOLS.concat(['신고구분(세무사 확인)']) : WCOLS;
-    const rows = title(TAX_SHEET[t] + (t==='none' ? ' (신고구분 확인 필요)' : ' 대상자'), L.length); rows.push(head(cols));
-    const first = rows.length + 1;
-    L.forEach((e,k)=>{
-      const p = e.p, r = e.r, mon = r.isMonthly;
-      const row = [C(k+1, XS.ctr), C(e.st.name, XS.txt), C(e.sec.name, XS.txt), C(p.role||'', XS.txt), C(p.name, XS.txt), rrnCell(e), natCell(e), visaCell(e),
-        miss(p.joinDate||'', true), C(p.leaveDate||'', XS.ctr), C(mon?'월급제':'시급제', XS.ctr),
-        mon ? missN(num(p.monthly)) : C('', XS.num), mon ? C('', XS.num) : missN(num(p.wage)), mon ? C('', XS.num) : missN(num(p.dayHours)),
-        C(r.wd, XS.num), missN(r.gross), ...acctCells(e), C(p.phone||'', XS.txt), C(note(e), XS.txt)];
-      if(t==='none') row.push(C('', XS.miss));
-      rows.push(row);
-    });
-    const last = rows.length;
-    rows.push(totalRow(cols.length, 4, [[15, L.reduce((a,e)=>a+e.r.gross,0)]], first, last));
-    sheets.push({name:TAX_SHEET[t], rows, widths: t==='none' ? WW.concat([16]) : WW, headRow:2});
-    summary[t] = {sheet:TAX_SHEET[t], gross:'P', first, last};
-  });
-  // 사업소득 3.3%
-  {
-    const L = E.filter(e=>e.t==='tax');
-    const cols = ['번호','매장','파트','직급','성명','주민(외국인)등록번호','내·외국인','체류자격','입사일','퇴사일','급여형태','월급','시급','하루 근무시간','근무일수','지급액(세전)','소득세(3%)','지방소득세(0.3%)','차인지급액','은행','계좌번호','연락처','비고'];
-    const rows = title('사업소득(3.3%) 지급명세', L.length); rows.push(head(cols));
-    const first = rows.length + 1;
-    let gs = 0, its = 0, lts = 0;
-    L.forEach((e,k)=>{
-      const p = e.p, r = e.r, mon = r.isMonthly, R = rows.length + 1;
-      const it = Math.floor(r.gross*0.03/10)*10, lt = Math.floor(r.gross*0.003/10)*10; gs += r.gross; its += it; lts += lt;
-      rows.push([C(k+1, XS.ctr), C(e.st.name, XS.txt), C(e.sec.name, XS.txt), C(p.role||'', XS.txt), C(p.name, XS.txt), rrnCell(e), natCell(e), visaCell(e),
-        miss(p.joinDate||'', true), C(p.leaveDate||'', XS.ctr), C(mon?'월급제':'시급제', XS.ctr),
-        mon ? missN(num(p.monthly)) : C('', XS.num), mon ? C('', XS.num) : missN(num(p.wage)), mon ? C('', XS.num) : missN(num(p.dayHours)),
-        C(r.wd, XS.num), missN(r.gross),
-        {f:`ROUNDDOWN(P${R}*0.03,-1)`, v:it, s:XS.num}, {f:`ROUNDDOWN(P${R}*0.003,-1)`, v:lt, s:XS.num}, {f:`P${R}-Q${R}-R${R}`, v:r.gross-it-lt, s:XS.num},
-        ...acctCells(e), C(p.phone||'', XS.txt), C(note(e), XS.txt)]);
-    });
-    const last = rows.length;
-    rows.push(totalRow(cols.length, 4, [[15,gs],[16,its],[17,lts],[18,gs-its-lts]], first, last));
-    rows.push([]); rows.push([C('· 소득세 3%, 지방소득세 0.3% (각각 10원 미만 버림) · 지급액은 앱에 입력된 월급·시급 기준', XS.note)]);
-    sheets.push({name:TAX_SHEET.tax, rows, widths:[5,7,8,7,16,17,8,8,11,11,8,11,9,8,8,12,11,11,12,11,18,14,26], headRow:2});
-    summary.tax = {sheet:TAX_SHEET.tax, gross:'P', first, last};
-  }
-  // 일용근로
-  {
-    const L = E.filter(e=>e.t==='daily');
-    const cols = ['번호','매장','파트','성명','주민(외국인)등록번호','내·외국인','체류자격','근무한 날','근무일수','근무 내역','총지급액','소득세','지방소득세','차인지급액','은행','계좌번호','연락처'];
-    const rows = title('일용근로소득 지급명세', L.length); rows.push(head(cols));
-    const first = rows.length + 1;
-    let g = 0, it = 0, lt = 0;
-    L.forEach((e,k)=>{
-      const p = e.p, d = e.d, R = rows.length + 1; g += d.gross; it += d.it; lt += d.lt;
-      rows.push([C(k+1, XS.ctr), C(e.st.name, XS.txt), C(e.sec.name, XS.txt), C(p.name, XS.txt), rrnCell(e), natCell(e), visaCell(e),
-        C(d.detail ? d.detail.map(r=>dlRecTxt(r)).join(' ') : d.days.map(fmtD).join(' '), XS.txt), C(d.n, XS.num),
-        C(d.detail ? `반 ${d.detail.filter(r=>r.type==='half').length} · 풀 ${d.detail.filter(r=>r.type==='full').length}` : (d.w ? '일당 ' + d.w.toLocaleString('ko-KR') : ''), d.detail || d.w ? XS.txt : XS.miss),
-        missN(d.gross), C(d.it, XS.num), C(d.lt, XS.num), {f:`K${R}-L${R}-M${R}`, v:d.net, s:XS.num},
-        ...acctCells(e), C(p.phone||'', XS.txt)]);
-    });
-    const last = rows.length;
-    rows.push(totalRow(cols.length, 3, [[8, L.reduce((a,e)=>a+e.d.n,0)],[10,g],[11,it],[12,lt],[13,g-it-lt]], first, last));
-    rows.push([]); rows.push([C('· 일용근로소득세 = (일당 − 15만원) × 6% × 45%, 하루 1,000원 미만은 안 냄 · 지방소득세 10% · 매일 지급 기준 · 단가: 평일 반 65,000 / 풀 120,000, 토·일·공휴일 반 70,000 / 풀 130,000 (앱에서 고친 금액 반영)', XS.note)]);
-    sheets.push({name:TAX_SHEET.daily, rows, widths:[5,7,8,16,17,8,8,34,8,12,12,9,9,12,11,18,14], headRow:2});
-    summary.daily = {sheet:TAX_SHEET.daily, gross:'K', first, last};
-  }
-  // 입퇴사 변동 (취득·상실 신고)
-  {
-    const cols = ['번호','매장','구분','날짜','성명','주민(외국인)등록번호','신고구분','파트','비고'];
-    const rows = [[C(`${yy}년 ${mm}월 입·퇴사 변동 (취득·상실 신고 대상) — ${COMPANY}`, XS.title)], [C(`작성일 ${made}`, XS.note)], head(cols)];
-    const find = id=>{ for(const st of STORES) for(const sec of st.sections){ const p = (allData[st.id][sec.id]||[]).find(x=>x.id===id); if(p) return p; } return null; };
-    const ev = [];
-    SL.forEach(st=>((allData.__log||{})[st.id]||[]).filter(x=>x.date && x.date.slice(0,7)===ym).forEach(x=>ev.push({st, x})));
-    ev.sort((a,b)=>a.x.date<b.x.date?-1:1).forEach((o,k)=>{
-      const p = find(o.x.staffId) || {}, t = p.name ? staffType(p) : 'none';
-      rows.push([C(k+1, XS.ctr), C(o.st.name, XS.txt), C(o.x.type==='join'?'입사(취득)':'퇴사(상실)', XS.ctr), C(o.x.date, XS.ctr), C(o.x.name||p.name||'', XS.txt),
-        withRrn ? (rrnDigits(p).length===13 ? C(p.rrn, XS.ctr) : C(p.rrn||'', XS.miss)) : C('(제외)', XS.ctr), C(TAX_LABEL[t], t==='none'?XS.miss:XS.txt), C(o.x.sec||'', XS.txt),
-        C(t==='daily' ? '일용직은 근로내용확인신고' : (t==='tax' ? '3.3%는 보험 취득·상실 신고 없음' : ''), XS.txt)]);
-    });
-    if(!ev.length) rows.push([C('', XS.txt), C(mm + '월 입·퇴사 없음', XS.txt)]);
-    sheets.push({name:'입퇴사변동', rows, widths:[5,7,11,11,16,17,16,9,28], headRow:2});
-  }
-  // 확인필요
-  {
-    const bad = E.filter(e=>e.miss.length);
-    const rows = [[C(`${yy}년 ${mm}월 확인 필요 항목 — 보내기 전에 채워 주세요`, XS.title)], [C(bad.length ? `${bad.length}명 · 앱에서 [엑셀 내보내기] → 이름을 눌러 바로 고칠 수 있어요` : '빠진 항목 없음', XS.note)], head(['번호','매장','성명','신고구분','빠진 항목','확인'])];
-    bad.forEach((e,k)=>rows.push([C(k+1, XS.ctr), C(e.st.name, XS.txt), C(e.p.name, XS.txt), C(TAX_LABEL[e.t], XS.txt), C(e.miss.join(', '), XS.txt), C('', XS.miss)]));
-    sheets.push({name:'확인필요', rows, widths:[5,7,18,16,50,8], headRow:2});
-  }
-  // 요약 (첫 장)
-  {
-    const types = ['ins','ins2','tax','daily','none'].filter(t=>summary[t]);
-    const q = n=>`'${n}'`;
-    const cols = ['매장', ...types.map(t=>TAX_LABEL[t]+' 인원'), '합계 인원', '지급액 합계(세전)'];
-    const rows = [[C(`${yy}년 ${mm}월 인건비 신고자료 — ${COMPANY}`, XS.title)],
-      [C(`귀속월 ${yy}-${String(mm).padStart(2,'0')} · 작성일 ${made} · 총 ${E.length}명` + (withRrn ? ' · 주민번호·계좌 포함 (전송 시 암호 걸기)' : ' · 주민번호·계좌 제외본'), XS.note)], [], head(cols)];
-    const fr = rows.length + 1, nT = types.length;
+  const SHEETS = [
+    {key:'ins', name:'4대보험', title:'4대보험', types:['ins','ins2'],
+     cols:['번호','성함','등록번호','입사일','급여(세전)','보험','비고'], widths:[6,22,18,13,14,16,22], payCol:4,
+     row:(e,k)=>{
+       const p = e.p, is2 = e.t==='ins2';
+       const jd = is2 ? (p.permitFrom || '') : (p.joinDate || '');
+       return [C(k, XS.ctr), C(showName(p.name), XS.txt), rrnC(p), jd ? C(jd, XS.ctr) : C(is2 && p.joinDate ? p.joinDate : '', XS.miss),
+         pay(e.r.gross), C(is2 ? '2대(고용·산재)' : '4대', XS.ctr),
+         C([is2 && !p.permitFrom ? '허가일 미입력' : '', note(e)].filter(Boolean).join(' · '), XS.txt)];
+     }},
+    {key:'tax', name:'소득세', title:'사업소득(3.3%)', types:['tax'],
+     cols:['번호','성함','등록번호','급여(세전)','비고'], widths:[6,22,18,14,22], payCol:3,
+     row:(e,k)=>[C(k, XS.ctr), C(showName(e.p.name), XS.txt), rrnC(e.p), pay(e.r.gross), C(note(e), XS.txt)]},
+    {key:'daily', name:'일용직', title:'일용근로', types:['daily'],
+     cols:['번호','성함','등록번호','근무일수','급여'], widths:[6,24,18,10,14], payCol:4,
+     row:(e,k)=>[C(k, XS.ctr), C(showName(e.p.name), XS.txt), rrnC(e.p), C(e.d.n, XS.num), pay(e.d.gross)]}
+  ];
+  const sheets = SHEETS.map(def=>{
+    const L = E.filter(e=>def.types.includes(e.t));
+    const rows = [[C(`${yy}년 ${mm}월 ${def.title} — ${COMPANY}`, XS.title)],
+      [C(`귀속월 ${yy}-${String(mm).padStart(2,'0')} · 작성일 ${made} · ${L.length}명` + (def.key==='ins' ? ' · 2대보험(고용·산재)은 워킹퍼밋 허가일을 입사일로 표기' : '') + ' · 노란 칸은 확인 필요', XS.note)],
+      def.cols.map(c=>C(c, XS.head))];
+    const P = colName(def.payCol), subs = [];
+    let n = 0;
     SL.forEach(st=>{
-      const R = rows.length + 1, row = [C(st.name, XS.txt)];
-      types.forEach(t=>{ const s = summary[t]; row.push({f:`COUNTIF(${q(s.sheet)}!B${s.first}:B${Math.max(s.last,s.first)},A${R})`, v:E.filter(e=>e.t===t && e.st.id===st.id).length, s:XS.num}); });
-      row.push({f:`SUM(B${R}:${colName(nT)}${R})`, v:E.filter(e=>e.st.id===st.id).length, s:XS.num});
-      row.push({f: types.map(t=>{ const s = summary[t]; return `SUMIF(${q(s.sheet)}!B${s.first}:B${Math.max(s.last,s.first)},A${R},${q(s.sheet)}!${s.gross}${s.first}:${s.gross}${Math.max(s.last,s.first)})`; }).join('+'),
-        v:E.filter(e=>e.st.id===st.id).reduce((a,e)=>a+(e.t==='daily'?e.d.gross:e.r.gross),0), s:XS.num});
-      rows.push(row);
+      const S = L.filter(e=>e.st.id===st.id); if(!S.length) return;
+      if(SL.length > 1 || !sid){ const hr = def.cols.map(()=>C('', XS.totTxt)); hr[1] = C(`■ ${st.name}점 (${S.length}명)`, XS.totTxt); rows.push(hr); }
+      const first = rows.length + 1;
+      S.forEach(e=>rows.push(def.row(e, ++n)));
+      const last = rows.length;
+      if(SL.length > 1 || !sid){
+        const sr = def.cols.map(()=>C('', XS.totTxt)); sr[1] = C(`${st.name}점 소계`, XS.totTxt);
+        sr[def.payCol] = {f:`SUM(${P}${first}:${P}${last})`, v:S.reduce((a,e)=>a+(e.t==='daily'?e.d.gross:e.r.gross),0), s:XS.totNum};
+        if(def.key==='daily') sr[3] = {f:`SUM(D${first}:D${last})`, v:S.reduce((a,e)=>a+e.d.n,0), s:XS.totNum};
+        rows.push(sr); subs.push(rows.length);
+      } else subs.push([first, last]);
     });
-    const lr = rows.length, tot = [C('합계', XS.totTxt)];
-    for(let ci=1; ci<=nT+2; ci++){ const L = colName(ci); const v = rows.slice(fr-1, lr).reduce((a,r)=>a+(r[ci].v||0),0); tot.push({f:`SUM(${L}${fr}:${L}${lr})`, v, s:XS.totNum}); }
-    rows.push(tot, []);
-    [ '시트 안내',
-      '· 4대보험 / 고용·산재(2대보험) / 사업소득(3.3%) / 일용근로: 신고구분별 명단과 그달 세전 지급액',
-      '· 미분류: 신고구분을 아직 정하지 않은 직원 — 세무사 확인 후 구분을 정해 주세요',
-      '· 입퇴사변동: 그달 취득·상실 신고 대상 / 확인필요: 비어 있는 항목 목록',
-      '· 노란 칸 = 비어 있거나 확인이 필요한 칸',
-      '· 지급액은 앱에 입력한 월급·시급·근무일 기준 참고값입니다 (주휴·연장·야간수당, 4대보험 근로자 공제 미포함)'
-    ].forEach((t,k)=>rows.push([C(t, k===0 ? XS.totTxt : XS.note)]));
-    sheets.unshift({name:'요약', rows, widths:[12, ...types.map(()=>13), 11, 16], headRow:3});
+    if(!n) rows.push([C('', XS.txt), C(`${mm}월 해당자 없음`, XS.txt)]);
+    else {
+      const tr = def.cols.map(()=>C('', XS.totTxt)); tr[0] = C('합계', XS.totTxt); tr[1] = C(`${n}명`, XS.totTxt);
+      const tot = L.reduce((a,e)=>a+(e.t==='daily'?e.d.gross:e.r.gross),0);
+      const ref = (L2)=> subs.map(x=>Array.isArray(x) ? `SUM(${L2}${x[0]}:${L2}${x[1]})` : `${L2}${x}`).join('+');
+      tr[def.payCol] = {f:ref(P), v:tot, s:XS.totNum};
+      if(def.key==='daily') tr[3] = {f:ref('D'), v:L.reduce((a,e)=>a+e.d.n,0), s:XS.totNum};
+      rows.push(tr);
+    }
+    return {name:def.name, rows, widths:def.widths, headRow:2};
+  });
+  const none = E.filter(e=>e.t==='none');
+  if(none.length){
+    const rows = [[C(`신고구분이 정해지지 않은 직원 — 4대보험·소득세·일용직 중 하나로 정해 주세요`, XS.title)], [C(`앱에서 이름을 눌러 구분을 고르면 다음 엑셀부터 해당 시트로 들어가요`, XS.note)],
+      ['번호','매장','성함','등록번호','급여(세전)'].map(c=>C(c, XS.head))];
+    none.forEach((e,k)=>rows.push([C(k+1, XS.ctr), C(e.st.name, XS.txt), C(showName(e.p.name), XS.txt), rrnC(e.p), pay(e.r.gross)]));
+    sheets.push({name:'구분없음', rows, widths:[6,10,22,18,14], headRow:2});
   }
-  const ORDER = ['요약', TAX_SHEET.ins, TAX_SHEET.ins2, TAX_SHEET.tax, TAX_SHEET.daily, TAX_SHEET.none, '입퇴사변동', '확인필요'];
-  sheets.sort((a,b)=>ORDER.indexOf(a.name)-ORDER.indexOf(b.name));
-  const name = `세무사전달_${ym}_` + (sid ? SL[0].name + '점_' : '전체매장_') + '인건비신고자료' + (withRrn ? '' : '_주민번호제외') + '.xlsx';
+  const name = `세무사전달_${ym}_` + (sid ? SL[0].name + '점_' : '전체매장_') + '인건비' + (withRrn ? '' : '_주민번호제외') + '.xlsx';
   return {name, sheets};
 }
 async function shareFiles(files, msg){
@@ -2494,6 +2419,7 @@ function openMemo(sec, i){
   document.getElementById('mAcct').value = p.acct || '';
   document.getElementById('mVisa').value = p.visa || '';
   document.getElementById('mPermitExp').value = p.permitExp || '';
+  document.getElementById('mPermitFrom').value = p.permitFrom || '';
   document.getElementById('mWage').value = p.wage || '';
   document.getElementById('mHours').value = p.hours || '';
   document.getElementById('mDayHours').value = p.dayHours || '';
@@ -2526,6 +2452,7 @@ function saveMemo(){
   p.acct = document.getElementById('mAcct').value.trim();
   p.visa = document.getElementById('mVisa').value.trim().toUpperCase();
   p.permitExp = document.getElementById('mPermitExp').value;
+  p.permitFrom = document.getElementById('mPermitFrom').value;
   p.local = (mPermitSt==='local'); p.permit = (mPermitSt==='yes');
   p.wage = document.getElementById('mWage').value;
   p.hours = document.getElementById('mHours').value.trim();
