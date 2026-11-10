@@ -301,6 +301,8 @@ header .title{font-size:29px;font-weight:700;letter-spacing:-1.2px;line-height:1
 .dmRow{cursor:pointer}.dmRow:active{background:#f3f6ff}.dmPen{color:#315bf5;font-size:11px}
 .deRec{display:grid;grid-template-columns:34px 1fr auto 52px auto 30px;gap:5px;align-items:center;margin-bottom:6px}.deRec span{font-size:12px;color:#727c8e;font-weight:700}.deRec em{font-style:normal;font-size:12px;color:#727c8e}.deRec input{padding:9px 6px!important;font-size:15px!important;min-width:0;text-align:right}.deRec button{border:0;background:none;color:#b23b3b;font-size:15px}.deRec.off{opacity:.4}.deRec.off input{text-decoration:line-through}
 .deTotal{text-align:right;font-size:13px;color:#55627a;margin-top:4px}.deTotal b{color:#1c2434;font-size:15px}
+.bkSent{margin:0 0 10px;padding:12px;border-radius:10px;background:#e7f5ef;border:1px solid #b7e0cc;color:#1c2434;font-size:13px;line-height:1.6}.bkSent b{color:#168364}.bkSent code{font-size:12px;background:#fff;padding:2px 6px;border-radius:5px;word-break:break-all}.bkSent small{color:#55627a}
+.bkMailBtns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.bkMailBtns a{flex:1 1 auto;text-align:center;padding:10px;border-radius:9px;background:#fff;border:1px solid #b7e0cc;color:#168364;font-weight:700;text-decoration:none;font-size:13px}
 .dlNote{font-size:11.5px;color:#8a4b00;padding:4px 4px 0}
 .dlClip{display:block;width:100%;padding:14px;border-radius:12px;border:0;background:#315bf5;color:#fff;font-family:inherit;font-size:16px;font-weight:800;margin-bottom:10px}.dlClip small{display:block;font-size:11.5px;font-weight:500;opacity:.85;margin-top:2px}
 .dlRegHead{font-size:12.5px;font-weight:700;color:#1c2434;margin:2px 0 6px}.dlRegHead small{font-weight:500;color:#8a95a7;margin-left:4px}
@@ -366,7 +368,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
   <button class="xls" onclick="openTaxCheck()">엑셀 내보내기</button>
 </div></div>
 <div class="shareNote" id="shareNote"></div>
-<input type="file" id="importFile" accept=".json,application/json,text/plain,*/*" style="display:none" onchange="importData(this)">
+<input type="file" id="importFile" accept=".txt,.json,text/plain,application/json,*/*" style="display:none" onchange="importData(this)">
 <div id="searchRes"></div>
 <div class="quickHeading">자주 쓰는 업무</div><div id="backupArea"></div>
 <div id="alertArea"></div>
@@ -502,6 +504,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
     <div class="bkInfo" id="bkInfo"></div>
     <div class="field"><label>백업 받을 메일 주소</label><input type="email" id="bkMail" style="width:100%;padding:12px;border:1px solid #dfe4ec;border-radius:10px;font-size:15px;font-family:inherit;box-sizing:border-box" placeholder="예) myname@naver.com" autocomplete="email" onchange="saveBkMail()"></div>
     <button class="bkBtn mail" onclick="mailBackup()">📧 메일로 백업 보내기<small>직원·주민번호·메모·휴무·입퇴사·일용직 기록 전부</small></button>
+    <div class="bkSent" id="bkSent" style="display:none"></div>
     <button class="bkBtn" onclick="downloadBackup()">⬇ 백업 파일만 저장하기</button>
     <button class="bkBtn load" onclick="document.getElementById('importFile').click()">📂 백업 파일 불러오기<small>다른 폰·컴퓨터에서 받은 백업 열기</small></button>
     <div class="bkHow">
@@ -2407,8 +2410,8 @@ async function exportData(){
     Object.keys(copy.data).forEach(k=>{ if(k.startsWith('__')) return; Object.values(copy.data[k]||{}).forEach(arr=>Array.isArray(arr) && arr.forEach(p=>{ if(p.rrn){ p.rrn=''; p.rrnOmitted=true; } })); });
     text = JSON.stringify(copy);
   }
-  const name = '직원리스트_' + stamp() + '.json';
-  const file = new File([text], name, {type:'application/json'});
+  const name = '직원리스트_' + stamp() + '.txt';
+  const file = new File([text], name, {type:'text/plain'});
   try{
     if(navigator.canShare && navigator.canShare({files:[file]})){
       await navigator.share({files:[file], title:'직원 리스트', text:'직원 리스트 저장 파일입니다. 앱에서 파일 불러오기로 열어주세요.'});
@@ -2432,6 +2435,7 @@ function bkStats(){
   return {staff, rrn, dl};
 }
 function openBackup(){
+  const sEl = document.getElementById('bkSent'); if(sEl){ sEl.style.display = 'none'; sEl.innerHTML = ''; }
   const S = bkStats(); let sent = 0; try{ sent = Number(localStorage.getItem('cwy_staff_sent_at'))||0; }catch(e){}
   document.getElementById('bkInfo').innerHTML = `직원 <b>${S.staff}명</b> · 일용직 기록 <b>${S.dl}건</b> · 매장 ${STORES.length}곳<br><small>마지막 백업: ${sent ? new Date(sent).toLocaleString('ko-KR') : '없음'}</small>`;
   try{ document.getElementById('bkMail').value = localStorage.getItem(BK_MAIL_KEY) || ''; }catch(e){}
@@ -2442,8 +2446,9 @@ function backupFile(){
   persist();
   const payload = {app:FILE_TAG, ver:2, kind:'full-backup', exportedAt:Date.now(), data:JSON.parse(JSON.stringify(allData))};
   delete payload.data.__att;
-  const name = '최우영_직원관리_백업_' + stamp() + '.json';
-  return new File([JSON.stringify(payload)], name, {type:'application/json'});
+  // 안드로이드 공유창은 .json 파일을 메일 앱에 넘기지 못해서 .txt(text/plain)로 만듦 — 불러오기는 그대로 됨
+  const name = '최우영_직원관리_백업_' + stamp() + '.txt';
+  return new File([JSON.stringify(payload)], name, {type:'text/plain'});
 }
 function bkMailText(file){
   const S = bkStats(), d = new Date();
@@ -2459,17 +2464,26 @@ function bkDownload(file){
 async function mailBackup(){
   saveBkMail();
   const to = document.getElementById('bkMail').value.trim(), file = backupFile(), M = bkMailText(file);
-  // 폰: 공유 창에서 Gmail·네이버메일 등을 고르면 파일이 첨부된 채로 열림
+  // 폰: 공유 창에서 Gmail·네이버 메일 앱을 고르면 백업 파일이 첨부된 채로 열림
   try{
     if(navigator.canShare && navigator.canShare({files:[file]})){
       await navigator.share({files:[file], title:M.subject, text:(to ? '받는 사람: ' + to + '\n\n' : '') + M.body});
-      markSent(); toast('메일 앱에서 받는 사람을 확인하고 보내세요'); return;
+      markSent(); bkShowSent(file, true); return;
     }
   }catch(e){ if(e && e.name==='AbortError') return; }
-  // 컴퓨터: 파일을 내려받고, 메일 쓰기 창을 연 뒤 내려받은 파일을 첨부
-  bkDownload(file); markSent();
-  setTimeout(()=>{ location.href = 'mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(M.subject) + '&body=' + encodeURIComponent(M.body + '\n\n(다운로드 폴더의 ' + file.name + ' 파일을 첨부해 주세요)'); }, 600);
-  alert('백업 파일을 내려받았어요.\n\n메일 쓰기 창이 열리면 다운로드 폴더의\n' + file.name + '\n파일을 첨부해서 보내 주세요.');
+  // 컴퓨터 등: 파일을 내려받고 메일 쓰기 버튼을 보여줌
+  bkDownload(file); markSent(); bkShowSent(file, false);
+}
+function bkShowSent(file, shared){
+  const to = document.getElementById('bkMail').value.trim(), M = bkMailText(file);
+  const body = M.body + '\n\n※ 다운로드 폴더의 ' + file.name + ' 파일을 첨부해 주세요';
+  const gmail = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(to) + '&su=' + encodeURIComponent(M.subject) + '&body=' + encodeURIComponent(body);
+  const mailto = 'mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(M.subject) + '&body=' + encodeURIComponent(body);
+  document.getElementById('bkSent').innerHTML = shared
+    ? `<b>✓ 공유 창으로 보냈어요</b><br>메일 앱에서 받는 사람을 확인하고 보내세요.<br><small>메일 앱이 목록에 없으면 카카오톡 "나와의 채팅"으로 보내도 돼요.</small>`
+    : `<b>✓ 백업 파일을 내려받았어요</b><br><code>${esc(file.name)}</code><br>아래에서 메일을 열고, 다운로드 폴더의 이 파일을 첨부해서 보내세요.
+       <div class="bkMailBtns"><a href="https://mail.naver.com/" target="_blank" rel="noopener">네이버 메일 열기</a><a href="${gmail}" target="_blank" rel="noopener">Gmail 쓰기</a><a href="${mailto}">기본 메일 앱</a></div>`;
+  document.getElementById('bkSent').style.display = 'block';
 }
 function downloadBackup(){ const f = backupFile(); bkDownload(f); markSent(); toast('백업 파일을 저장했어요'); }
 function markSent(){
