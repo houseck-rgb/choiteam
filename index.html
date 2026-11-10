@@ -303,6 +303,12 @@ header .title{font-size:29px;font-weight:700;letter-spacing:-1.2px;line-height:1
 .deTotal{text-align:right;font-size:13px;color:#55627a;margin-top:4px}.deTotal b{color:#1c2434;font-size:15px}
 .bkSent{margin:0 0 10px;padding:12px;border-radius:10px;background:#e7f5ef;border:1px solid #b7e0cc;color:#1c2434;font-size:13px;line-height:1.6}.bkSent b{color:#168364}.bkSent code{font-size:12px;background:#fff;padding:2px 6px;border-radius:5px;word-break:break-all}.bkSent small{color:#55627a}
 .bkMailBtns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.bkMailBtns a{flex:1 1 auto;text-align:center;padding:10px;border-radius:9px;background:#fff;border:1px solid #b7e0cc;color:#168364;font-weight:700;text-decoration:none;font-size:13px}
+.day small{display:block;font-size:8.5px;line-height:1.05;font-weight:800;margin-top:1px;white-space:nowrap;overflow:hidden}
+.day.absent{background:#fde8e8;border-color:#e6a5a5;color:#b23b3b}.day.half{background:#e8f1fb;border-color:#a9c8ea;color:#1f6fb2}
+.dpBtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.dpBtns button{padding:14px 8px;border-radius:11px;border:1.5px solid #e4e8f0;background:#fff;font-family:inherit;font-size:15px;font-weight:700;color:#1c2434}.dpBtns button:first-child{grid-column:1/-1}
+.dpBtns button.on{border-color:#315bf5;background:#edf2ff;color:#2545ca}.dpBtns button.off.on{border-color:#6b4f9a;background:#f3eefa;color:#6b4f9a}.dpBtns button.ab.on{border-color:#b23b3b;background:#fde8e8;color:#b23b3b}.dpBtns button.hf.on{border-color:#1f6fb2;background:#e8f1fb;color:#1f6fb2}
+.dpH{display:grid;grid-template-columns:1fr auto 44px 44px;gap:6px;align-items:center}.dpH input{font-size:18px!important;text-align:center}.dpH button{height:44px;border-radius:9px;border:1px solid #e4e8f0;background:#fff;font-size:18px;font-weight:800}
+.oc .cnt.ab{background:#fde8e8;color:#b23b3b}.oc .cnt.hf{background:#e8f1fb;color:#1f6fb2}
 .dlNote{font-size:11.5px;color:#8a4b00;padding:4px 4px 0}
 .dlClip{display:block;width:100%;padding:14px;border-radius:12px;border:0;background:#315bf5;color:#fff;font-family:inherit;font-size:16px;font-weight:800;margin-bottom:10px}.dlClip small{display:block;font-size:11.5px;font-weight:500;opacity:.85;margin-top:2px}
 .dlRegHead{font-size:12.5px;font-weight:700;color:#1c2434;margin:2px 0 6px}.dlRegHead small{font-weight:500;color:#8a95a7;margin-left:4px}
@@ -462,7 +468,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
       <div><label>퇴사일 (퇴사 시 입력)</label><input type="date" id="mOut" onchange="updPay()"></div>
     </div>
     <div class="field">
-      <label id="calLabel">휴무일 (날짜를 누르면 휴무 체크)</label>
+      <label id="calLabel">근무 기록 (날짜를 누르면 휴무·결근·오전/오후 반타임)</label>
       <div class="cal" id="mCal"></div>
     </div>
     <div class="field">
@@ -652,6 +658,25 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
   <button class="saveBtn" onclick="saveAll()">변경사항 저장</button>
 </div>
 
+<!-- 날짜별 근무 기록 -->
+<div class="modalOverlay" id="dayPick">
+  <div class="modalBox">
+    <h2 id="dpTitle"></h2>
+    <div class="dpBtns" id="dpBtns">
+      <button data-t="" onclick="dpPick('')">✓ 정상 근무</button>
+      <button data-t="off" class="off" onclick="dpPick('off')">💤 휴무</button>
+      <button data-t="absent" class="ab" onclick="dpPick('absent')">🚫 결근</button>
+      <button data-t="am" class="hf" onclick="dpPick('am')">🌅 오전 반타임</button>
+      <button data-t="pm" class="hf" onclick="dpPick('pm')">🌇 오후 반타임</button>
+    </div>
+    <div id="dpHalf" style="display:none">
+      <div class="field"><label>일한 시간</label><div class="dpH"><input type="number" id="dpHours" inputmode="decimal" step="0.5" min="0"><span>시간</span>
+        <button onclick="dpAddH(-0.5)">−</button><button onclick="dpAddH(0.5)">＋</button></div></div>
+      <div class="field"><label>몇 시부터 몇 시까지 (선택)</label><input type="text" id="dpTime" placeholder="예) 10:00~14:00"></div>
+    </div>
+    <div class="btnRow" style="margin-top:10px"><button class="bGray" onclick="document.getElementById('dayPick').classList.remove('show')">닫기</button><button class="bRed" id="dpSaveBtn" style="display:none" onclick="dpSave()">저장</button></div>
+  </div>
+</div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -860,7 +885,7 @@ function setLog(p, secName, type, date){
 let lastAction = '';
 function isOffToday(p){ return Array.isArray(p.off) && p.off.includes(today()); }
 function offInMonth(p, ym){ return (p.off||[]).filter(d=>d.slice(0,7)===ym).length; }
-let calMonth = '', calOff = [], calWork = [], mType = 'none', mPayType = 'hourly';
+let calMonth = '', calOff = [], calWork = [], calMark = {}, mType = 'none', mPayType = 'hourly';
 function setPayType(t){
   mPayType = t;
   document.querySelectorAll('#mPayType button').forEach(b=>b.classList.toggle('on', b.dataset.t===t));
@@ -871,7 +896,7 @@ function setMType(t){
   mType = (mType===t ? 'none' : t);
   document.querySelectorAll('#mType button').forEach(b=>b.classList.toggle('on', b.classList.contains(mType)));
   document.getElementById('memoModal').classList.toggle('isDaily', mType==='daily');
-  document.getElementById('calLabel').textContent = mType==='daily' ? '근무일 (일한 날을 누르세요)' : '휴무일 (날짜를 누르면 휴무 체크)';
+  document.getElementById('calLabel').textContent = mType==='daily' ? '근무일 (일한 날을 누르세요)' : '근무 기록 (날짜를 누르면 휴무·결근·오전/오후 반타임)';
   renderCal();
 }
 function renderCal(){
@@ -883,10 +908,15 @@ function renderCal(){
   for(let d=1; d<=days; d++){
     const ds = calMonth + '-' + String(d).padStart(2,'0');
     const dl = mType==='daily';
-    h += `<button class="day ${dl ? (calWork.includes(ds)?'work':'') : (calOff.includes(ds)?'off':'')} ${ds===t?'today':''}" onclick="calToggle('${ds}')">${d}</button>`;
+    const mk = !dl && !calOff.includes(ds) ? calMark[ds] : null;
+    const mkCls = mk ? (mk.t==='absent' ? 'absent' : 'half') : '';
+    const mkTxt = mk ? (mk.t==='absent' ? '결근' : (mk.t==='am' ? '오전' : '오후') + (mk.h ? ' ' + mk.h + 'h' : '')) : '';
+    h += `<button class="day ${dl ? (calWork.includes(ds)?'work':'') : (calOff.includes(ds)?'off':'')} ${mkCls} ${ds===t?'today':''}" onclick="calToggle('${ds}')">${d}${mkTxt ? `<small>${mkTxt}</small>` : ''}</button>`;
   }
   const cnt = (mType==='daily' ? calWork : calOff).filter(x=>x.slice(0,7)===calMonth).length;
-  h += `</div><div class="calCount" style="${mType==='daily'?'color:#c06a00':''}">${m}월 ${mType==='daily'?'근무':'휴무'} ${cnt}일</div>`;
+  const mks = Object.entries(calMark).filter(([k])=>k.slice(0,7)===calMonth && !calOff.includes(k)).map(([,v])=>v);
+  const ab = mks.filter(v=>v.t==='absent').length, hf = mks.filter(v=>v.t==='am' || v.t==='pm').length;
+  h += `</div><div class="calCount" style="${mType==='daily'?'color:#c06a00':''}">${m}월 ${mType==='daily'?'근무':'휴무'} ${cnt}일` + (mType!=='daily' && ab ? ` · <span style="color:#b23b3b">결근 ${ab}일</span>` : '') + (mType!=='daily' && hf ? ` · <span style="color:#1f6fb2">반타임 ${hf}회</span>` : '') + `</div>`;
   document.getElementById('mCal').innerHTML = h;
   if(typeof updPay==='function' && cur) updPay();
 }
@@ -896,10 +926,53 @@ function calMove(n){
   calMonth = y + '-' + String(m).padStart(2,'0'); renderCal();
 }
 function calToggle(ds){
+  if(mType!=='daily'){ openDayPick(ds); return; }
   const L = mType==='daily' ? calWork : calOff;
   const i = L.indexOf(ds);
   if(i>=0) L.splice(i,1); else L.push(ds);
   renderCal();
+}
+/* 날짜별 근무 기록: 휴무 · 결근 · 오전 반타임 · 오후 반타임(일한 시간) */
+let dpDate = '', dpType = '';
+function openDayPick(ds){
+  dpDate = ds; const mk = calMark[ds];
+  dpType = calOff.includes(ds) ? 'off' : (mk ? mk.t : '');
+  const d = new Date(ds+'T00:00:00');
+  document.getElementById('dpTitle').textContent = `${d.getMonth()+1}/${d.getDate()} (${'일월화수목금토'[d.getDay()]}) ${document.getElementById('mName').value || ''}`;
+  const dh = Number(document.getElementById('mDayHours').value) || 0;
+  document.getElementById('dpHours').value = mk && mk.h ? mk.h : (dh ? Math.round(dh/2*2)/2 : 4);
+  document.getElementById('dpTime').value = mk && mk.time ? mk.time : '';
+  dpRender(); document.getElementById('dayPick').classList.add('show');
+}
+function dpRender(){
+  document.querySelectorAll('#dpBtns button').forEach(b=>b.classList.toggle('on', b.dataset.t===dpType));
+  const hf = (dpType==='am' || dpType==='pm');
+  document.getElementById('dpHalf').style.display = hf ? 'block' : 'none';
+  document.getElementById('dpSaveBtn').style.display = hf ? '' : 'none';
+}
+function dpPick(t){
+  dpType = t; dpRender();
+  if(t==='' || t==='off' || t==='absent') dpSave();           // 휴무·결근·정상은 바로 저장
+  else document.getElementById('dpHours').focus();
+}
+function dpAddH(n){ const el = document.getElementById('dpHours'); el.value = Math.max(0, (Number(el.value)||0) + n); }
+function dpSave(){
+  const ds = dpDate, i = calOff.indexOf(ds);
+  if(i>=0) calOff.splice(i,1);
+  delete calMark[ds];
+  if(dpType==='off') calOff.push(ds);
+  else if(dpType==='absent') calMark[ds] = {t:'absent'};
+  else if(dpType==='am' || dpType==='pm'){
+    const h = Math.max(0, Number(document.getElementById('dpHours').value) || 0);
+    calMark[ds] = {t:dpType, h, time: document.getElementById('dpTime').value.trim()};
+  }
+  document.getElementById('dayPick').classList.remove('show');
+  renderCal();
+}
+function markSummary(p, ym){
+  const M = p.marks || {}, off = p.off || [];
+  const L = Object.entries(M).filter(([k])=>k.slice(0,7)===ym && !off.includes(k) && staffActiveOn(p, k)).map(([,v])=>v);
+  return {absent: L.filter(v=>v.t==='absent').length, half: L.filter(v=>v.t==='am' || v.t==='pm').length};
 }
 function daysLeft(d){ if(!d) return null; const a=new Date(today()+'T00:00:00'), b=new Date(d+'T00:00:00'); return Math.round((b-a)/86400000); }
 /* 주황 이름: 2대보험 직원인데 워킹퍼밋(준비됨 체크 또는 만료일)이 안 적혀 있거나 만료됨 */
@@ -950,15 +1023,15 @@ function renderOffBoard(){
     const ds = offMonth + '-' + String(d).padStart(2,'0'), ppl = offPeople(ds), ev = dayEvents(ds);
     const evH = ev.map(x=>`<span class="ev ${x.type}">${x.type==='join'?'입':'퇴'}${esc((x.name||'?').slice(0,2))}</span>`).join('');
     const room = Math.max(0, 3 - ev.length);
-    h += `<button class="oc ${ds===t?'today':''} ${ds===offSel?'sel':''}" onclick="offPick('${ds}')"><span class="top"><span class="dn">${d}</span>${ppl.length?`<span class="cnt">휴${ppl.length}</span>`:''}</span>${evH}${ppl.slice(0,room).map(x=>`<span class="nm">${esc((x.p.name||'?').slice(0,4))}</span>`).join('')}${ppl.length>room && ppl.length?`<span class="more">+${ppl.length-room}</span>`:''}</button>`;
+    h += `<button class="oc ${ds===t?'today':''} ${ds===offSel?'sel':''}" onclick="offPick('${ds}')"><span class="top"><span class="dn">${d}</span>${ppl.length?`<span class="cnt">휴${ppl.length}</span>`:''}${(()=>{ let a=0,hh=0; SECTIONS.forEach(sec=>data[sec.id].forEach(p=>{ const mk=(p.marks||{})[ds]; if(mk && p.name && !(p.off||[]).includes(ds)){ if(mk.t==='absent') a++; else hh++; } })); return (a?`<span class="cnt ab">결${a}</span>`:'') + (hh?`<span class="cnt hf">반${hh}</span>`:''); })()}</span>${evH}${ppl.slice(0,room).map(x=>`<span class="nm">${esc((x.p.name||'?').slice(0,4))}</span>`).join('')}${ppl.length>room && ppl.length?`<span class="more">+${ppl.length-room}</span>`:''}</button>`;
   }
   document.getElementById('offGrid').innerHTML = h;
   // 직원별 이번 달 휴무 일수
   const rows = [];
-  SECTIONS.forEach(sec=>data[sec.id].forEach(p=>{ const n = offInMonth(p, offMonth); if(n && p.name) rows.push(`${esc(p.name)} <b>${n}일</b>`); }));
+  SECTIONS.forEach(sec=>data[sec.id].forEach(p=>{ const n = offInMonth(p, offMonth), ms = markSummary(p, offMonth); if(p.name && (n || ms.absent || ms.half)) rows.push(`${esc(p.name)} <b>${n}일</b>` + (ms.absent ? ` <span style="color:#b23b3b">결${ms.absent}</span>` : '') + (ms.half ? ` <span style="color:#1f6fb2">반${ms.half}</span>` : '')); }));
   const ML = logs().filter(x=>x.date && x.date.slice(0,7)===offMonth);
   const ioLine = `<b>${m}월 입사 ${ML.filter(x=>x.type==='join').length}명 · 퇴사 ${ML.filter(x=>x.type==='leave').length}명</b><br>`;
-  document.getElementById('offStat').innerHTML = ioLine + (rows.length ? '<b>' + m + '월 휴무 일수</b><br>' + rows.join(' · ') : m + '월 휴무가 아직 없어요.');
+  document.getElementById('offStat').innerHTML = ioLine + (rows.length ? '<b>' + m + '월 휴무 일수</b> <small>(결=결근 · 반=반타임)</small><br>' + rows.join(' · ') : m + '월 휴무가 아직 없어요.');
   if(offSel) offPick(offSel, true);
 }
 function offPick(ds, keep){
@@ -966,9 +1039,11 @@ function offPick(ds, keep){
   const ppl = offPeople(ds), d = new Date(ds+'T00:00:00'), ev = dayEvents(ds);
   const jn = ev.filter(x=>x.type==='join'), lv = ev.filter(x=>x.type==='leave');
   // 그날 일하는 인원 = 그날 재직 중 - 휴무
-  let working = 0; SECTIONS.forEach(sec=>data[sec.id].forEach(p=>{ if(staffActiveOn(p, ds) && !(p.off||[]).includes(ds)) working++; }));
+  let working = 0; SECTIONS.forEach(sec=>data[sec.id].forEach(p=>{ if(p.name && staffActiveOn(p, ds) && !(p.off||[]).includes(ds) && !((p.marks||{})[ds] && p.marks[ds].t==='absent')) working++; }));
   document.getElementById('offDetail').innerHTML = `<b>${d.getMonth()+1}/${d.getDate()} (${'일월화수목금토'[d.getDay()]})</b> · 근무 ${working}명 · 휴무 ${ppl.length}명` +
     (ppl.length ? '<br>💤 휴무: ' + ppl.map(x=>`${esc(x.p.name||'이름 없음')} <small>(${x.sec.name})</small>`).join(', ') : '') +
+    (()=>{ const ab = [], hf = []; SECTIONS.forEach(sec=>data[sec.id].forEach(p=>{ const mk = (p.marks||{})[ds]; if(!mk || !p.name || (p.off||[]).includes(ds) || !staffActiveOn(p, ds)) return; if(mk.t==='absent') ab.push(esc(p.name)); else hf.push(`${esc(p.name)} <small>(${mk.t==='am'?'오전':'오후'}${mk.h?' '+mk.h+'시간':''}${mk.time?' '+esc(mk.time):''})</small>`); }));
+      return (ab.length ? '<br><span style="color:#b23b3b">🚫 결근: ' + ab.join(', ') + '</span>' : '') + (hf.length ? '<br><span style="color:#1f6fb2">🌓 반타임: ' + hf.join(', ') + '</span>' : ''); })() +
     (jn.length ? '<br><span style="color:#1f6fb2">🟦 입사: ' + jn.map(x=>`${esc(x.name||'이름 없음')} <small>(${x.sec})</small>`).join(', ') + '</span>' : '') +
     (lv.length ? '<br><span style="color:#b23b3b">🟥 퇴사: ' + lv.map(x=>`${esc(x.name||'이름 없음')} <small>(${x.sec})</small>`).join(', ') + '</span>' : '');
   if(!keep) renderOffBoard();
@@ -981,6 +1056,7 @@ function moveMonth(n){
   if(m<1){ m=12; y--; } if(m>12){ m=1; y++; }
   viewMonth = y + '-' + String(m).padStart(2,'0'); logOpen = false; renderMonth(); renderLog();
 }
+function fmtYD(d){ const [y,m,dd] = d.split('-'); return y.slice(2)+'.'+Number(m)+'.'+Number(dd); }
 function fmtD(d){ const [y,m,dd] = d.split('-'); return Number(m)+'/'+Number(dd); }
 let logOpen = false;
 function renderLog(){
@@ -1100,14 +1176,28 @@ function removeStore(){
   persist(); closeCfg(); switchStore(STORES[0].id);
 }
 /* ---------- 급여 예상 ---------- */
-function workDays(p, ym, offList){
-  const [y,m] = ym.split('-').map(Number), days = new Date(y, m, 0).getDate();
+function workDays(p, ym, offList, marks){
+  const [y,m] = ym.split('-').map(Number), days = new Date(y, m, 0).getDate(), M = marks || p.marks || {};
   let n = 0;
   for(let d=1; d<=days; d++){
     const ds = ym + '-' + String(d).padStart(2,'0');
-    if(staffActiveOn(p, ds) && !(offList||p.off||[]).includes(ds)) n++;
+    if(staffActiveOn(p, ds) && !(offList||p.off||[]).includes(ds) && !(M[ds] && M[ds].t==='absent')) n++;
   }
   return n;
+}
+/* 시급제: 반타임 날은 적어 둔 시간만, 결근은 0 */
+function workHours(p, ym, offList, marks, hrs){
+  const [y,m] = ym.split('-').map(Number), days = new Date(y, m, 0).getDate(), M = marks || p.marks || {}, off = offList || p.off || [];
+  let h = 0, half = 0, absent = 0;
+  for(let d=1; d<=days; d++){
+    const ds = ym + '-' + String(d).padStart(2,'0');
+    if(!staffActiveOn(p, ds) || off.includes(ds)) continue;
+    const mk = M[ds];
+    if(mk && mk.t==='absent'){ absent++; continue; }
+    if(mk && (mk.t==='am' || mk.t==='pm')){ half++; h += Number(mk.h)||0; continue; }
+    h += hrs;
+  }
+  return {h, half, absent};
 }
 function activeDays(p, ym){
   const [y,m] = ym.split('-').map(Number), days = new Date(y, m, 0).getDate();
@@ -1115,16 +1205,16 @@ function activeDays(p, ym){
   for(let d=1; d<=days; d++){ if(staffActiveOn(p, ym + '-' + String(d).padStart(2,'0'))) n++; }
   return {n, days};
 }
-function calcPay(p, ym, offList){
+function calcPay(p, ym, offList, marks){
   const wage = Number(p.wage)||0, hrs = Number(p.dayHours)||0;
-  const wd = workDays(p, ym, offList);
+  const wd = workDays(p, ym, offList, marks), wh = workHours(p, ym, offList, marks, hrs);
   let gross, monthly = 0, act = null;
   if(p.payType==='monthly'){
     monthly = Number(p.monthly)||0; act = activeDays(p, ym);
     gross = act.n===act.days ? monthly : Math.floor(monthly * act.n / act.days / 10) * 10;
-  } else gross = Math.round(wage * hrs * wd);
+  } else gross = Math.round(wage * wh.h);
   const tax = p.tax ? Math.floor(gross * 0.03 / 10) * 10 + Math.floor(gross * 0.003 / 10) * 10 : 0;
-  return {wage, hrs, wd, gross, tax, net: gross - tax, monthly, act, isMonthly: p.payType==='monthly'};
+  return {wage, hrs, wd, gross, tax, net: gross - tax, monthly, act, isMonthly: p.payType==='monthly', totalH: wh.h, half: wh.half, absent: wh.absent};
 }
 /* 일용근로소득세: (일당 − 15만원) × 6% × 45%(세액공제 후), 1,000원 미만은 안 냄(소액부징수) · 지방세 10% */
 function dailyTax(dayWage){
@@ -1164,7 +1254,7 @@ function updPay(){
     return;
   }
   tmp.tax = (mType==='tax'); tmp.ins = (mType==='ins'); tmp.ins2 = (mType==='ins2');
-  const r = calcPay(tmp, ym, calOff);
+  const r = calcPay(tmp, ym, calOff, calMark);
   let head;
   if(r.isMonthly){
     if(!r.monthly){ box.innerHTML = '월급을 넣으면 ' + mm + '월 지급액이 계산돼요.'; return; }
@@ -1173,12 +1263,14 @@ function updPay(){
     if(r.act.n===0){ box.innerHTML = mm + '월에는 재직 기간이 아니에요.'; return; }
   } else {
     if(!r.wage || !r.hrs){ box.innerHTML = '시급과 하루 근무시간을 넣으면 ' + mm + '월 예상 급여가 계산돼요.'; return; }
-    head = `${mm}월 근무 <b>${r.wd}일</b> × ${r.hrs}시간 × ${won(r.wage)}<br>예상 급여 <b>${won(r.gross)}</b>`;
+    head = (r.half ? `${mm}월 근무 <b>${r.wd}일</b> (반타임 ${r.half}회 포함) · 총 <b>${r.totalH}시간</b> × ${won(r.wage)}` : `${mm}월 근무 <b>${r.wd}일</b> × ${r.hrs}시간 × ${won(r.wage)}`) +
+      (r.absent ? ` · <span style="color:#b23b3b">결근 ${r.absent}일 뺌</span>` : '') + `<br>예상 급여 <b>${won(r.gross)}</b>`;
   }
   box.innerHTML = head +
     (tmp.tax ? `<br>3.3% 공제 −${won(r.tax)} → 실지급 <b>${won(r.net)}</b>` : '') +
     (tmp.ins ? `<br>4대보험 공제는 따로 계산하세요` : '') +
     (tmp.ins2 ? `<br>고용보험(근로자 부담분) 공제는 따로 계산하세요 · 산재보험은 사업주만 부담` : '') +
+    (r.isMonthly && (r.absent || r.half) ? `<br><span style="color:#b23b3b">${mm}월 결근 ${r.absent}일 · 반타임 ${r.half}회</span> <small style="display:inline">(월급에서 자동으로 빼지 않아요)</small>` : '') +
     (r.isMonthly ? `<small>월급제는 휴무일을 빼지 않아요 · 입사·퇴사한 달만 달력 날짜로 나눠 계산</small>` : `<small>휴무일·입퇴사일을 뺀 날로 계산 · 주휴수당·연장/야간수당은 포함 안 됨</small>`);
 }
 
@@ -2012,6 +2104,7 @@ function makeTaxFile(ym, sid, withRrn){
     if(p.leaveDate && p.leaveDate.slice(0,7)===ym) a.push(fmtD(p.leaveDate) + ' 퇴사');
     if(e.r && e.r.isMonthly && e.r.act && e.r.act.n < e.r.act.days) a.push('일할계산 ' + e.r.act.n + '/' + e.r.act.days + '일');
     if(p.permitExp) a.push('퍼밋 만료 ' + p.permitExp);
+    const ms = markSummary(p, ym); if(ms.absent) a.push('결근 ' + ms.absent + '일'); if(ms.half) a.push('반타임 ' + ms.half + '회');
     return a.join(' · ');
   };
   const title = (t, n)=>[[C(`${yy}년 ${mm}월 ${t} — ${COMPANY}`, XS.title)], [C(`귀속월 ${yy}-${String(mm).padStart(2,'0')} · 작성일 ${made} · ${n}명 · 노란 칸은 비어 있어 확인이 필요해요`, XS.note)]];
@@ -2226,7 +2319,7 @@ function render(){
       </div>
       ${data[s.id].map((p,i)=>(listFilter && !(listFilter==='permit' ? p.permit : staffType(p)===listFilter)) ? '' : `
         <div class="row ${isLeft(p)?'left':''}">
-          <button class="io ${p.leaveDate?'out':(p.joinDate?'in':'')}" onclick="openIo('${s.id}',${i})">${p.leaveDate ? '퇴사<br>'+fmtD(p.leaveDate) : (p.joinDate ? '입사<br>'+fmtD(p.joinDate) : '입·퇴')}</button>
+          <button class="io ${p.leaveDate?'out':(p.joinDate?'in':'')}" onclick="openIo('${s.id}',${i})">${p.leaveDate ? '퇴사<br>'+fmtYD(p.leaveDate) : (p.joinDate ? '입사<br>'+fmtYD(p.joinDate) : '입·퇴')}</button>
           ${isOffToday(p) ? `<button class="att offday" disabled>휴무</button>` : `<button class="att ${isIn(p)?'on':''}" ${isLeft(p)?'disabled':''} onclick="toggleAtt('${s.id}',${i})">${isIn(p)?'✓<br>출근':'출근'}</button>`}
           <button class="nameBtn" onclick="openMemo('${s.id}',${i})">
             ${p.role && !(p.daily && p.role==='일용') ? `<span class="role">${esc(p.role)}</span>` : ''}<span class="nm ${p.name?'':'empty'} ${permitNotReady(p)?'noPermit':''}">${p.name ? esc(p.name) : '이름'}</span>
@@ -2297,7 +2390,7 @@ function openMemo(sec, i){
   document.getElementById('mDayHours').value = p.dayHours || '';
   document.getElementById('mMonthly').value = p.monthly || '';
   updContact(); updDday();
-  calMonth = viewMonth; calOff = (p.off||[]).slice(); calWork = (p.workDays||[]).slice();
+  calMonth = viewMonth; calOff = (p.off||[]).slice(); calWork = (p.workDays||[]).slice(); calMark = JSON.parse(JSON.stringify(p.marks||{}));
   document.getElementById('mDayWage').value = p.dayWage || '';
   mType = 'x'; setMType(staffType(p));
   setPayType(p.payType==='monthly' ? 'monthly' : 'hourly');
@@ -2345,6 +2438,7 @@ function saveMemo(){
   const cut = new Date(); cut.setFullYear(cut.getFullYear()-1);
   const cutS = cut.toISOString().slice(0,10);
   p.off = calOff.filter(d=>d >= cutS).sort();
+  p.marks = {}; Object.keys(calMark).filter(d=>d >= cutS).sort().forEach(d=>{ p.marks[d] = calMark[d]; });
   logs().forEach(x=>{ if(x.staffId===p.id) x.name = p.name; });
   p.memoAt = Date.now(); touch(p);
   const moved = moveStaffIfNeeded(p);
@@ -2525,7 +2619,7 @@ function importData(input){
   r.readAsText(f);
 }
 function closeImp(){ document.getElementById('impModal').classList.remove('show'); pendingImport = null; }
-function isEmptyStaff(p){ return !p.name && !p.memo && !p.phone && !p.joinDate && !p.leaveDate && !(p.off||[]).length && !p.permit && !p.tax && !p.ins && !p.ins2 && !p.wage && !p.monthly && !p.permitExp && !p.rrn && !p.daily && !(p.workDays||[]).length; }
+function isEmptyStaff(p){ return !p.name && !Object.keys(p.marks||{}).length && !p.memo && !p.phone && !p.joinDate && !p.leaveDate && !(p.off||[]).length && !p.permit && !p.tax && !p.ins && !p.ins2 && !p.wage && !p.monthly && !p.permitExp && !p.rrn && !p.daily && !(p.workDays||[]).length; }
 function stamp2(p){ return Number(p.updatedAt || p.memoAt || 0); }
 /* 합치기: 직원마다 더 최근에 고친 쪽을 남김 */
 function mergeData(mine, theirs){
