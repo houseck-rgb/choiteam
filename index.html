@@ -291,6 +291,8 @@ header .title{font-size:29px;font-weight:700;letter-spacing:-1.2px;line-height:1
 .bkHow{margin:10px 0 4px;padding:12px;border-radius:10px;background:#fafbfd;border:1px solid #eef1f6;font-size:12.5px;color:#55627a;line-height:1.6}.bkHow ol{margin:6px 0;padding-left:18px}.bkHow span{color:#b25b00;font-weight:600}
 .dailyBar button.pay{grid-column:1/-1;border-color:#b7e0cc;background:#effaf4;color:#168364}.dailyBar button.pay small{color:#4f9a7c}
 .dlAmt::-webkit-inner-spin-button,.dlAmt::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.dlAmt{-moz-appearance:textfield}
+.dlDays{font-size:12px;color:#55627a;padding:6px 4px 0;display:flex;align-items:center;gap:5px;flex-wrap:wrap}.dlDays input{width:52px;padding:6px!important;font-size:14px!important;text-align:center}.dlDays.need{color:#c06a00}.dlDays.need input{background:#fff2cc!important;border-color:#e3b366!important}
+.dlNote{font-size:11.5px;color:#8a4b00;padding:4px 4px 0}
 .dlClip{display:block;width:100%;padding:14px;border-radius:12px;border:0;background:#315bf5;color:#fff;font-family:inherit;font-size:16px;font-weight:800;margin-bottom:10px}.dlClip small{display:block;font-size:11.5px;font-weight:500;opacity:.85;margin-top:2px}
 .dlRegHead{font-size:12.5px;font-weight:700;color:#1c2434;margin:2px 0 6px}.dlRegHead small{font-weight:500;color:#8a95a7;margin-left:4px}
 .dlRegs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}.dlRegs button{padding:8px 11px;border-radius:20px;border:1px solid #d6def3;background:#f6f8ff;color:#2545ca;font-family:inherit;font-size:14px;font-weight:700}.dlRegs small{font-size:10.5px;font-weight:500;color:#7d8fc9;margin-left:4px}
@@ -545,7 +547,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
     <div class="dlTotal" id="dlTotal"></div>
     <div class="dlBtns"><button onclick="dlAdd()">+ 한 명 추가</button><button onclick="dlCopyPrev()">↺ 지난 명단 그대로</button></div>
     <details class="dlManual"><summary>직접 붙여넣기 칸 열기</summary>
-      <textarea id="dlPasteBox" style="min-height:100px" placeholder="여기에 길게 눌러 붙여넣으면 바로 들어가요&#10;예) 홍길동 900101-1234567 풀&#10;Tamang Bishal 950505-5123456 국민 123-45-678901" onpaste="setTimeout(dlPaste,60)"></textarea>
+      <textarea id="dlPasteBox" style="min-height:100px" placeholder="여기에 길게 눌러 붙여넣으면 바로 들어가요&#10;예) 710424-5860015 ZHANG LINHU (장림호)&#10;홍길동 900101-1234567 풀&#10;Tamang Bishal 950505-5123456 국민 123-45-678901" onpaste="setTimeout(dlPaste,60)"></textarea>
       <button class="smallBtn" style="width:100%;margin-top:6px" onclick="dlPaste()">⬇ 넣기</button>
     </details>
     <button class="dlPayBtn" id="dlPayBtn" onclick="dlPay()"></button>
@@ -1325,13 +1327,13 @@ function renderDaily(){
       <div class="dlRow">
         <input type="text" class="dlName" value="${esc(x.name)}" placeholder="이름" onchange="dlSetName(${k},this.value)">
         <div class="dlType"><button class="${x.type==='half'?'on':''}" onclick="dlSetType(${k},'half')">반타임</button><button class="${x.type==='full'?'on':''}" onclick="dlSetType(${k},'full')">풀타임</button></div>
-        <input type="number" class="dlAmt ${x.amt!=='' && !x.auto ? 'edited' : ''}" inputmode="numeric" value="${x.amt}" placeholder="금액" oninput="dlSetAmt(${k},this)">
+        <input type="number" class="dlAmt ${x.amt!=='' && !x.auto ? 'edited' : ''}" inputmode="numeric" value="${x.amt}" placeholder="금액" oninput="dlSetAmt(${k},this)" onchange="renderDaily()">
         <button class="dlDel" onclick="dlDel(${k})" aria-label="삭제">✕</button>
       </div>
       <div class="dlRow2">
         <input type="text" class="${String(x.rrn||'').replace(/\D/g,'').length===13?'':'need'}" value="${esc(x.rrn||'')}" placeholder="등록번호 (주민·외국인)" inputmode="numeric" autocomplete="off" onchange="dlSetField(${k},'rrn',this)">
         <input type="text" value="${esc(x.acct||'')}" placeholder="은행 계좌 (입금용)" autocomplete="off" onchange="dlSetField(${k},'acct',this)">
-      </div>
+      </div>${Number(x.amt) > 130000 ? `<div class="dlDays ${x.days?'':'need'}">여러 날 몫이면 근무 일수 <input type="number" inputmode="numeric" min="1" value="${x.days||''}" placeholder="?" onchange="dlSetDays(${k},this)"> 일${x.days ? ` · 하루 ${won(Math.round(x.amt/x.days))}` : ' <b>← 세금 계산에 필요해요</b>'}</div>` : ''}${x.note ? `<div class="dlNote">붙여넣은 금액: ${esc(x.note)}</div>` : ''}
     </div>`).join('')
     : '<div class="dlEmpty">아직 등록된 일용직이 없어요.<br>카톡 명단(이름·등록번호)을 아래에 붙여넣거나 "+ 한 명 추가"를 누르세요.</div>';
   dlTotal();
@@ -1340,8 +1342,10 @@ function dlTotal(){
   const day = dlDay(dlStore, dlDate, false), L = day ? day.list.filter(x=>dlNorm(x.name)) : [];
   const h = L.filter(x=>x.type==='half').length, f = L.filter(x=>x.type==='full').length, sum = L.reduce((a,x)=>a+(Number(x.amt)||0),0);
   const noType = L.filter(x=>!x.type && !x.amt).length, noRrn = L.filter(x=>String(x.rrn||'').replace(/\D/g,'').length!==13).length;
+  const nd = L.filter(x=>Number(x.amt) > 130000 && !Number(x.days)).length;
   document.getElementById('dlTotal').innerHTML = `<b>${L.length}명</b> · 반 ${h} · 풀 ${f} · 합계 <b>${won(sum)}</b>` +
     (noType ? `<br><span class="warn">⚠ 금액(반·풀) 안 누른 사람 ${noType}명</span>` : '') +
+    (nd ? `<br><span class="warn">⚠ 근무 일수 확인 ${nd}명 (13만원 넘는 금액)</span>` : '') +
     (noRrn ? `<br><span class="warn">⚠ 등록번호 없는 사람 ${noRrn}명 — 세무사 신고에 필요해요</span>` : '');
   const paid = day && day.paid;
   document.getElementById('dlPayBtn').innerHTML = paid
@@ -1403,58 +1407,88 @@ function dlTogglePrem(on){
   d.list.forEach(x=>{ if(x.auto && x.type) x.amt = dlRate(x.type, on); });   // 직접 고친 금액은 그대로
   dlSave(); renderDaily();
 }
-/* 카톡 명단 붙여넣기: 한 줄에 한 명. "홍길동 900101-1234567", "김철수 풀 국민 123-45-678", "Tamang 950505-5123456 반" 등 */
+/* 명단 붙여넣기 해석
+   - 한 줄형: "710424-5860015 ZHANG LINHU (장림호)", "홍길동 900101-1234567 풀"
+   - 여러 줄형: 이름 / 등록번호 / 번호 / 금액(13만원, 65000원, +65000원) — 빈 줄로 사람 구분
+   이름·등록번호·금액 순서는 상관없음 */
+function parseLine(raw){
+  let s = ' ' + String(raw||'').trim() + ' ';
+  const o = {rrn:'', bank:'', acct:'', type:'', amts:[], name:''};
+  let m = s.match(/(\d{6})\s*[-_]?\s*([1-8]\d{6})(?!\d)/);
+  if(m){ o.rrn = m[1] + '-' + m[2]; s = s.replace(m[0], ' '); }
+  s = s.replace(/01[016789][\s\-.]?\d{3,4}[\s\-.]?\d{4}/g, ' ');                       // 전화번호
+  m = s.match(/(카카오뱅크|케이뱅크|토스뱅크|새마을금고|우체국|농협|신협|수협|[가-힣A-Z]{1,6}은행|SC제일|IBK|KB)/);
+  if(m){ o.bank = m[1]; s = s.replace(m[0], ' '); }
+  // 금액: 13만원, 6.5만, 65,000원, +65000원, 65000
+  s = s.replace(/[+＋]?\s*(\d+(?:\.\d+)?)\s*만\s*(\d{1,4})?\s*천?\s*원?/g, (all, a, b)=>{ o.amts.push(Math.round(Number(a)*10000) + (b ? Number(b)*1000 : 0)); return ' '; });
+  s = s.replace(/[+＋]?\s*(\d{1,3}(?:,\d{3})+|\d{4,7})\s*원/g, (all, a)=>{ o.amts.push(Number(a.replace(/,/g,''))); return ' '; });
+  m = s.match(/\d{2,6}(?:[\s\-]\d{2,7}){1,4}|\d{10,14}/g);
+  if(m){ const a = m.find(t=>t.replace(/\D/g,'').length >= 10); if(a){ o.acct = a.trim().replace(/\s+/g,'-'); s = s.replace(a, ' '); } }
+  s = s.replace(/(^|\s)[+＋]?\s*(\d{5,7})(?=\s|$)/g, (all, sp, a)=>{ const v = Number(a); if(v >= 30000){ o.amts.push(v); return ' '; } return all; });
+  if(/풀\s*타임|종일|full/i.test(s) || /(^|[\s(\[\/:])풀(?=$|[\s)\]\/,.])/.test(s)) o.type = 'full';
+  else if(/반\s*타임|하프|half/i.test(s) || /(^|[\s(\[\/:])반(?=$|[\s)\]\/,.])/.test(s)) o.type = 'half';
+  s = s.replace(/\(\s*([가-힣]{2,6}|(?!full\b|half\b)[A-Za-z][A-Za-z .]{1,30}?)\s*\)/i, '\u0001$1\u0002');   // "ZHANG LINHU (장림호)" 괄호 이름 유지
+  s = s.replace(/^[\s\-•*·▶►☞✔✅☑]+|^\s*\d{1,2}[.)]\s+/, ' ')
+       .replace(/\d{1,2}\s*[\/.월]\s*\d{1,2}\s*일?/g, ' ')
+       .replace(/\d{1,2}(:\d{2})?\s*시?\s*[~\-]\s*\d{1,2}(:\d{2})?\s*시?/g, ' ')
+       .replace(/풀\s*타임|반\s*타임|종일|하프|full|half/gi, ' ')
+       .replace(/(^|[\s(\[\/:])(풀|반)(?=$|[\s)\]\/,.])/g, ' ')
+       .replace(/주민\s*(등록)?\s*번호|외국인\s*등록\s*(증|번호)?|등록\s*번호|계좌\s*(번호)?|은행|예금주|성\s*명|이\s*름|\bname\b|\d+\s*명|님|파출|일용직?|금액|합계|[()\[\]:：~\-_|+＋,]/gi, ' ')
+       .replace(/\b\d+\b/g, ' ')
+       .replace(/\s+/g, ' ').trim().replace(/\s*\u0001\s*/, '(').replace(/\s*\u0002/, ')');
+  o.name = (s.length >= 2 || /[가-힣]/.test(s)) && s.length <= 40 ? s : '';
+  return o;
+}
 function parsePaste(text){
-  const out = [];
-  String(text||'').split(/\n|,|，|、|;/).forEach(raw=>{
-    let s = raw.trim(); if(!s) return;
-    let rrn = '', acct = '', bank = '', type = '', amt = '';
-    let m = s.match(/(\d{6})\s*[-_]?\s*([1-8]\d{6})(?!\d)/);
-    if(m){ rrn = m[1] + '-' + m[2]; s = s.replace(m[0], ' '); }
-    s = s.replace(/01[016789][\s\-.]?\d{3,4}[\s\-.]?\d{4}/g, ' ');                       // 전화번호
-    m = s.match(/(카카오뱅크|케이뱅크|토스뱅크|새마을금고|우체국|농협|신협|수협|[가-힣A-Z]{1,6}은행|국민|신한|우리|하나|기업|SC제일|IBK|KB)/);
-    if(m){ bank = m[1]; s = s.replace(m[0], ' '); }
-    m = s.match(/\d{2,6}(?:[\s\-]\d{2,7}){1,4}|\d{10,14}/g);
-    if(m){ const a = m.find(t=>t.replace(/\D/g,'').length >= 10); if(a){ acct = a.trim().replace(/\s+/g,'-'); s = s.replace(a, ' '); } }
-    if(/풀\s*타임|종일|full/i.test(s) || /(^|[\s(\[\/:])풀(?=$|[\s)\]\/,.])/.test(s)) type = 'full';
-    else if(/반\s*타임|하프|half/i.test(s) || /(^|[\s(\[\/:])반(?=$|[\s)\]\/,.])/.test(s)) type = 'half';
-    m = s.match(/(\d{1,3}(?:,\d{3})+|\d{5,6})\s*원?|(\d+(?:\.\d)?)\s*만/);
-    if(m){ amt = m[1] ? Number(m[1].replace(/,/g,'')) : Math.round(Number(m[2])*10000); if(amt < 30000 || amt > 500000) amt = ''; }
-    s = s.replace(/^[\s\-•*·▶►☞✔✅☑\d.)\]]+/, '')
-         .replace(/\d{1,2}\s*[\/.월]\s*\d{1,2}\s*일?/g, ' ')
-         .replace(/\d{1,2}(:\d{2})?\s*시?\s*[~\-]\s*\d{1,2}(:\d{2})?\s*시?/g, ' ')
-         .replace(/(\d{1,3}(,\d{3})+|\d{4,})\s*원?|\d+(\.\d)?\s*만\s*원?/g, ' ')
-         .replace(/풀\s*타임|반\s*타임|종일|하프|full|half/gi, ' ')
-         .replace(/(^|[\s(\[\/:])(풀|반)(?=$|[\s)\]\/,.])/g, ' ')
-         .replace(/주민(등록)?번호|외국인\s*등록(증|번호)?|등록번호|계좌(번호)?|은행|예금주|\d+\s*명|님|파출|일용직?|[()\[\]:：~\-_|]/g, ' ')
-         .replace(/\s+/g, ' ').trim();
-    if(!s || s.length > 25 || /^\d+$/.test(s)) return;
-    if(!rrn && (STORES.some(st=>raw.includes(st.name+'점')) || /명단|입금|근무자|파출\s*인원/.test(raw))) return;   // "구로점 파출 명단" 같은 머리줄
-    out.push({name:s, rrn, acct:[bank, acct].filter(Boolean).join(' '), type, amt});
+  const people = [];
+  let cur = null;
+  const close = ()=>{ if(cur && cur.name) people.push(cur); cur = null; };
+  String(text||'').replace(/\r/g,'').split('\n').forEach(raw=>{
+    const t = raw.trim();
+    if(!t){ close(); return; }                                                     // 빈 줄 = 다음 사람
+    if(!/\d{6}\s*[-_]?\s*[1-8]\d{6}/.test(t) && (STORES.some(st=>t.includes(st.name+'점')) || /명단|입금\s*내역|근무자|파출\s*인원/.test(t))) return;   // 머리줄
+    const o = parseLine(t);
+    // 새 사람 시작: 이름이 있는 줄인데 지금 사람에게 이미 이름이 있을 때, 또는 등록번호가 또 나올 때
+    if(!cur || (o.name && cur.name) || (o.rrn && cur.rrn)){ if(cur && !cur.name && !o.name){ /* 이름 없는 조각은 버림 */ } close(); cur = {name:'', rrn:'', bank:'', acct:'', type:'', amts:[]}; }
+    if(o.name) cur.name = o.name;
+    if(o.rrn) cur.rrn = o.rrn;
+    if(o.bank && !cur.bank) cur.bank = o.bank;
+    if(o.acct && !cur.acct) cur.acct = o.acct;
+    if(o.type) cur.type = o.type;
+    cur.amts.push(...o.amts);
   });
-  // "이름" 다음 줄에 등록번호만 있는 경우 합치기
-  return out;
+  close();
+  return people.map(p=>({name:p.name, rrn:p.rrn, acct:[p.bank, p.acct].filter(Boolean).join(' '), type:p.type, amt: p.amts.length ? p.amts.reduce((a,b)=>a+b,0) : '', parts: p.amts}));
+}
+function dlRecTxt(r){ return fmtD(r.date) + (r.type==='half'?'반':r.type==='full'?'풀':'') + (r.days > 1 ? `(${r.days}일)` : ''); }
+function dlGuessDays(amt){ for(const r of [65000,120000,70000,130000]){ if(amt % r === 0) return amt / r; } return ''; }
+function dlSetDays(k, el){ const d = dlDay(dlStore, dlDate, true), x = d.list[k]; x.days = el.value==='' ? '' : Math.max(1, Math.round(Number(el.value))); dlSave(); renderDaily(); }
+function dlTypeFromAmt(amt){
+  if(amt===65000 || amt===70000) return 'half';
+  if(amt===120000 || amt===130000) return 'full';
+  return '';
 }
 function dlPaste(){
   const ta = document.getElementById('dlPasteBox');
-  // 등록번호·계좌만 있는 줄은 바로 위 이름 줄에 붙임
-  const lines = String(ta.value||'').split('\n'), merged = [];
-  lines.forEach(l=>{ const t = l.trim(); if(!t) return; if(merged.length && /^[\d\s\-_.:가-힣()]*$/.test(t) && !/[가-힣]{2,}/.test(t.replace(/(은행|뱅크|금고|농협|신협|등록번호|주민번호|계좌)/g,'')) && /\d{6}/.test(t)) merged[merged.length-1] += ' ' + t; else merged.push(t); });
-  const P = parsePaste(merged.join('\n'));
-  if(!P.length){ toast('이름을 찾지 못했어요. 한 줄에 한 명씩 붙여넣어 주세요'); return; }
+  const P = parsePaste(ta.value);
+  if(!P.length){ toast('이름을 찾지 못했어요. 이름과 등록번호를 붙여넣어 주세요'); return; }
   const d = dlDay(dlStore, dlDate, true), prem = dlPrem(dlStore, dlDate);
   let n = 0, upd = 0;
   P.forEach(p=>{
-    const ex = d.list.find(x=>dlNorm(x.name)===p.name);
-    if(ex){ if(p.rrn && !ex.rrn){ ex.rrn = p.rrn; upd++; } if(p.acct && !ex.acct){ ex.acct = p.acct; upd++; } dlRemember(ex); return; }
-    const rate = dlRate(p.type, prem);
-    const x = {id:uid(), name:p.name, rrn:p.rrn, acct:p.acct, type:p.type, amt: p.amt!=='' ? p.amt : rate, auto: p.amt==='' || p.amt===rate};
-    if(p.type) dlRemember(x);
+    const rd = String(p.rrn||'').replace(/\D/g,'');
+    const ex = d.list.find(x=>dlNorm(x.name)===p.name || (rd.length===13 && String(x.rrn||'').replace(/\D/g,'')===rd));
+    if(ex){ if(p.rrn && !ex.rrn){ ex.rrn = p.rrn; upd++; } if(p.acct && !ex.acct){ ex.acct = p.acct; upd++; } if(p.amt!=='' && ex.amt===''){ ex.amt = p.amt; ex.auto = false; upd++; } dlRemember(ex); return; }
+    let type = p.type || (p.amt!=='' ? dlTypeFromAmt(p.amt) : '');
+    const rate = dlRate(type, prem);
+    const x = {id:uid(), name:p.name, rrn:p.rrn, acct:p.acct, type, amt: p.amt!=='' ? p.amt : rate, auto: p.amt==='' || p.amt===rate};
+    if(p.parts && p.parts.length > 1) x.note = p.parts.map(v=>v.toLocaleString('ko-KR')).join(' + ');
+    if(Number(x.amt) > 130000) x.days = dlGuessDays(Number(x.amt));
+    if(type) dlRemember(x);
     dlFill(x); dlRemember(x); d.list.push(x); n++;
   });
   ta.value = ''; dlSave(); renderDaily();
-  const gs = d.list.filter(x=>x.guess).length;
-  toast(n ? n + '명 넣었어요' + (gs ? ' · ' + gs + '명은 평소 근무로 금액까지 자동' : ' · 반타임/풀타임을 눌러 주세요') : (upd ? '등록번호·계좌를 채웠어요' : '이미 모두 들어가 있어요'));
+  const gs = d.list.filter(x=>x.guess).length, withAmt = P.filter(p=>p.amt!=='').length;
+  toast(n ? n + '명 넣었어요' + (withAmt ? ' · 금액 ' + withAmt + '명 그대로' : '') + (gs ? ' · ' + gs + '명 평소 근무로 자동' : '') : (upd ? '등록번호·계좌·금액을 채웠어요' : '이미 모두 들어가 있어요'));
 }
 function dlCopyPrev(){
   const D = dlAll()[dlStore] || {}, prev = Object.keys(D).filter(ds=>ds < dlDate && (D[ds].list||[]).some(x=>dlNorm(x.name))).sort().pop();
@@ -1531,17 +1565,22 @@ function dlMonth(sid, ym){   // 사람별로 묶기
     const L = (D[ds].list||[]).filter(x=>dlNorm(x.name)); if(!L.length) return;
     days.push({ds, list:L, sum:L.reduce((a,x)=>a+(Number(x.amt)||0),0), paid:D[ds].paid});
     L.forEach(x=>{
-      const k = dlNorm(x.name);
-      if(!by.has(k)) by.set(k, {name:k, rec:[], rrn:'', acct:''});
-      const w = by.get(k); w.rec.push({date:ds, type:x.type, amt:Number(x.amt)||0});
+      const rd = String(x.rrn||'').replace(/\D/g,''), n = dlNorm(x.name);
+      // 같은 사람은 등록번호로 묶음 (이름을 조금 다르게 적어도 한 사람으로)
+      let k = rd.length===13 ? 'R' + rd : 'N' + n;
+      if(!by.has(k) && rd.length===13 && by.has('N' + n)){ by.set(k, by.get('N' + n)); by.delete('N' + n); }
+      if(!by.has(k) && rd.length!==13){ const hit = [...by.entries()].find(([kk,w])=>w.name===n); if(hit) k = hit[0]; }
+      if(!by.has(k)) by.set(k, {name:n, rec:[], rrn:'', acct:''});
+      const w = by.get(k); w.rec.push({date:ds, type:x.type, amt:Number(x.amt)||0, days:Math.max(1, Number(x.days)||1), needDays: Number(x.amt) > 130000 && !Number(x.days)});
       if(x.rrn) w.rrn = x.rrn; if(x.acct) w.acct = x.acct;
     });
   });
   const people = [...by.values()].map(w=>{
     const o = dlBook()[w.name] || {}; if(!w.rrn) w.rrn = o.rrn || ''; if(!w.acct) w.acct = o.acct || '';
-    let it = 0, lt = 0; w.rec.forEach(r=>{ const t = dailyTax(r.amt); it += t.it; lt += t.lt; });
+    // 여러 날 몫을 한 번에 받은 경우: 하루치(금액÷일수)로 세금 계산
+    let it = 0, lt = 0; w.rec.forEach(r=>{ const t = dailyTax(Math.round(r.amt / r.days)); it += t.it * r.days; lt += t.lt * r.days; });
     const gross = w.rec.reduce((a,r)=>a+r.amt,0);
-    return Object.assign(w, {n:w.rec.length, half:w.rec.filter(r=>r.type==='half').length, full:w.rec.filter(r=>r.type==='full').length, gross, it, lt, net:gross-it-lt, noAmt:w.rec.some(r=>!r.amt)});
+    return Object.assign(w, {n:w.rec.reduce((a,r)=>a+r.days,0), needDays:w.rec.some(r=>r.needDays), half:w.rec.filter(r=>r.type==='half').length, full:w.rec.filter(r=>r.type==='full').length, gross, it, lt, net:gross-it-lt, noAmt:w.rec.some(r=>!r.amt)});
   }).sort((a,b)=>b.n-a.n || (a.name<b.name?-1:1));
   return {people, days};
 }
@@ -1555,7 +1594,7 @@ function renderDailyMonth(){
   document.getElementById('dmSum').innerHTML = `<div><span>인원</span><b>${R.people.length}명</b></div><div><span>연인원</span><b>${md}일</b></div><div><span>${esc(st.name)}점 ${m}월 합계</span><b>${won(tot)}</b></div>`;
   document.getElementById('dmPeople').innerHTML = R.people.length
     ? `<table class="dmTbl"><thead><tr><th>이름 · 등록번호</th><th>반</th><th>풀</th><th>일수</th><th>합계</th></tr></thead><tbody>` +
-      R.people.map(p=>`<tr><td><b>${esc(p.name)}</b>${p.noAmt?' <small style="color:#c06a00;display:inline">금액 빠짐</small>':''}<small class="${p.rrn?'':'warnTxt'}">${esc(p.rrn || '⚠ 등록번호 없음')}</small><small>${p.rec.map(r=>fmtD(r.date)+(r.type==='half'?'반':r.type==='full'?'풀':'?')).join(' ')}</small></td><td>${p.half}</td><td>${p.full}</td><td>${p.n}</td><td class="r">${won(p.gross)}</td></tr>`).join('') +
+      R.people.map(p=>`<tr><td><b>${esc(p.name)}</b>${p.noAmt?' <small style="color:#c06a00;display:inline">금액 빠짐</small>':''}<small class="${p.rrn?'':'warnTxt'}">${esc(p.rrn || '⚠ 등록번호 없음')}</small><small>${p.rec.map(r=>dlRecTxt(r)).join(' ')}</small></td><td>${p.half}</td><td>${p.full}</td><td>${p.n}</td><td class="r">${won(p.gross)}</td></tr>`).join('') +
       `</tbody><tfoot><tr><td>합계</td><td>${R.people.reduce((a,p)=>a+p.half,0)}</td><td>${R.people.reduce((a,p)=>a+p.full,0)}</td><td>${md}</td><td class="r">${won(tot)}</td></tr></tfoot></table>`
     : `<div class="dlEmpty">${m}월 ${esc(st.name)}점 일용직 기록이 없어요</div>`;
   document.getElementById('dmDays').innerHTML = R.days.map(d=>`<button class="dmDay" onclick="openDaily('${dmStore}','${d.ds}')"><span class="dt ${dlPrem(dmStore,d.ds)?'hol':''}">${dlDayName(d.ds)}${d.paid?' <em>💰입금</em>':''}</span><span class="sm">${d.list.length}명 · ${won(d.sum)}</span><span class="nm">${d.list.map(x=>esc(x.name)+(x.type==='half'?' 반':x.type==='full'?' 풀':' ?')).join(', ')}</span></button>`).join('');
@@ -1563,7 +1602,7 @@ function renderDailyMonth(){
 function dmText(){
   const [y,m] = dmMonth.split('-').map(Number), R = dlMonth(dmStore, dmMonth), st = STORES.find(x=>x.id===dmStore);
   const tot = R.people.reduce((a,p)=>a+p.gross,0);
-  return `[${st.name}점 ${y}년 ${m}월 일용직 명단]\n` + R.people.map((p,k)=>`${k+1}. ${p.name} ${p.rrn||'(등록번호 없음)'}\n   ${p.rec.map(r=>fmtD(r.date)+(r.type==='half'?'반':r.type==='full'?'풀':'')).join(' ')} · ${p.n}일 · ${won(p.gross)}${p.acct ? '\n   ' + p.acct : ''}`).join('\n') +
+  return `[${st.name}점 ${y}년 ${m}월 일용직 명단]\n` + R.people.map((p,k)=>`${k+1}. ${p.name} ${p.rrn||'(등록번호 없음)'}\n   ${p.rec.map(r=>dlRecTxt(r)).join(' ')} · ${p.n}일 · ${won(p.gross)}${p.acct ? '\n   ' + p.acct : ''}`).join('\n') +
     `\n\n합계 ${R.people.length}명 · 연 ${R.people.reduce((a,p)=>a+p.n,0)}일 · ${won(tot)}`;
 }
 function dmShare(){ shareText(dmText()); }
@@ -1573,7 +1612,7 @@ async function dmExcel(){
     ['번호','성명','등록번호(주민·외국인)','내·외국인','근무한 날','반','풀','근무일수','총지급액','소득세','지방소득세','차인지급액','은행·계좌'].map(c=>C(c, XS.head))];
   const first = rows.length + 1;
   R.people.forEach((p,k)=>{ const R2 = rows.length + 1; rows.push([C(k+1, XS.ctr), C(p.name, XS.txt), p.rrn ? C(p.rrn, XS.ctr) : C('', XS.miss), natOf(p.rrn) ? C(natOf(p.rrn), XS.ctr) : C('', XS.miss),
-    C(p.rec.map(r=>fmtD(r.date)+(r.type==='half'?'반':r.type==='full'?'풀':'')).join(' '), XS.txt), C(p.half, XS.num), C(p.full, XS.num), C(p.n, XS.num), C(p.gross, p.noAmt?XS.missNum:XS.num), C(p.it, XS.num), C(p.lt, XS.num), {f:`I${R2}-J${R2}-K${R2}`, v:p.net, s:XS.num}, C(p.acct||'', XS.txt)]); });
+    C(p.rec.map(r=>dlRecTxt(r)).join(' '), XS.txt), C(p.half, XS.num), C(p.full, XS.num), C(p.n, XS.num), C(p.gross, p.noAmt?XS.missNum:XS.num), C(p.it, XS.num), C(p.lt, XS.num), {f:`I${R2}-J${R2}-K${R2}`, v:p.net, s:XS.num}, C(p.acct||'', XS.txt)]); });
   const last = rows.length, tr = ['합계','',`${R.people.length}명`,'','',null,null,null,null,null,null,null,''].map(v=>C(v||'', XS.totTxt));
   [[5,'F'],[6,'G'],[7,'H'],[8,'I'],[9,'J'],[10,'K'],[11,'L']].forEach(([ci,L])=>{ const v = R.people.reduce((a,p)=>a+[p.half,p.full,p.n,p.gross,p.it,p.lt,p.net][ci-5],0); tr[ci] = last>=first ? {f:`SUM(${L}${first}:${L}${last})`, v, s:XS.totNum} : C(0, XS.totNum); });
   rows.push(tr);
@@ -1641,6 +1680,7 @@ function taxEntries(ym, sid){
       d:{days: w.rec.map(r=>r.date), detail: w.rec, n: w.n, w:'', gross: w.gross, it: w.it, lt: w.lt, net: w.net}};
     if(rrnDigits(p).length!==13) e.miss.push('등록번호');
     if(w.noAmt) e.miss.push('금액 빠진 날');
+    if(w.needDays) e.miss.push('근무 일수');
     out.push(e);
   }));
   return out;
@@ -1793,7 +1833,7 @@ function makeTaxFile(ym, sid, withRrn){
     L.forEach((e,k)=>{
       const p = e.p, d = e.d, R = rows.length + 1; g += d.gross; it += d.it; lt += d.lt;
       rows.push([C(k+1, XS.ctr), C(e.st.name, XS.txt), C(e.sec.name, XS.txt), C(p.name, XS.txt), rrnCell(e), natCell(e), visaCell(e),
-        C(d.detail ? d.detail.map(r=>fmtD(r.date)+(r.type==='half'?'반':r.type==='full'?'풀':'')).join(' ') : d.days.map(fmtD).join(' '), XS.txt), C(d.n, XS.num),
+        C(d.detail ? d.detail.map(r=>dlRecTxt(r)).join(' ') : d.days.map(fmtD).join(' '), XS.txt), C(d.n, XS.num),
         C(d.detail ? `반 ${d.detail.filter(r=>r.type==='half').length} · 풀 ${d.detail.filter(r=>r.type==='full').length}` : (d.w ? '일당 ' + d.w.toLocaleString('ko-KR') : ''), d.detail || d.w ? XS.txt : XS.miss),
         missN(d.gross), C(d.it, XS.num), C(d.lt, XS.num), {f:`K${R}-L${R}-M${R}`, v:d.net, s:XS.num},
         ...acctCells(e), C(p.phone||'', XS.txt)]);
