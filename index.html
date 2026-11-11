@@ -332,6 +332,8 @@ header .title{font-size:29px;font-weight:700;letter-spacing:-1.2px;line-height:1
 .dmDay em{font-style:normal;font-size:11px;color:#168364;margin-left:4px}
 .payRec{border:1px solid #e4e8f0;border-radius:10px;margin-bottom:6px;background:#fff}.payRec summary{list-style:none;cursor:pointer;padding:10px 12px;display:grid;grid-template-columns:1fr auto;gap:2px 8px}.payRec summary::-webkit-details-marker{display:none}.payRec .pd{font-weight:700;font-size:14px}.payRec .ps{grid-column:1/-1;font-size:12px;color:#727c8e;grid-row:2}.payRec .pt{font-size:13px;text-align:right;grid-row:1;grid-column:2}.payRec .dmTbl{margin:0 8px;width:calc(100% - 16px)}
 .payBtns{display:flex;gap:6px;padding:8px}.payBtns button{flex:1;padding:9px;border-radius:8px;border:1px solid #e4e8f0;background:#f6f8ff;color:#315bf5;font-family:inherit;font-size:13px;font-weight:600}.payBtns .del{flex:0 0 60px;color:#b23b3b;background:#fff}
+.bkSafe{padding:12px;border-radius:10px;border:1px solid #b7e0cc;background:#f3faf6;font-size:13px;line-height:1.75;margin-bottom:12px;color:#1c2434}.bkSafe .bkBtn{margin:8px 0 0}
+.deMv{display:flex;gap:6px}.deMv select{flex:1;min-width:0}.deMv button{flex-shrink:0;border:0;border-radius:9px;background:#315bf5;color:#fff;font-family:inherit;font-size:14px;font-weight:700;padding:0 14px}
 .taxOk{padding:12px;border-radius:10px;background:#e7f5ef;color:#168364;font-weight:700;font-size:13px}
 .taxChk{display:flex!important;align-items:center;gap:8px;margin:14px 0 10px!important;font-size:13px!important;color:#1c2434!important}.taxChk input{width:18px;height:18px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
@@ -519,6 +521,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
   <div class="modalBox">
     <h2>💾 전체 백업</h2>
     <div class="bkInfo" id="bkInfo"></div>
+    <div class="bkSafe" id="bkSafe"></div>
     <div class="field"><label>백업 받을 메일 주소</label><input type="email" id="bkMail" style="width:100%;padding:12px;border:1px solid #dfe4ec;border-radius:10px;font-size:15px;font-family:inherit;box-sizing:border-box" placeholder="예) myname@naver.com" autocomplete="email" onchange="saveBkMail()"></div>
     <button class="bkBtn mail" onclick="mailBackup()">📧 메일로 백업 보내기<small>직원·주민번호·메모·휴무·입퇴사·일용직 기록 전부</small></button>
     <div class="bkSent" id="bkSent" style="display:none"></div>
@@ -541,6 +544,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
     <div class="calHead" style="margin-top:10px"><button onclick="dmMove(-1)">◀</button><b id="dmTtl"></b><button onclick="dmMove(1)">▶</button></div>
     <div class="dmSum" id="dmSum"></div>
     <div id="dmPeople"></div>
+    <div class="dlBtns" style="margin-top:10px"><button onclick="daOpen()">+ 사람 추가</button><button onclick="undoLast()">↶ 되돌리기</button></div>
     <div class="btnRow" style="margin-top:12px">
       <button class="bGray" onclick="document.getElementById('dmModal').classList.remove('show')">닫기</button>
       <button class="bRed" onclick="dmShare()">📤 명단 공유</button>
@@ -558,7 +562,24 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
     <div class="field"><label>등록번호 (주민·외국인)</label><input type="text" id="deRrn" inputmode="numeric" autocomplete="off"></div>
     <div class="field"><label>은행 계좌</label><input type="text" id="deAcct" autocomplete="off" placeholder="예) 국민 123-45-678901"></div>
     <div class="field"><label>이번 달 지급 (회차별 금액 · 일수)</label><div id="deRecs"></div><div class="deTotal">합계 <b id="deTotal"></b></div></div>
+    <div class="field"><label>↪ 다른 매장으로 옮기기</label><div class="moveBox"><div class="deMv"><select id="deMoveTo"></select><button type="button" onclick="dmMovePerson()">옮기기</button></div><small>이번 달 이 사람의 근무 기록(반·풀·금액·등록번호·계좌)이 그대로 옮겨가요</small></div></div>
     <div class="btnRow"><button class="bGray" onclick="dmEditClose()">취소</button><button class="bRed" onclick="dmEditSave()">수정 저장</button></div>
+    <button class="delLink" onclick="dmDelPerson()">🗑 이번 달 기록에서 이 사람 빼기</button>
+  </div>
+</div>
+
+<!-- 한 달 리스트에 사람 추가 -->
+<div class="modalOverlay" id="dmAddModal">
+  <div class="modalBox">
+    <h2 id="daTitle">+ 일용직 추가</h2>
+    <div class="field"><label>이름</label><input type="text" id="daName" list="daNames" placeholder="이름" autocomplete="off" onchange="daFillName()"></div>
+    <datalist id="daNames"></datalist>
+    <div class="field"><label>등록번호 (주민·외국인)</label><input type="text" id="daRrn" inputmode="numeric" autocomplete="off" placeholder="000000-0000000"></div>
+    <div class="field"><label>은행 계좌</label><input type="text" id="daAcct" autocomplete="off" placeholder="예) 국민 123-45-678901"></div>
+    <div class="field"><label>근무한 날</label><input type="date" id="daDate" onchange="daRate()"><div class="cfgHint" id="daDay" style="margin:6px 0 0"></div></div>
+    <div class="field"><label>근무</label><div class="payChips" id="daType"><button type="button" data-t="half" onclick="daSetType('half')">반타임</button><button type="button" data-t="full" onclick="daSetType('full')">풀타임</button></div></div>
+    <div class="field"><label>금액 (원) — 반·풀을 누르면 자동, 직접 고쳐도 돼요</label><input type="number" id="daAmt" inputmode="numeric" placeholder="금액"></div>
+    <div class="btnRow"><button class="bGray" onclick="daClose()">닫기</button><button class="bRed" onclick="daSave()">추가</button></div>
   </div>
 </div>
 
@@ -873,6 +894,7 @@ function persist(){
     localStorage.setItem(KEY, JSON.stringify(allData));
     localStorage.setItem(SAVED_AT_KEY, String(Date.now()));
     showSaved();
+    if(typeof safeAfterSave==='function') safeAfterSave();
     return true;
   }
   catch(e){ const el=document.getElementById('saveInfo');el.classList.add('dirty');el.innerHTML='<b>저장 실패 · 다시 저장해주세요</b><br>백업 파일로 기록을 보관할 수 있어요';toast('저장하지 못했어요. 저장 공간·브라우저 설정을 확인해주세요');return false; }
@@ -1474,7 +1496,7 @@ function openDaily(sid, ds){
 }
 function closeDaily(){
   const d = dlDay(dlStore, dlDate, false);
-  if(d){ d.list = d.list.filter(x=>dlNorm(x.name)); d.at = Date.now(); persist(); }
+  if(d){ d.list = d.list.filter(x=>dlNorm(x.name)); d.at = Date.now(); persist(); autoBackup(); }
   document.getElementById('dailyModal').classList.remove('show');
   if(document.getElementById('dmModal').classList.contains('show')) renderDailyMonth();
   if(document.getElementById('payModal').classList.contains('show')) renderPay();
@@ -1486,7 +1508,7 @@ function renderDaily(){
   const day = dlDay(dlStore, dlDate, false), list = day ? day.list : [], prem = dlPrem(dlStore, dlDate);
   document.getElementById('dlStores').innerHTML = STORES.map(st=>`<button class="${st.id===dlStore?'on':''}" onclick="dlStore='${st.id}';renderDaily()">${esc(st.name)}</button>`).join('');
   document.getElementById('dlDate').value = dlDate;
-  document.getElementById('dlDayName').textContent = dlDayName(dlDate);
+  document.getElementById('dlDayName').textContent = (STORES.find(x=>x.id===dlStore)||{name:''}).name + '점 · ' + dlDayName(dlDate);
   document.getElementById('dlPrem').checked = prem;
   document.getElementById('dlPremTxt').innerHTML = prem ? '<b>주말·공휴일 단가</b> 반 7만 · 풀 13만' : '<b>평일 단가</b> 반 6.5만 · 풀 12만';
   const inList = new Set(list.map(x=>dlNorm(x.name)));
@@ -1691,7 +1713,7 @@ function dlPay(){
   else { snap.id = uid(); P.push(snap); }
   d.paid = {id: old ? old.id : snap.id, at: snap.at};
   L.forEach(dlRemember);
-  dlSave(); dlTotal();
+  dlSave(); dlTotal(); autoBackup();
   toast((old ? '입금 기록을 고쳐 저장했어요 · ' : '입금 기록에 저장했어요 · ') + L.length + '명 ' + won(snap.total));
 }
 let payStore = '', payMonth = '';
@@ -1774,7 +1796,7 @@ function renderDailyMonth(){
   document.getElementById('dmPeople').innerHTML = R.people.length
     ? `<table class="dmTbl"><thead><tr><th>이름 · 등록번호</th><th>반</th><th>풀</th><th>일수</th><th>합계</th></tr></thead><tbody>` +
       R.people.map((p,k)=>`<tr class="dmRow" onclick="dmEdit(${k})"><td><b>${esc(p.name)}</b> <span class="dmPen">✎</span>${p.noAmt?' <small style="color:#c06a00;display:inline">금액 빠짐</small>':''}<small class="${p.rrn?'':'warnTxt'}">${esc(p.rrn || '⚠ 등록번호 없음')}</small></td><td>${p.half}</td><td>${p.full}</td><td>${p.n}</td><td class="r">${won(p.gross)}</td></tr>`).join('') +
-      `</tbody><tfoot><tr><td>합계</td><td>${R.people.reduce((a,p)=>a+p.half,0)}</td><td>${R.people.reduce((a,p)=>a+p.full,0)}</td><td>${md}</td><td class="r">${won(tot)}</td></tr></tfoot></table>` + `<div class="cfgHint" style="margin-top:6px">✎ 이름을 누르면 수정할 수 있어요</div>`
+      `</tbody><tfoot><tr><td>합계</td><td>${R.people.reduce((a,p)=>a+p.half,0)}</td><td>${R.people.reduce((a,p)=>a+p.full,0)}</td><td>${md}</td><td class="r">${won(tot)}</td></tr></tfoot></table>` + `<div class="cfgHint" style="margin-top:6px">✎ 이름을 누르면 수정 · 다른 매장 이동 · 빼기</div>`
     : `<div class="dlEmpty">${m}월 ${esc(st.name)}점 일용직 기록이 없어요</div>`;
 }
 function dmShowName(n){ return String(n||'').replace(/\s*\(/, ' ('); }
@@ -1798,6 +1820,7 @@ function dmEdit(k){
     <input type="number" inputmode="numeric" class="deDays" data-i="${i}" value="${r.days>1?r.days:1}" min="1" oninput="deTotal()"><em>일</em>
     <button onclick="deDelRec(${i},this)" title="빼기">✕</button></div>`).join('');
   deTotal();
+  document.getElementById('deMoveTo').innerHTML = '<option value="">옮길 매장 고르기</option>' + STORES.filter(s=>s.id!==dmStore).map(s=>`<option value="${s.id}">${esc(s.name)}점</option>`).join('');
   document.getElementById('dmEditModal').classList.add('show');
 }
 function deDelRec(i, btn){ const row = btn.closest('.deRec'); row.classList.toggle('off'); btn.textContent = row.classList.contains('off') ? '↺' : '✕'; deTotal(); }
@@ -1824,6 +1847,7 @@ function dmEditSave(){
   if(removed) ch.push(`${removed}회 기록 빼기`);
   if(!ch.length){ toast('바뀐 내용이 없어요'); dmEditClose(); return; }
   if(!confirm(`${p.name} 정보를 수정하시겠습니까?\n\n` + ch.join('\n'))) return;
+  snap(p.name + ' 수정');
   rows.forEach((row,i)=>{
     const r = p.rec[i], day = D[r.date]; if(!day) return;
     const k = day.list.findIndex(x=>x.id===r.id); if(k<0) return;
@@ -1837,8 +1861,86 @@ function dmEditSave(){
   // 인명부(등록번호·계좌 기억)도 새 이름으로
   const B = dlBook(); if(name !== p.name && B[p.name]){ B[name] = Object.assign({}, B[p.name], B[name]||{}); delete B[p.name]; }
   dlRemember({name, rrn, acct});
-  persist(); dmEditClose(); renderDailyMonth(); renderCallAlert();
+  persist(); autoBackup(); dmEditClose(); renderDailyMonth(); renderCallAlert();
   toast('수정했어요');
+}
+/* 다른 매장으로 옮기기 */
+function dmMovePerson(){
+  if(!dmEditP) return;
+  const dest = document.getElementById('deMoveTo').value;
+  if(!dest){ toast('옮길 매장을 골라 주세요'); return; }
+  const p = dmEditP.orig, src = dmEditP.store, D = dlAll()[src] || {};
+  const sN = STORES.find(x=>x.id===src).name, dN = STORES.find(x=>x.id===dest).name;
+  const paid = p.rec.filter(r=>D[r.date] && D[r.date].paid).length;
+  if(!confirm(`${p.name} ${Number(dmMonth.slice(5))}월 기록 ${p.rec.length}건을\n${sN}점 → ${dN}점으로 옮길까요?` + (paid ? `\n\n⚠ 이 중 ${paid}건은 이미 💰 입금 기록이 있어요. 입금 기록은 그대로 남아요.` : ''))) return;
+  snap(`${p.name} ${sN}→${dN} 이동`);
+  let moved = 0, skip = 0;
+  p.rec.forEach(r=>{
+    const day = D[r.date]; if(!day) return;
+    const k = day.list.findIndex(x=>x.id===r.id); if(k<0) return;
+    const x = day.list[k], dd = dlDay(dest, r.date, true);
+    if(dd.list.some(y=>dlNorm(y.name)===dlNorm(x.name))){ skip++; return; }   // 그 매장 같은 날에 이미 있음
+    day.list.splice(k,1); day.at = Date.now();
+    if(x.auto && x.type) x.amt = dlRate(x.type, dlPrem(dest, r.date));
+    dd.list.push(x); dd.at = Date.now(); moved++;
+  });
+  persist(); autoBackup(); dmEditClose(); renderDailyMonth(); renderCallAlert();
+  toast(`${p.name} ${moved}건을 ${dN}점으로 옮겼어요` + (skip ? ` · ${skip}건은 ${dN}점 같은 날에 이미 있어서 남겨 뒀어요` : ''));
+}
+/* 이번 달 기록에서 빼기 */
+function dmDelPerson(){
+  if(!dmEditP) return;
+  const p = dmEditP.orig, src = dmEditP.store, D = dlAll()[src] || {};
+  const paid = p.rec.filter(r=>D[r.date] && D[r.date].paid).length;
+  if(!confirm(`${p.name}을(를) ${STORES.find(x=>x.id===src).name}점 ${Number(dmMonth.slice(5))}월 기록 ${p.rec.length}건에서 모두 뺄까요?` + (paid ? `\n\n⚠ 이 중 ${paid}건은 💰 입금 기록이 있어요. 입금 기록은 그대로 남아요.` : '') + `\n\n잘못 뺐으면 ↶ 되돌리기로 살릴 수 있어요.`)) return;
+  snap(`${p.name} 빼기`);
+  p.rec.forEach(r=>{ const day = D[r.date]; if(!day) return; const k = day.list.findIndex(x=>x.id===r.id); if(k>=0){ day.list.splice(k,1); day.at = Date.now(); } });
+  persist(); autoBackup(); dmEditClose(); renderDailyMonth(); renderCallAlert();
+  toast(p.name + ' 뺐어요 · ↶ 되돌리기 가능');
+}
+/* 한 달 리스트에서 사람 추가 */
+let daType = '';
+function daOpen(){
+  const st = STORES.find(x=>x.id===dmStore);
+  document.getElementById('daTitle').textContent = '+ ' + st.name + '점 일용직 추가';
+  ['daName','daRrn','daAcct','daAmt'].forEach(id=>document.getElementById(id).value = '');
+  const t = today();
+  document.getElementById('daDate').value = t.slice(0,7)===dmMonth ? t : dmMonth + '-01';
+  document.getElementById('daNames').innerHTML = Object.keys(dlBook()).sort().map(n=>`<option value="${esc(n)}">`).join('');
+  daType = ''; daSetType('');
+  document.getElementById('dmAddModal').classList.add('show');
+  setTimeout(()=>document.getElementById('daName').focus(), 50);
+}
+function daClose(){ document.getElementById('dmAddModal').classList.remove('show'); }
+function daFillName(){
+  const o = dlBook()[dlNorm(document.getElementById('daName').value)] || {};
+  if(o.rrn && !document.getElementById('daRrn').value) document.getElementById('daRrn').value = o.rrn;
+  if(o.acct && !document.getElementById('daAcct').value) document.getElementById('daAcct').value = o.acct;
+  if(o.type && !daType) daSetType(o.type);
+}
+function daSetType(t){ daType = t; document.querySelectorAll('#daType button').forEach(b=>b.classList.toggle('on', b.dataset.t===t)); daRate(); }
+function daRate(){
+  const ds = document.getElementById('daDate').value;
+  document.getElementById('daDay').textContent = ds ? dlDayName(ds) + (dlPrem(dmStore, ds) ? ' · 주말·공휴일 단가' : ' · 평일 단가') : '';
+  if(ds && daType) document.getElementById('daAmt').value = dlRate(daType, dlPrem(dmStore, ds));
+}
+function daSave(){
+  const name = dlNorm(document.getElementById('daName').value), ds = document.getElementById('daDate').value;
+  const rrn = dlFmtRrn(document.getElementById('daRrn').value), acct = document.getElementById('daAcct').value.trim();
+  const amtV = document.getElementById('daAmt').value, amt = amtV==='' ? '' : Number(amtV);
+  if(!name){ toast('이름을 넣어 주세요'); return; }
+  if(!ds){ toast('근무한 날을 골라 주세요'); return; }
+  if(amt===''){ toast('반·풀을 누르거나 금액을 넣어 주세요'); return; }
+  const d = dlDay(dmStore, ds, true), rd = rrn.replace(/\D/g,'');
+  if(d.list.some(x=>dlNorm(x.name)===name || (rd.length===13 && String(x.rrn||'').replace(/\D/g,'')===rd))){ toast(dlDayName(ds) + '에 이미 있는 사람이에요'); return; }
+  snap(name + ' 추가');
+  const rate = dlRate(daType, dlPrem(dmStore, ds));
+  const x = {id:uid(), name, rrn, acct, type: daType || dlTypeFromAmt(amt), amt, auto: amt===rate};
+  if(amt > 130000) x.days = dlGuessDays(amt);
+  d.list.push(x); d.at = Date.now(); dlRemember(x);
+  persist(); autoBackup(); daClose();
+  dmMonth = ds.slice(0,7); renderDailyMonth(); renderCallAlert();
+  toast(name + ' 추가했어요');
 }
 function dmShare(){ shareText(dmText()); }
 async function dmExcel(){
@@ -2569,6 +2671,7 @@ function openBackup(){
   const S = bkStats(); let sent = 0; try{ sent = Number(localStorage.getItem('cwy_staff_sent_at'))||0; }catch(e){}
   document.getElementById('bkInfo').innerHTML = `직원 <b>${S.staff}명</b> · 일용직 기록 <b>${S.dl}건</b> · 매장 ${STORES.length}곳<br><small>마지막 백업: ${sent ? new Date(sent).toLocaleString('ko-KR') : '없음'}</small>`;
   try{ document.getElementById('bkMail').value = localStorage.getItem(BK_MAIL_KEY) || ''; }catch(e){}
+  renderSafe();
   document.getElementById('bkModal').classList.add('show');
 }
 function saveBkMail(){ try{ localStorage.setItem(BK_MAIL_KEY, document.getElementById('bkMail').value.trim()); }catch(e){} }
@@ -2577,7 +2680,7 @@ function backupFile(){
   const payload = {app:FILE_TAG, ver:2, kind:'full-backup', exportedAt:Date.now(), data:JSON.parse(JSON.stringify(allData))};
   delete payload.data.__att;
   // 안드로이드 공유창은 .json 파일을 메일 앱에 넘기지 못해서 .txt(text/plain)로 만듦 — 불러오기는 그대로 됨
-  const name = '최우영_직원관리_백업_' + stamp() + '.txt';
+  const name = FOLDER_NAME + '_백업_' + stamp() + '.txt';
   return new File([JSON.stringify(payload)], name, {type:'text/plain'});
 }
 function bkMailText(file){
@@ -2628,7 +2731,8 @@ function renderBackup(){
   const hasData = STORES.some(st=>st.sections.some(sec=>(allData[st.id][sec.id]||[]).some(p=>p.name)));
   const days = sent ? Math.floor((Date.now()-sent)/86400000) : null;
   const need = hasData && (sent ? (days >= 7 && saved > sent) : true);
-  el.innerHTML = need ? `<div class="backupBar"><span>💾 ${sent ? days + '일째 백업을 안 했어요' : '아직 백업을 한 번도 안 했어요'}<br><small style="font-weight:600">폰을 바꾸거나 앱이 지워지면 기록이 사라질 수 있어요</small></span><button onclick="openBackup()">지금 백업</button></div>` : '';
+  const fw = (canFolder && folderH && !folderOk) ? `<div class="backupBar"><span>📁 ${FOLDER_NAME} 폴더 자동 저장이 멈췄어요<br><small style="font-weight:600">한 번 눌러 다시 연결하면 계속 저장돼요</small></span><button onclick="folderConnect()">다시 연결</button></div>` : '';
+  el.innerHTML = fw + (need ? `<div class="backupBar"><span>💾 ${sent ? days + '일째 백업을 안 했어요' : '아직 백업을 한 번도 안 했어요'}<br><small style="font-weight:600">폰을 바꾸거나 앱이 지워지면 기록이 사라질 수 있어요</small></span><button onclick="openBackup()">지금 백업</button></div>` : '');
 }
 function showShareNote(){
   let sent = 0, recv = 0;
@@ -2642,6 +2746,9 @@ function importData(input){
   const f = input.files && input.files[0];
   input.value = '';
   if(!f) return;
+  readImportFile(f);
+}
+function readImportFile(f){
   const r = new FileReader();
   r.onload = ()=>{
     let obj;
@@ -2749,6 +2856,7 @@ function doImport(mode){
     next = obj.data; msg = '받은 내용으로 바꿨어요';
   }
   try{
+    snap('백업 파일 불러오기');
     localStorage.setItem('cwy_staff_backup_before_import', localStorage.getItem(KEY) || '');
     localStorage.setItem(KEY, JSON.stringify(next));
     localStorage.setItem('cwy_staff_recv_at', String(Date.now()));
@@ -2774,6 +2882,114 @@ function checkNewMonth(force){
 setInterval(()=>checkNewMonth(false), 60000);
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) checkNewMonth(true); });
 
+
+/* ---------- 안전 보관: 지움 방지 · 2중 저장 · 폴더 자동 백업 · 되돌리기 ---------- */
+var FOLDER_NAME = '최우영씨푸드그룹인력';
+var AUTO_DAY_KEY = 'cwy_auto_bk_day', AUTO_ON_KEY = 'cwy_auto_bk_on', UNDO_KEY = 'cwy_staff_undo';
+var canFolder = typeof window.showDirectoryPicker === 'function';
+var folderH = null, folderOk = false, safeT = 0;
+function idbOpen(){ return new Promise((res, rej)=>{ const r = indexedDB.open('cwy_staff_safe', 1); r.onupgradeneeded = ()=>r.result.createObjectStore('kv'); r.onsuccess = ()=>res(r.result); r.onerror = ()=>rej(r.error); }); }
+async function idbSet(k, v){ try{ const db = await idbOpen(); await new Promise((res, rej)=>{ const t = db.transaction('kv','readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = res; t.onerror = ()=>rej(t.error); }); }catch(e){} }
+async function idbGet(k){ try{ const db = await idbOpen(); return await new Promise(res=>{ const r = db.transaction('kv').objectStore('kv').get(k); r.onsuccess = ()=>res(r.result); r.onerror = ()=>res(undefined); }); }catch(e){ return undefined; } }
+/* 저장할 때마다: 앱 안 보관함(2중 저장)과 연결된 폴더에 같이 저장 */
+function safeAfterSave(){
+  clearTimeout(safeT);
+  safeT = setTimeout(()=>{ let s = ''; try{ s = localStorage.getItem(KEY) || ''; }catch(e){} if(s) idbSet('data', {at:Date.now(), s}); folderSave(false); }, 1200);
+}
+function backupPayload(){ const payload = {app:FILE_TAG, ver:2, kind:'full-backup', exportedAt:Date.now(), data:JSON.parse(JSON.stringify(allData))}; delete payload.data.__att; return JSON.stringify(payload); }
+/* 되돌리기: 빼기·이동·수정·불러오기 바로 전 상태를 하나 보관 */
+function snap(label){ try{ localStorage.setItem(UNDO_KEY, JSON.stringify({at:Date.now(), label, data:allData})); }catch(e){ try{ localStorage.removeItem(UNDO_KEY); }catch(_){} } }
+function undoInfo(){ try{ const u = JSON.parse(localStorage.getItem(UNDO_KEY) || 'null'); return u && u.data ? u : null; }catch(e){ return null; } }
+function shortTime(t){ return new Date(t).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+async function undoLast(){
+  const u = undoInfo();
+  if(!u){ toast('되돌릴 기록이 없어요'); return; }
+  if(!confirm(`"${u.label}" 하기 전으로 되돌릴까요?\n(${shortTime(u.at)})\n\n그 뒤에 고친 내용은 없어져요.`)) return;
+  try{ const s = JSON.stringify(u.data); localStorage.setItem(KEY, s); localStorage.removeItem(UNDO_KEY); localStorage.setItem(SAVED_AT_KEY, String(Date.now())); await idbSet('data', {at:Date.now(), s}); }
+  catch(e){ toast('되돌리지 못했어요'); return; }
+  alert('"' + u.label + '" 전으로 되돌렸어요');
+  location.reload();
+}
+/* 폴더 자동 저장 (컴퓨터 크롬 등 폴더 저장을 지원하는 곳) */
+async function folderInit(){
+  if(!canFolder) return;
+  folderH = await idbGet('folder') || null;
+  if(folderH){ try{ folderOk = (await folderH.queryPermission({mode:'readwrite'})) === 'granted'; }catch(e){ folderOk = false; } }
+  if(folderOk) folderSave(false);
+  renderBackup();
+}
+async function folderConnect(){
+  try{
+    if(folderH && !folderOk){
+      folderOk = (await folderH.requestPermission({mode:'readwrite'})) === 'granted';
+      if(folderOk){ await folderSave(true); toast(FOLDER_NAME + ' 폴더 저장을 다시 켰어요'); renderSafe(); renderBackup(); return; }
+    }
+    const parent = await window.showDirectoryPicker({id:'cwy-staff', mode:'readwrite'});
+    folderH = parent.name === FOLDER_NAME ? parent : await parent.getDirectoryHandle(FOLDER_NAME, {create:true});
+    await idbSet('folder', folderH); folderOk = true;
+    await folderSave(true); toast(FOLDER_NAME + ' 폴더에 저장했어요'); renderSafe(); renderBackup();
+  }catch(e){ if(e && e.name==='AbortError') return; toast('폴더를 연결하지 못했어요'); }
+}
+async function folderSave(show){
+  if(!folderH || !folderOk) return false;
+  try{
+    const txt = backupPayload();
+    for(const nm of [FOLDER_NAME + '_' + today() + '.txt', FOLDER_NAME + '_최신.txt']){
+      const fh = await folderH.getFileHandle(nm, {create:true}), w = await fh.createWritable(); await w.write(txt); await w.close();
+    }
+    try{ localStorage.setItem('cwy_folder_at', String(Date.now())); localStorage.setItem('cwy_staff_sent_at', String(Date.now())); }catch(e){}
+    if(show) renderSafe();
+    return true;
+  }catch(e){ folderOk = false; renderBackup(); return false; }
+}
+async function folderLoad(){
+  try{
+    if(!folderH){ toast('먼저 폴더를 연결하세요'); return; }
+    if(!folderOk){ folderOk = (await folderH.requestPermission({mode:'readwrite'})) === 'granted'; if(!folderOk) return; }
+    let best = null;
+    for await (const [nm, h] of folderH.entries()){ if(h.kind==='file' && /\.(txt|json)$/i.test(nm)){ const f = await h.getFile(); if(!best || f.lastModified > best.lastModified) best = f; } }
+    if(!best){ toast('폴더에 백업 파일이 없어요'); return; }
+    document.getElementById('bkModal').classList.remove('show');
+    readImportFile(best);
+  }catch(e){ toast('폴더를 열지 못했어요'); }
+}
+/* 폰(폴더 저장이 안 되는 곳): 하루 한 번, 누른 동작과 함께 백업 파일을 다운로드 폴더에 저장 */
+function autoOn(){ try{ return localStorage.getItem(AUTO_ON_KEY) !== '0'; }catch(e){ return true; } }
+function setAutoOn(v){ try{ localStorage.setItem(AUTO_ON_KEY, v ? '1' : '0'); }catch(e){} renderSafe(); }
+function autoBackup(){
+  if(folderH && folderOk){ folderSave(false); return; }
+  if(!autoOn()) return;
+  let d = ''; try{ d = localStorage.getItem(AUTO_DAY_KEY) || ''; }catch(e){}
+  if(d === today()) return;
+  bkDownload(new File([backupPayload()], FOLDER_NAME + '_' + today() + '.txt', {type:'text/plain'}));
+  try{ localStorage.setItem(AUTO_DAY_KEY, today()); localStorage.setItem('cwy_staff_sent_at', String(Date.now())); }catch(e){}
+  setTimeout(()=>toast('오늘 백업 파일을 다운로드 폴더에 저장했어요'), 1800);
+  renderBackup();
+}
+async function renderSafe(){
+  const el = document.getElementById('bkSafe'); if(!el) return;
+  let pers = false; try{ pers = navigator.storage && navigator.storage.persisted ? await navigator.storage.persisted() : false; }catch(e){}
+  let fat = 0, ad = ''; try{ fat = Number(localStorage.getItem('cwy_folder_at')) || 0; ad = localStorage.getItem(AUTO_DAY_KEY) || ''; }catch(e){}
+  const u = undoInfo();
+  el.innerHTML = `<b>🛡 안전 보관</b>
+    <div>${pers ? '✅ 폰이 자료를 지우지 않도록 잠금 켜짐' : '⚠ 자료 지움 방지 대기 — 홈 화면에 앱을 설치하면 켜져요'}</div>
+    <div>✅ 2중 저장 켜짐 <small style="color:#727c8e">(한쪽이 지워져도 다른 쪽에서 자동 복구)</small></div>` +
+    (canFolder
+      ? `<div>${folderOk ? '✅' : '📁'} <b>${FOLDER_NAME}</b> 폴더 자동 저장 ${folderOk ? '켜짐 · 마지막 ' + (fat ? shortTime(fat) : '-') : (folderH ? '— 다시 연결 필요' : '— 아직 연결 안 됨')}</div>
+         <button class="bkBtn" onclick="folderConnect()">📁 ${folderH ? (folderOk ? '저장 폴더 바꾸기' : '폴더 다시 연결') : FOLDER_NAME + ' 폴더 만들고 연결'}<small>고른 곳 안에 ${FOLDER_NAME} 폴더를 만들고, 고칠 때마다 자동 저장</small></button>` +
+        (folderH ? `<button class="bkBtn load" onclick="folderLoad()">📂 폴더의 최근 백업 불러오기<small>폴더에서 가장 최근 파일을 열어요</small></button>` : '')
+      : `<label class="taxChk" style="margin:6px 0 2px!important"><input type="checkbox" ${autoOn() ? 'checked' : ''} onchange="setAutoOn(this.checked)"> 하루 한 번 백업 파일 자동 저장</label>
+         <div class="cfgHint" style="margin:0">파일 이름 <b>${FOLDER_NAME}_날짜.txt</b> · 오늘 ${ad === today() ? '✓ 저장함' : '아직'}<br>내 파일 앱 → 다운로드에 저장돼요. <b>${FOLDER_NAME}</b> 폴더로 옮겨 두세요.</div>`) +
+    `<button class="bkBtn" onclick="undoLast()">↶ 되돌리기<small>${u ? esc(u.label) + ' (' + shortTime(u.at) + ') 하기 전으로' : '되돌릴 기록 없음'}</small></button>`;
+}
+/* 시작할 때: 크롬 저장이 비었는데 2중 저장본이 있으면 복구 */
+(async()=>{
+  let has = false; try{ has = !!localStorage.getItem(KEY); }catch(e){}
+  const v = await idbGet('data');
+  if(!has && v && v.s){ try{ localStorage.setItem(KEY, v.s); }catch(e){ return; } alert('지워진 기록을 2중 저장본에서 복구했어요'); location.reload(); return; }
+  if(has) safeAfterSave();
+  folderInit();
+})();
 /* 홈 화면 설치 · 오프라인 */
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){
   window.addEventListener('load', ()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
