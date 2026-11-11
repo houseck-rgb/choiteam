@@ -1,5 +1,5 @@
 /* 최우영 직원관리 — 항상 새 버전 먼저, 인터넷이 안 될 때만 저장본 사용 */
-const CACHE = 'cwy-staff-v20261111-5';
+const CACHE = 'cwy-staff-v20261111-6';
 self.addEventListener('install', e=>{ self.skipWaiting(); });
 self.addEventListener('activate', e=>{
   e.waitUntil((async()=>{
