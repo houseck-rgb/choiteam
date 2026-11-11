@@ -334,6 +334,9 @@ header .title{font-size:29px;font-weight:700;letter-spacing:-1.2px;line-height:1
 .payBtns{display:flex;gap:6px;padding:8px}.payBtns button{flex:1;padding:9px;border-radius:8px;border:1px solid #e4e8f0;background:#f6f8ff;color:#315bf5;font-family:inherit;font-size:13px;font-weight:600}.payBtns .del{flex:0 0 60px;color:#b23b3b;background:#fff}
 .bkSafe{padding:12px;border-radius:10px;border:1px solid #b7e0cc;background:#f3faf6;font-size:13px;line-height:1.75;margin-bottom:12px;color:#1c2434}.bkSafe .bkBtn{margin:8px 0 0}
 .deMv{display:flex;gap:6px}.deMv select{flex:1;min-width:0}.deMv button{flex-shrink:0;border:0;border-radius:9px;background:#315bf5;color:#fff;font-family:inherit;font-size:14px;font-weight:700;padding:0 14px}
+.dmTabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:#e9edf3;border-radius:11px;margin:10px 0 2px}.dmTabs button{border:0;background:none;border-radius:8px;min-height:44px;font-family:inherit;font-size:14.5px;font-weight:700;color:#6c7890}.dmTabs button.on{background:#fff;color:#2545ca;box-shadow:0 1px 4px #17233a14}
+.dmDayCard{border:1px solid #e4e8f0;border-radius:12px;margin-bottom:10px;background:#fff;overflow:hidden}.dmDayHead{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#f6f8ff;border-bottom:1px solid #e4e8f0;flex-wrap:wrap}.dmDayHead b.d{font-size:15px}.dmDayHead .t{margin-left:auto;font-size:13px}.dmDayHead em{font-style:normal;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:20px}.dmDayHead em.ok{background:#e7f5ef;color:#168364}.dmDayHead em.no{background:#fff2cc;color:#8a4b00}
+.dmNew{display:block;width:100%;padding:13px;border-radius:11px;border:0;background:#315bf5;color:#fff;font-family:inherit;font-size:15px;font-weight:700;margin:4px 0 10px}
 .taxOk{padding:12px;border-radius:10px;background:#e7f5ef;color:#168364;font-weight:700;font-size:13px}
 .taxChk{display:flex!important;align-items:center;gap:8px;margin:14px 0 10px!important;font-size:13px!important;color:#1c2434!important}.taxChk input{width:18px;height:18px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
@@ -372,7 +375,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
 </head>
 <body>
 
-<header><div class="headerInner"><div class="brandLine"><div class="wordmark"><span class="brandDot"></span>CHOI CEO <span style="font-weight:400;color:#9aa4b5">/ PEOPLE</span></div><span class="workspaceTag">직원 관리 · v11.11-6</span></div>
+<header><div class="headerInner"><div class="brandLine"><div class="wordmark"><span class="brandDot"></span>CHOI CEO <span style="font-weight:400;color:#9aa4b5">/ PEOPLE</span></div><span class="workspaceTag">직원 관리 · v11.11-10</span></div>
   <div class="title" id="hTitle">구로점 직원 리스트</div>
   <div class="sub">함께 일하는 사람들, 한눈에 관리하세요.</div>
 </div></header>
@@ -390,7 +393,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
 <div class="quickHeading">자주 쓰는 업무</div><div id="backupArea"></div>
 <div id="alertArea"></div>
 <div id="callAlert"></div>
-<div class="dailyBar"><button class="call" onclick="openCalls()">📞 업체 호출 붙여넣기<small>이번 주 호출 저장</small></button><button onclick="openDaily()">🧾 일용직 오늘 등록<small>명단 붙여넣기 · 반/풀 체크</small></button><button onclick="openDailyMonth()">📅 일용직 한 달 리스트<small>매장별 인원·금액·공유</small></button><button class="pay" onclick="openPay()">💰 일용직 입금 기록<small>입금한 날짜와 명단</small></button></div>
+<div class="dailyBar"><button class="call" onclick="openCalls()">📞 업체 호출 붙여넣기<small>이번 주 호출 저장</small></button><button onclick="openDaily()">🧾 일용직 오늘 등록<small>명단 붙여넣기 · 반/풀 체크</small></button><button onclick="openDailyMonth()">📅 일용직 입금·월별 리스트<small>일별 입금 · 월별 명단 · 수정</small></button><button class="pay" onclick="openPay()">💰 일용직 입금 기록<small>입금한 날짜와 명단</small></button></div>
 <button class="bkOpen" onclick="openBackup()">백업 · 다른 기기로 옮기기</button>
 <div id="peopleOverview"></div><div class="detailPane">
 
@@ -540,17 +543,19 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
 <!-- 일용직 한 달 리스트 -->
 <div class="modalOverlay" id="dmModal">
   <div class="modalBox">
-    <h2>📅 일용직 한 달 리스트</h2>
+    <h2>📅 일용직 입금 · 월별 리스트</h2>
     <div class="taxStores" id="dmStores"></div>
     <div class="calHead" style="margin-top:10px"><button onclick="dmMove(-1)">◀</button><b id="dmTtl"></b><button onclick="dmMove(1)">▶</button></div>
+    <div class="dmTabs"><button id="dmTabDay" onclick="dmSetTab('day')">📆 일별 입금 리스트</button><button id="dmTabMon" onclick="dmSetTab('mon')">📋 월별 명단</button></div>
     <div class="dmSum" id="dmSum"></div>
     <div id="dmPeople"></div>
     <div class="dlBtns" style="margin-top:10px"><button onclick="daOpen()">+ 사람 추가</button><button onclick="undoLast()">↶ 되돌리기</button></div>
+    <button class="dlPayBtn" id="dmSaveBtn" onclick="dmSaveNow()"></button>
     <div class="btnRow" style="margin-top:12px">
       <button class="bGray" onclick="document.getElementById('dmModal').classList.remove('show')">닫기</button>
-      <button class="bRed" onclick="dmShare()">📤 명단 공유</button>
+      <button class="bRed" onclick="dmShare()">📤 월별 명단 공유</button>
     </div>
-    <button class="smallBtn" style="width:100%;margin-top:8px" onclick="dmExcel()">📊 한 달 명단 엑셀로 공유 (등록번호 포함)</button>
+    <button class="smallBtn" style="width:100%;margin-top:8px" onclick="dmExcel()">📊 월별 명단 엑셀로 공유 (이름·등록번호·금액)</button>
 
   </div>
 </div>
@@ -561,11 +566,23 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
     <h2>✎ 일용직 정보 수정</h2>
     <div class="field"><label>이름</label><input type="text" id="deName"></div>
     <div class="field"><label>등록번호 (주민·외국인)</label><input type="text" id="deRrn" inputmode="numeric" autocomplete="off"></div>
-    <div class="field"><label>은행 계좌</label><input type="text" id="deAcct" autocomplete="off" placeholder="예) 국민 123-45-678901"></div>
-    <div class="field"><label>이번 달 지급 (회차별 금액 · 일수)</label><div id="deRecs"></div><div class="deTotal">합계 <b id="deTotal"></b></div></div>
+    <div class="field" style="display:none"><label>은행 계좌</label><input type="text" id="deAcct" autocomplete="off"></div>
+    <div class="field"><label>이번 달 입금 (날짜별 금액 · ✕로 빼기)</label><div id="deRecs"></div><div class="deTotal">합계 <b id="deTotal"></b></div></div>
     <div class="field"><label>↪ 다른 매장으로 옮기기</label><div class="moveBox"><div class="deMv"><select id="deMoveTo"></select><button type="button" onclick="dmMovePerson()">옮기기</button></div><small>매장을 고르고 <b>옮기기</b>나 <b>수정 저장</b>을 누르면 이번 달 기록이 그대로 옮겨가요 (✕로 뺀 날은 빼고)</small></div></div>
     <div class="btnRow"><button class="bGray" onclick="dmEditClose()">취소</button><button class="bRed" onclick="dmEditSave()">수정 저장</button></div>
     <button class="delLink" onclick="dmDelPerson()">🗑 이번 달 기록에서 이 사람 빼기</button>
+  </div>
+</div>
+
+<!-- 월별 명단 한 번에 등록 -->
+<div class="modalOverlay" id="dmPasteModal">
+  <div class="modalBox">
+    <h2>📋 월별 명단 등록</h2>
+    <div class="cfgHint" id="dpmTarget" style="margin-top:-4px"></div>
+    <button class="dlClip" onclick="dmPasteClip()">📋 복사한 명단 바로 넣기<small>카톡·메모에서 한 달 명단 복사 → 이 버튼 한 번</small></button>
+    <textarea id="dmPasteBox" style="min-height:140px" placeholder="여기에 붙여넣어도 돼요&#10;예)&#10;1. 김옥란 621207-6102197&#10;   130,000원&#10;2. ZHAO JINDAN 580702-6180495 120,000원"></textarea>
+    <div class="cfgHint">이름 · 등록번호 · 금액만 있으면 돼요. 이 달에 이미 있는 사람은 건너뛰어요(이름을 눌러 고치세요).</div>
+    <div class="btnRow"><button class="bGray" onclick="document.getElementById('dmPasteModal').classList.remove('show')">닫기</button><button class="bRed" onclick="dmPasteSave()">이 달에 등록</button></div>
   </div>
 </div>
 
@@ -576,12 +593,12 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
     <div class="field"><label>이름</label><input type="text" id="daName" list="daNames" placeholder="이름" autocomplete="off" onchange="daFillName()"></div>
     <datalist id="daNames"></datalist>
     <div class="field"><label>등록번호 (주민·외국인)</label><input type="text" id="daRrn" inputmode="numeric" autocomplete="off" placeholder="000000-0000000"></div>
-    <div class="field"><label>은행 계좌</label><input type="text" id="daAcct" autocomplete="off" placeholder="예) 국민 123-45-678901"></div>
-    <div class="field"><label>근무한 날</label><input type="date" id="daDate" onchange="daRate()"><div class="cfgHint" id="daDay" style="margin:6px 0 0"></div>
-      <button type="button" class="smallBtn" style="margin:8px 0 0" onclick="daAddDate()">+ 이 날짜 담기 (여러 날 일했으면 날짜마다 누르기)</button>
+    <div class="field" style="display:none"><label>은행 계좌</label><input type="text" id="daAcct" autocomplete="off"></div>
+    <div class="field"><label>입금(근무)한 날</label><input type="date" id="daDate" onchange="daRate()"><div class="cfgHint" id="daDay" style="margin:6px 0 0"></div>
+      <button type="button" class="smallBtn" id="daAddDateBtn" style="margin:8px 0 0" onclick="daAddDate()">+ 이 날짜 담기 (여러 날 일했으면 날짜마다 누르기)</button>
       <div class="dlRegs" id="daDates" style="margin:8px 0 0"></div></div>
-    <div class="field"><label>근무</label><div class="payChips" id="daType"><button type="button" data-t="half" onclick="daSetType('half')">반타임</button><button type="button" data-t="full" onclick="daSetType('full')">풀타임</button></div></div>
-    <div class="field"><label>금액 (원) — 반·풀을 누르면 자동, 직접 고쳐도 돼요</label><input type="number" id="daAmt" inputmode="numeric" placeholder="금액"></div>
+    <div class="field"><label>빠른 금액 (누르면 금액이 들어가요)</label><div class="payChips" id="daType"><button type="button" data-t="half" onclick="daSetType('half')">반타임</button><button type="button" data-t="full" onclick="daSetType('full')">풀타임</button></div></div>
+    <div class="field"><label>금액 (원)</label><input type="number" id="daAmt" inputmode="numeric" placeholder="금액"></div>
     <div id="daFrom"></div>
     <div class="btnRow"><button class="bGray" onclick="daClose()">닫기</button><button class="bRed" id="daSaveBtn" onclick="daSave()">추가</button></div>
   </div>
@@ -1630,14 +1647,15 @@ function parseLine(raw){
   if(/풀\s*타임|종일|full/i.test(s) || /(^|[\s(\[\/:])풀(?=$|[\s)\]\/,.])/.test(s)) o.type = 'full';
   else if(/반\s*타임|하프|half/i.test(s) || /(^|[\s(\[\/:])반(?=$|[\s)\]\/,.])/.test(s)) o.type = 'half';
   s = s.replace(/\(\s*([가-힣]{2,6}|(?!full\b|half\b)[A-Za-z][A-Za-z .]{1,30}?)\s*\)/i, '\u0001$1\u0002');   // "ZHANG LINHU (장림호)" 괄호 이름 유지
-  s = s.replace(/^[\s\-•*·▶►☞✔✅☑]+|^\s*\d{1,2}[.)]\s+/, ' ')
+  s = s.replace(/^[\s\-•*·▶►☞✔✅☑]*(\d{1,2}\s*[.)]\s*)?/, ' ')
        .replace(/\d{1,2}\s*[\/.월]\s*\d{1,2}\s*일?/g, ' ')
        .replace(/\d{1,2}(:\d{2})?\s*시?\s*[~\-]\s*\d{1,2}(:\d{2})?\s*시?/g, ' ')
        .replace(/풀\s*타임|반\s*타임|종일|하프|full|half/gi, ' ')
        .replace(/(^|[\s(\[\/:])(풀|반)(?=$|[\s)\]\/,.])/g, ' ')
        .replace(/주민\s*(등록)?\s*번호|외국인\s*등록\s*(증|번호)?|등록\s*번호|계좌\s*(번호)?|은행|예금주|성\s*명|이\s*름|\bname\b|\d+\s*명|님|파출|일용직?|금액|합계|[()\[\]:：~\-_|+＋,]/gi, ' ')
        .replace(/\b\d+\b/g, ' ')
-       .replace(/\s+/g, ' ').trim().replace(/\s*\u0001\s*/, '(').replace(/\s*\u0002/, ')');
+       .replace(/\s+/g, ' ').trim().replace(/\s*\u0001\s*/, '(').replace(/\s*\u0002/, ')')
+       .replace(/^[\s.,·•*]+|[\s.,·•*]+$/g, '');
   o.name = (s.length >= 2 || /[가-힣]/.test(s)) && s.length <= 40 ? s : '';
   return o;
 }
@@ -1649,6 +1667,7 @@ function parsePaste(text){
     const t = raw.trim();
     if(!t){ close(); return; }                                                     // 빈 줄 = 다음 사람
     if(!/\d{6}\s*[-_]?\s*[1-8]\d{6}/.test(t) && (STORES.some(st=>t.includes(st.name+'점')) || /명단|입금\s*내역|근무자|파출\s*인원/.test(t))) return;   // 머리줄
+    if(!/\d{6}\s*[-_]?\s*[1-8]\d{6}/.test(t) && /^[\s\[(]*(총\s*)?(합\s*계|소\s*계|총\s*계|총\s*액|합)\b|^[\s\[(]*(합계|소계|총계)/.test(t)){ close(); return; }   // 합계 줄은 사람 아님
     const o = parseLine(t);
     // 새 사람 시작: 이름이 있는 줄인데 지금 사람에게 이미 이름이 있을 때, 또는 등록번호가 또 나올 때
     if(!cur || (o.name && cur.name) || (o.rrn && cur.rrn)){ if(cur && !cur.name && !o.name){ /* 이름 없는 조각은 버림 */ } close(); cur = {name:'', rrn:'', bank:'', acct:'', type:'', amts:[]}; }
@@ -1680,11 +1699,13 @@ function dlPaste(){
   const P = parsePaste(ta.value);
   if(!P.length){ toast('이름을 찾지 못했어요. 이름과 등록번호를 붙여넣어 주세요'); return; }
   const d = dlDay(dlStore, dlDate, true), prem = dlPrem(dlStore, dlDate);
-  let n = 0, upd = 0;
+  let n = 0, upd = 0; const same = [], dupR = [];
   P.forEach(p=>{
     const rd = String(p.rrn||'').replace(/\D/g,'');
-    const ex = d.list.find(x=>dlNorm(x.name)===p.name || (rd.length===13 && String(x.rrn||'').replace(/\D/g,'')===rd));
-    if(ex){ if(p.rrn && !ex.rrn){ ex.rrn = p.rrn; upd++; } if(p.acct && !ex.acct){ ex.acct = p.acct; upd++; } if(p.amt!=='' && ex.amt===''){ ex.amt = p.amt; ex.auto = false; upd++; } dlRemember(ex); return; }
+    const ex = d.list.find(x=>dlNorm(x.name)===p.name);
+    const twin = rd.length===13 && d.list.find(x=>dlNorm(x.name)!==p.name && String(x.rrn||'').replace(/\D/g,'')===rd);
+    if(twin) dupR.push(p.name + '·' + dlNorm(twin.name));
+    if(ex){ same.push(p.name); if(p.rrn && !ex.rrn){ ex.rrn = p.rrn; upd++; } if(p.acct && !ex.acct){ ex.acct = p.acct; upd++; } if(p.amt!=='' && ex.amt===''){ ex.amt = p.amt; ex.auto = false; upd++; } dlRemember(ex); return; }
     let type = p.type || (p.amt!=='' ? dlTypeFromAmt(p.amt) : '');
     const rate = dlRate(type, prem);
     const x = {id:uid(), name:p.name, rrn:p.rrn, acct:p.acct, type, amt: p.amt!=='' ? p.amt : rate, auto: p.amt==='' || p.amt===rate};
@@ -1695,7 +1716,9 @@ function dlPaste(){
   });
   ta.value = ''; dlSave(); renderDaily();
   const gs = d.list.filter(x=>x.guess).length, withAmt = P.filter(p=>p.amt!=='').length;
-  toast(n ? n + '명 넣었어요' + (withAmt ? ' · 금액 ' + withAmt + '명 그대로' : '') + (gs ? ' · ' + gs + '명 평소 근무로 자동' : '') : (upd ? '등록번호·계좌·금액을 채웠어요' : '이미 모두 들어가 있어요'));
+  const stN = (STORES.find(x=>x.id===dlStore)||{name:''}).name;
+  toast(`${stN}점 ${dlDayName(dlDate)} · 명단 ${P.length}명 중 ` + (n ? n + '명 새로 넣음' : '새로 넣은 사람 없음') + (same.length ? ` · ${same.length}명은 이미 있음(${same.join(', ')})` : '') + (withAmt ? ' · 금액 ' + withAmt + '명 그대로' : '') + (gs ? ' · ' + gs + '명 평소 근무로 자동' : '') + (upd ? ' · 빈칸 채움' : ''));
+  if(dupR.length) setTimeout(()=>alert('⚠ 등록번호가 같은데 이름이 다른 사람이 있어요\n\n' + dupR.join('\n') + '\n\n둘 중 한 명의 등록번호를 확인해 주세요.'), 300);
 }
 function dlCopyPrev(){
   const D = dlAll()[dlStore] || {}, prev = Object.keys(D).filter(ds=>ds < dlDate && (D[ds].list||[]).some(x=>dlNorm(x.name))).sort().pop();
@@ -1774,12 +1797,16 @@ function dlMonth(sid, ym){   // 사람별로 묶기
     L.forEach(x=>{
       if(!x.id) x.id = uid();   // 옛 기록에 번호가 없으면 붙임 (수정·이동이 정확히 되도록)
       const rd = String(x.rrn||'').replace(/\D/g,''), n = dlNorm(x.name);
-      // 같은 사람은 등록번호로 묶음 (이름을 조금 다르게 적어도 한 사람으로)
-      let k = rd.length===13 ? 'R' + rd : 'N' + n;
-      if(!by.has(k) && rd.length===13 && by.has('N' + n)){ by.set(k, by.get('N' + n)); by.delete('N' + n); }
-      if(!by.has(k) && rd.length!==13){ const hit = [...by.entries()].find(([kk,w])=>w.name===n); if(hit) k = hit[0]; }
-      if(!by.has(k)) by.set(k, {name:n, rec:[], rrn:'', acct:''});
-      const w = by.get(k); w.alt = w.alt || []; if(n!==w.name && !w.alt.includes(n)) w.alt.push(n);
+      // 같은 사람 묶기: 이름이 같거나 비슷하고(예: ZHANG LINHU = ZHANG LINHU (장림호)) 등록번호가 서로 다르지 않을 때만.
+      // 등록번호가 같아도 이름이 전혀 다르면 따로 보여 줌 (한 명이 사라지지 않게)
+      const base = n.replace(/\(.*?\)/g,'').replace(/\s+/g,'').toLowerCase();
+      let k = null;
+      for(const [kk, w0] of by){
+        const sameN = w0.name===n || (base.length>=2 && w0.base.length>=2 && (w0.base.includes(base) || base.includes(w0.base)));
+        if(sameN && (!w0.rd || rd.length!==13 || w0.rd===rd)){ k = kk; break; }
+      }
+      if(!k){ k = 'P' + by.size; by.set(k, {name:n, base, rd:'', rec:[], rrn:'', acct:''}); }
+      const w = by.get(k); if(!w.rd && rd.length===13) w.rd = rd; w.alt = w.alt || []; if(n!==w.name && !w.alt.includes(n)) w.alt.push(n);
       w.rec.push({date:ds, id:x.id, type:x.type, amt:Number(x.amt)||0, days:Math.max(1, Number(x.days)||1), needDays: Number(x.amt) > 130000 && !Number(x.days)});
       if(x.rrn) w.rrn = x.rrn; if(x.acct) w.acct = x.acct;
     });
@@ -1795,17 +1822,89 @@ function dlMonth(sid, ym){   // 사람별로 묶기
 }
 function openDailyMonth(){ dmStore = dmStore || storeId; dmMonth = dmMonth || viewMonth; renderDailyMonth(); document.getElementById('dmModal').classList.add('show'); }
 function dmMove(n){ let [y,m] = dmMonth.split('-').map(Number); m += n; if(m<1){m=12;y--;} if(m>12){m=1;y++;} dmMonth = y+'-'+String(m).padStart(2,'0'); renderDailyMonth(); }
+let dmTab = 'day'; try{ dmTab = localStorage.getItem('cwy_dm_tab') || 'day'; }catch(e){}
+function dmSetTab(t){ dmTab = t; try{ localStorage.setItem('cwy_dm_tab', t); }catch(e){} renderDailyMonth(); }
+function dmPaidTime(d){ if(!d.paid) return ''; const t = new Date(d.paid.at); return (t.getMonth()+1) + '/' + t.getDate() + ' ' + String(t.getHours()).padStart(2,'0') + ':' + String(t.getMinutes()).padStart(2,'0'); }
 function renderDailyMonth(){
   const [y,m] = dmMonth.split('-').map(Number), R = dlMonth(dmStore, dmMonth), st = STORES.find(x=>x.id===dmStore);
   document.getElementById('dmStores').innerHTML = STORES.map(s=>`<button class="${s.id===dmStore?'on':''}" onclick="dmStore='${s.id}';renderDailyMonth()">${esc(s.name)}</button>`).join('');
   document.getElementById('dmTtl').textContent = `${y}년 ${m}월`;
-  const tot = R.people.reduce((a,p)=>a+p.gross,0), md = R.people.reduce((a,p)=>a+p.n,0), RI = dlRrnIndex(dmMonth);
-  document.getElementById('dmSum').innerHTML = `<div><span>인원</span><b>${R.people.length}명</b></div><div><span>연인원</span><b>${md}일</b></div><div><span>${esc(st.name)}점 ${m}월 합계</span><b>${won(tot)}</b></div>`;
-  document.getElementById('dmPeople').innerHTML = R.people.length
-    ? `<table class="dmTbl"><thead><tr><th>이름 · 등록번호</th><th>반</th><th>풀</th><th>일수</th><th>합계</th></tr></thead><tbody>` +
-      R.people.map((p,k)=>`<tr class="dmRow" onclick="dmEdit(${k})"><td><b>${esc(p.name)}</b> <span class="dmPen">✎</span>${p.noAmt?' <small style="color:#c06a00;display:inline">금액 빠짐</small>':''}<small class="${p.rrn?'':'warnTxt'}">${esc(p.rrn || '⚠ 등록번호 없음')}</small>${dmDupNote(p, RI)}</td><td>${p.half}</td><td>${p.full}</td><td>${p.n}</td><td class="r">${won(p.gross)}</td></tr>`).join('') +
-      `</tbody><tfoot><tr><td>합계</td><td>${R.people.reduce((a,p)=>a+p.half,0)}</td><td>${R.people.reduce((a,p)=>a+p.full,0)}</td><td>${md}</td><td class="r">${won(tot)}</td></tr></tfoot></table>` + `<div class="cfgHint" style="margin-top:6px">✎ 이름을 누르면 수정 · 다른 매장 이동 · 빼기</div>`
-    : `<div class="dlEmpty">${m}월 ${esc(st.name)}점 일용직 기록이 없어요</div>`;
+  document.getElementById('dmTabDay').classList.toggle('on', dmTab==='day');
+  document.getElementById('dmTabMon').classList.toggle('on', dmTab!=='day');
+  const tot = R.people.reduce((a,p)=>a+p.gross,0), RI = dlRrnIndex(dmMonth);
+  document.getElementById('dmSum').innerHTML = `<div><span>인원</span><b>${R.people.length}명</b></div><div><span>입금한 날</span><b>${R.days.length}일</b></div><div><span>${esc(st.name)}점 ${m}월 합계</span><b>${won(tot)}</b></div>`;
+  dmSavedLine();
+  if(dmTab==='day'){
+    // 일별 입금 리스트: 날짜마다 누구에게 얼마를 줬는지 (누르면 그날 명단 고치기)
+    const days = R.days.slice().reverse();
+    document.getElementById('dmPeople').innerHTML = `<button class="dmNew" onclick="openDaily('${dmStore}', today())">🧾 오늘 입금 명단 입력</button>` + (days.length ? days.map(d=>`
+      <div class="dmDayCard">
+        <div class="dmDayHead"><b class="d">${dlDayName(d.ds)}</b><em class="${d.paid?'ok':'no'}">${d.paid ? '✓ 입금 ' + dmPaidTime(d) : '입금 전'}</em><span class="t">${d.list.length}명 · <b>${won(d.sum)}</b></span></div>
+        <table class="dmTbl"><tbody>${d.list.map(x=>`<tr class="dmRow" onclick="openDaily('${dmStore}','${d.ds}')"><td><b>${esc(dmShowName(x.name))}</b>${x.monthly ? ' <small style="display:inline;color:#2545ca">월 등록</small>' : ''}<small class="${x.rrn?'':'warnTxt'}">${esc(x.rrn || '⚠ 등록번호 없음')}</small></td><td class="r">${x.amt!=='' ? won(Number(x.amt)) : '<span class="warnTxt">금액 없음</span>'}</td></tr>`).join('')}</tbody></table>
+        <div class="payBtns"><button onclick="openDaily('${dmStore}','${d.ds}')">✎ 이 날 고치기</button><button onclick="daOpen(null,'${d.ds}')">+ 사람 추가</button><button onclick="shareText(dmDayText('${d.ds}'))">📤 공유</button></div>
+      </div>`).join('') : `<div class="dlEmpty">${m}월 ${esc(st.name)}점 입금 기록이 없어요.<br>위 버튼으로 오늘 명단을 넣어 주세요.</div>`);
+    return;
+  }
+  // 월별 명단: 이름 · 등록번호 · 금액만
+  document.getElementById('dmPeople').innerHTML = `<button class="dmNew" onclick="dmPasteOpen()">📋 ${m}월 명단 한 번에 등록</button>` + (R.people.length
+    ? `<table class="dmTbl"><thead><tr><th>이름 · 등록번호</th><th>금액</th></tr></thead><tbody>` +
+      R.people.map((p,k)=>`<tr class="dmRow" onclick="dmEdit(${k})"><td><b>${esc(dmShowName(p.name))}</b> <span class="dmPen">✎</span>${p.noAmt?' <small style="color:#c06a00;display:inline">금액 빠짐</small>':''}<small class="${p.rrn?'':'warnTxt'}">${esc(p.rrn || '⚠ 등록번호 없음')}</small>${dmDupNote(p, RI)}</td><td class="r">${won(p.gross)}</td></tr>`).join('') +
+      `</tbody><tfoot><tr><td>합계 ${R.people.length}명</td><td class="r">${won(tot)}</td></tr></tfoot></table>` + `<div class="cfgHint" style="margin-top:6px">✎ 이름을 누르면 수정 · 다른 매장 이동 · 빼기</div>`
+    : `<div class="dlEmpty">${m}월 ${esc(st.name)}점 일용직 기록이 없어요.<br>위 버튼으로 한 달 명단을 붙여넣어 등록하세요.</div>`);
+}
+/* 월별 명단 한 번에 등록: 이름·등록번호·금액 → 그 달 기록으로 (이번 달이면 오늘, 지난 달이면 그 달 마지막 날 날짜로 저장) */
+function dmMonthDate(ym){ const t = today(); if(t.slice(0,7)===ym) return t; const [y,m] = ym.split('-').map(Number); return ym + '-' + String(new Date(y, m, 0).getDate()).padStart(2,'0'); }
+function dmPasteOpen(){
+  const st = STORES.find(x=>x.id===dmStore);
+  document.getElementById('dpmTarget').innerHTML = `<b>${esc(st.name)}점 ${Number(dmMonth.slice(5))}월</b>에 등록해요 · 날짜는 ${dlDayName(dmMonthDate(dmMonth))}로 들어가요`;
+  document.getElementById('dmPasteBox').value = '';
+  document.getElementById('dmPasteModal').classList.add('show');
+}
+async function dmPasteClip(){
+  let t = ''; try{ t = await navigator.clipboard.readText(); }catch(e){}
+  if(!t || !t.trim()){ document.getElementById('dmPasteBox').focus(); toast('아래 칸을 길게 눌러 붙여넣기 하세요'); return; }
+  document.getElementById('dmPasteBox').value = t; dmPasteSave();
+}
+function dmPasteSave(){
+  const P = parsePaste(document.getElementById('dmPasteBox').value);
+  if(!P.length){ toast('이름을 찾지 못했어요. 이름·등록번호·금액을 붙여넣어 주세요'); return; }
+  const R = dlMonth(dmStore, dmMonth), ds = dmMonthDate(dmMonth);
+  const has = (nm, rd)=>R.people.some(w=>w.name===nm || (rd.length===13 && String(w.rrn||'').replace(/\D/g,'')===rd && w.name===nm));
+  snap(Number(dmMonth.slice(5)) + '월 명단 등록');
+  const d = dlDay(dmStore, ds, true); let n = 0; const skip = [], noAmt = [], dupR = [], diff = [];
+  P.forEach(p=>{
+    const rd = String(p.rrn||'').replace(/\D/g,'');
+    if(has(p.name, rd) || d.list.some(x=>dlNorm(x.name)===p.name)){
+      skip.push(p.name);
+      const w = R.people.find(w=>w.name===p.name);
+      if(w && p.amt!=='' && Number(p.amt)!==w.gross) diff.push(`${p.name}: 앱 ${won(w.gross)} → 명단 ${won(Number(p.amt))}`);
+      return;
+    }
+    const twin = rd.length===13 && R.people.find(w=>w.name!==p.name && String(w.rrn||'').replace(/\D/g,'')===rd);
+    if(twin) dupR.push(p.name + '·' + twin.name);
+    const x = {id:uid(), name:p.name, rrn:p.rrn, acct:p.acct, type: p.type || (p.amt!=='' ? dlTypeFromAmt(p.amt) : ''), amt:p.amt, auto:false, monthly:true};
+    if(x.amt==='') noAmt.push(p.name);
+    if(Number(x.amt) > 130000) x.days = dlGuessDays(Number(x.amt));
+    dlFill(x); delete x.guess; d.list.push(x); dlRemember(x); n++;
+  });
+  d.at = Date.now(); persist(); autoBackup();
+  document.getElementById('dmPasteModal').classList.remove('show');
+  dmTab = 'mon'; renderDailyMonth(); renderCallAlert();
+  toast(`${STORES.find(x=>x.id===dmStore).name}점 ${Number(dmMonth.slice(5))}월 · ${P.length}명 중 ${n}명 등록` + (skip.length ? ` · ${skip.length}명은 이미 있음(${skip.join(', ')})` : '') + (noAmt.length ? ` · 금액 없음 ${noAmt.length}명` : ''));
+  const warn = (diff.length ? '⚠ 이미 있는 사람 중 금액이 다른 사람\n' + diff.join('\n') + '\n→ 월별 명단에서 이름을 눌러 금액을 고쳐 주세요.\n\n' : '') + (dupR.length ? '⚠ 등록번호가 같은데 이름이 다른 사람\n' + dupR.join('\n') + '\n→ 둘 중 한 명의 등록번호를 확인해 주세요.' : '');
+  if(warn) setTimeout(()=>alert(warn.trim()), 300);
+}
+/* 리스트 화면의 저장: 전체 정보 저장 + 백업 파일 */
+function dmSavedLine(){
+  let t = 0; try{ t = Number(localStorage.getItem(SAVED_AT_KEY)) || 0; }catch(e){}
+  const el = document.getElementById('dmSaveBtn'); if(!el) return;
+  el.innerHTML = `💾 저장하기 <small>${t ? '마지막 저장 ' + new Date(t).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) + ' · ' : ''}고칠 때마다 자동 저장돼요 · 누르면 백업 파일까지 저장</small>`;
+}
+function dmSaveNow(){ saveAll(); dmSavedLine(); }
+function dmDayText(ds){
+  const d = dlDay(dmStore, ds, false), st = STORES.find(x=>x.id===dmStore), L = d ? d.list.filter(x=>dlNorm(x.name)) : [];
+  const sum = L.reduce((a,x)=>a+(Number(x.amt)||0),0);
+  return `[${st.name}점 ${dlDayName(ds)} 일용직 입금]\n` + L.map((x,k)=>`${k+1}. ${dmShowName(x.name)} ${x.rrn||'(등록번호 없음)'}\n   ${(Number(x.amt)||0).toLocaleString('ko-KR')}원`).join('\n') + `\n\n합계 ${L.length}명 · ${sum.toLocaleString('ko-KR')}원`;
 }
 /* 이번 달 전 매장에서 등록번호별 이름·매장 */
 function dlRrnIndex(ym){
@@ -1817,8 +1916,8 @@ function dlRrnIndex(ym){
   return M;
 }
 function dmDupNote(p, idx){
-  const rd = String(p.rrn||'').replace(/\D/g,''), a = (idx.get(rd) || []).filter(e=>!(e.st===dmStore && (e.n===p.name || (p.alt||[]).includes(e.n))));
-  const names = (p.alt||[]).map(n=>n + '(이 매장)').concat(a.map(e=>e.n + '(' + e.sn + ')'));
+  const rd = String(p.rrn||'').replace(/\D/g,''), a = (idx.get(rd) || []).filter(e=>e.n!==p.name && !(p.alt||[]).includes(e.n));
+  const names = a.map(e=>e.n + '(' + e.sn + ')');
   return names.length ? `<small class="warnTxt">⚠ 같은 등록번호: ${esc(names.join(', '))}</small>` : '';
 }
 function dmShowName(n){ return String(n||'').replace(/\s*\(/, ' ('); }
@@ -1827,7 +1926,7 @@ function dmText(){
   const tot = R.people.reduce((a,p)=>a+p.gross,0);
   return `[${st.name}점 ${y}년 ${m}월 일용직 명단]\n` +
     R.people.map((p,k)=>`${k+1}. ${dmShowName(p.name)} ${p.rrn||'(등록번호 없음)'}\n   ${p.gross.toLocaleString('ko-KR')}원`).join('\n') +
-    `\n\n합계 ${R.people.length}명 · 연 ${R.people.reduce((a,p)=>a+p.n,0)}일 · ${tot.toLocaleString('ko-KR')}원`;
+    `\n\n합계 ${R.people.length}명 · ${tot.toLocaleString('ko-KR')}원`;
 }
 /* ---------- 한 달 리스트에서 사람별 수정 ---------- */
 let dmEditP = null;
@@ -1955,14 +2054,15 @@ function staffToDaily(){
   if(!document.getElementById('dmModal').classList.contains('show')) openDailyMonth();
   daOpen(from);
 }
-function daOpen(from){
+function daOpen(from, presetDate){
   daFrom = from && from.id ? from : null;
   daDates = []; setTimeout(daRenderDates, 0);
   const st = STORES.find(x=>x.id===dmStore);
   document.getElementById('daTitle').textContent = '+ ' + st.name + '점 일용직 추가';
   ['daName','daRrn','daAcct','daAmt'].forEach(id=>document.getElementById(id).value = '');
   const t = today();
-  document.getElementById('daDate').value = t.slice(0,7)===dmMonth ? t : dmMonth + '-01';
+  document.getElementById('daDate').value = presetDate || (t.slice(0,7)===dmMonth ? t : dmMonth + '-01');
+  document.getElementById('daAddDateBtn').style.display = from && from.id ? '' : 'none';
   document.getElementById('daNames').innerHTML = Object.keys(dlBook()).sort().map(n=>`<option value="${esc(n)}">`).join('');
   daType = ''; daSetType('');
   if(daFrom){
@@ -2027,14 +2127,12 @@ function dmShare(){ shareText(dmText()); }
 async function dmExcel(){
   const [y,m] = dmMonth.split('-').map(Number), R = dlMonth(dmStore, dmMonth), st = STORES.find(x=>x.id===dmStore), C = (v,s)=>({v,s});
   const rows = [[C(`${y}년 ${m}월 일용직 명단 — ${COMPANY_NAME} ${st.name}점`, XS.title)], [C(`작성일 ${today()} · ${R.people.length}명`, XS.note)],
-    ['번호','성명','등록번호(주민·외국인)','내·외국인','반','풀','근무일수','총지급액','소득세','지방소득세','차인지급액','은행·계좌'].map(c=>C(c, XS.head))];
+    ['번호','성명','등록번호(주민·외국인)','금액'].map(c=>C(c, XS.head))];
   const first = rows.length + 1;
-  R.people.forEach((p,k)=>{ const R2 = rows.length + 1; rows.push([C(k+1, XS.ctr), C(p.name, XS.txt), p.rrn ? C(p.rrn, XS.ctr) : C('', XS.miss), natOf(p.rrn) ? C(natOf(p.rrn), XS.ctr) : C('', XS.miss),
-    C(p.half, XS.num), C(p.full, XS.num), C(p.n, XS.num), C(p.gross, p.noAmt?XS.missNum:XS.num), C(p.it, XS.num), C(p.lt, XS.num), {f:`H${R2}-I${R2}-J${R2}`, v:p.net, s:XS.num}, C(p.acct||'', XS.txt)]); });
-  const last = rows.length, tr = ['합계','',`${R.people.length}명`,'',null,null,null,null,null,null,null,''].map(v=>C(v||'', XS.totTxt));
-  [[4,'E'],[5,'F'],[6,'G'],[7,'H'],[8,'I'],[9,'J'],[10,'K']].forEach(([ci,L])=>{ const v = R.people.reduce((a,p)=>a+[p.half,p.full,p.n,p.gross,p.it,p.lt,p.net][ci-4],0); tr[ci] = last>=first ? {f:`SUM(${L}${first}:${L}${last})`, v, s:XS.totNum} : C(0, XS.totNum); });
-  rows.push(tr);
-  openXlPrev([{name:`일용직명단_${st.name}점_${dmMonth}.xlsx`, sheets:[{name:'일용직명단', rows, widths:[5,18,18,8,6,6,8,12,9,9,12,24], headRow:2}]}]);
+  R.people.forEach((p,k)=>rows.push([C(k+1, XS.ctr), C(dmShowName(p.name), XS.txt), p.rrn ? C(p.rrn, XS.ctr) : C('', XS.miss), C(p.gross, p.noAmt?XS.missNum:XS.num)]));
+  const last = rows.length, tot = R.people.reduce((a,p)=>a+p.gross,0);
+  rows.push([C('합계', XS.totTxt), C(`${R.people.length}명`, XS.totTxt), C('', XS.totTxt), last>=first ? {f:`SUM(D${first}:D${last})`, v:tot, s:XS.totNum} : C(0, XS.totNum)]);
+  openXlPrev([{name:`일용직명단_${st.name}점_${dmMonth}.xlsx`, sheets:[{name:'일용직명단', rows, widths:[6,24,20,14], headRow:2}]}]);
 }
 /* 세무사 엑셀용: 붙여넣기 기록의 사람과 직원 카드(주민번호·계좌) 연결 */
 function findStaffByName(sid, name){
@@ -2710,7 +2808,7 @@ function deleteStaff(){
 function toast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
-  clearTimeout(window.__t); window.__t = setTimeout(()=>t.classList.remove('show'), 1600);
+  clearTimeout(window.__t); window.__t = setTimeout(()=>t.classList.remove('show'), msg.length > 40 ? 4500 : 1600);
 }
 
 render();
