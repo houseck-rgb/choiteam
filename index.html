@@ -299,7 +299,7 @@ header .title{font-size:29px;font-weight:700;letter-spacing:-1.2px;line-height:1
 .callAlert{border:1px solid #f3c2c2;background:#fff5f5;border-radius:12px;padding:11px 12px;margin:0 0 12px}.callAlert b{color:#b23b3b;font-size:13.5px}.callAlert div{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}.callAlert button{border:1px solid #f3c2c2;background:#fff;color:#b23b3b;border-radius:20px;padding:6px 10px;font-family:inherit;font-size:12.5px;font-weight:700}.callAlert small{color:#a26b6b;font-size:11.5px}
 .callGrp{border:1px solid #e4e8f0;border-radius:10px;padding:8px 10px;margin-top:8px}.callGrp b{font-size:13.5px}.callRow{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;font-size:13px;padding:5px 0;border-top:1px solid #f0f2f6;color:#55627a}
 .dmRow{cursor:pointer}.dmRow:active{background:#f3f6ff}.dmPen{color:#315bf5;font-size:11px}
-.deRec{display:grid;grid-template-columns:34px 1fr auto 52px auto 30px;gap:5px;align-items:center;margin-bottom:6px}.deRec span{font-size:12px;color:#727c8e;font-weight:700}.deRec em{font-style:normal;font-size:12px;color:#727c8e}.deRec input{padding:9px 6px!important;font-size:15px!important;min-width:0;text-align:right}.deRec button{border:0;background:none;color:#b23b3b;font-size:15px}.deRec.off{opacity:.4}.deRec.off input{text-decoration:line-through}
+.deRec{display:grid;grid-template-columns:40px 1fr auto 52px auto 30px;gap:5px;align-items:center;margin-bottom:6px}.deRec span{font-size:12px;color:#727c8e;font-weight:700}.deRec em{font-style:normal;font-size:12px;color:#727c8e}.deRec input{padding:9px 6px!important;font-size:15px!important;min-width:0;text-align:right}.deRec button{border:0;background:none;color:#b23b3b;font-size:15px}.deRec.off{opacity:.4}.deRec.off input{text-decoration:line-through}
 .deTotal{text-align:right;font-size:13px;color:#55627a;margin-top:4px}.deTotal b{color:#1c2434;font-size:15px}
 .bkSent{margin:0 0 10px;padding:12px;border-radius:10px;background:#e7f5ef;border:1px solid #b7e0cc;color:#1c2434;font-size:13px;line-height:1.6}.bkSent b{color:#168364}.bkSent code{font-size:12px;background:#fff;padding:2px 6px;border-radius:5px;word-break:break-all}.bkSent small{color:#55627a}
 .bkMailBtns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.bkMailBtns a{flex:1 1 auto;text-align:center;padding:10px;border-radius:9px;background:#fff;border:1px solid #b7e0cc;color:#168364;font-weight:700;text-decoration:none;font-size:13px}
@@ -372,7 +372,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
 </head>
 <body>
 
-<header><div class="headerInner"><div class="brandLine"><div class="wordmark"><span class="brandDot"></span>CHOI CEO <span style="font-weight:400;color:#9aa4b5">/ PEOPLE</span></div><span class="workspaceTag">직원 관리</span></div>
+<header><div class="headerInner"><div class="brandLine"><div class="wordmark"><span class="brandDot"></span>CHOI CEO <span style="font-weight:400;color:#9aa4b5">/ PEOPLE</span></div><span class="workspaceTag">직원 관리 · v11.11-5</span></div>
   <div class="title" id="hTitle">구로점 직원 리스트</div>
   <div class="sub">함께 일하는 사람들, 한눈에 관리하세요.</div>
 </div></header>
@@ -418,6 +418,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
         <select id="mMove"></select>
         <small>다른 파트·매장을 고르고 저장하면 그 자리로 옮겨져요. 원래 자리는 빈 칸으로 남아요.</small>
       </div>
+      <button type="button" class="smallBtn" style="margin:8px 0 0;color:#ad691d;border-color:#f1d7b3;background:#fff8ee" onclick="staffToDaily()">🧾 일용직 명단으로 옮기기<br><small style="font-weight:500">이름·등록번호·계좌를 가지고 일용직 한 달 리스트로</small></button>
     </div>
     <div class="field">
       <label>구분 (하나만 선택)</label>
@@ -562,7 +563,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
     <div class="field"><label>등록번호 (주민·외국인)</label><input type="text" id="deRrn" inputmode="numeric" autocomplete="off"></div>
     <div class="field"><label>은행 계좌</label><input type="text" id="deAcct" autocomplete="off" placeholder="예) 국민 123-45-678901"></div>
     <div class="field"><label>이번 달 지급 (회차별 금액 · 일수)</label><div id="deRecs"></div><div class="deTotal">합계 <b id="deTotal"></b></div></div>
-    <div class="field"><label>↪ 다른 매장으로 옮기기</label><div class="moveBox"><div class="deMv"><select id="deMoveTo"></select><button type="button" onclick="dmMovePerson()">옮기기</button></div><small>이번 달 이 사람의 근무 기록(반·풀·금액·등록번호·계좌)이 그대로 옮겨가요</small></div></div>
+    <div class="field"><label>↪ 다른 매장으로 옮기기</label><div class="moveBox"><div class="deMv"><select id="deMoveTo"></select><button type="button" onclick="dmMovePerson()">옮기기</button></div><small>매장을 고르고 <b>옮기기</b>나 <b>수정 저장</b>을 누르면 이번 달 기록이 그대로 옮겨가요 (✕로 뺀 날은 빼고)</small></div></div>
     <div class="btnRow"><button class="bGray" onclick="dmEditClose()">취소</button><button class="bRed" onclick="dmEditSave()">수정 저장</button></div>
     <button class="delLink" onclick="dmDelPerson()">🗑 이번 달 기록에서 이 사람 빼기</button>
   </div>
@@ -579,7 +580,8 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
     <div class="field"><label>근무한 날</label><input type="date" id="daDate" onchange="daRate()"><div class="cfgHint" id="daDay" style="margin:6px 0 0"></div></div>
     <div class="field"><label>근무</label><div class="payChips" id="daType"><button type="button" data-t="half" onclick="daSetType('half')">반타임</button><button type="button" data-t="full" onclick="daSetType('full')">풀타임</button></div></div>
     <div class="field"><label>금액 (원) — 반·풀을 누르면 자동, 직접 고쳐도 돼요</label><input type="number" id="daAmt" inputmode="numeric" placeholder="금액"></div>
-    <div class="btnRow"><button class="bGray" onclick="daClose()">닫기</button><button class="bRed" onclick="daSave()">추가</button></div>
+    <div id="daFrom"></div>
+    <div class="btnRow"><button class="bGray" onclick="daClose()">닫기</button><button class="bRed" id="daSaveBtn" onclick="daSave()">추가</button></div>
   </div>
 </div>
 
@@ -885,8 +887,9 @@ function showSaved(){
 }
 function saveAll(){
   if(persist()){
+    saveFullNow();
     const m = today().slice(0,7), L = logs().filter(x=>x.date && x.date.slice(0,7)===m);
-    toast(`저장 완료 · 이번 달 입사 ${L.filter(x=>x.type==='join').length}명 · 퇴사 ${L.filter(x=>x.type==='leave').length}명`);
+    toast(`전체 저장 완료 · 백업 파일도 저장 · 이번 달 입사 ${L.filter(x=>x.type==='join').length}명 · 퇴사 ${L.filter(x=>x.type==='leave').length}명`);
   }
 }
 function persist(){
@@ -1766,13 +1769,15 @@ function dlMonth(sid, ym){   // 사람별로 묶기
     const L = (D[ds].list||[]).filter(x=>dlNorm(x.name)); if(!L.length) return;
     days.push({ds, list:L, sum:L.reduce((a,x)=>a+(Number(x.amt)||0),0), paid:D[ds].paid});
     L.forEach(x=>{
+      if(!x.id) x.id = uid();   // 옛 기록에 번호가 없으면 붙임 (수정·이동이 정확히 되도록)
       const rd = String(x.rrn||'').replace(/\D/g,''), n = dlNorm(x.name);
       // 같은 사람은 등록번호로 묶음 (이름을 조금 다르게 적어도 한 사람으로)
       let k = rd.length===13 ? 'R' + rd : 'N' + n;
       if(!by.has(k) && rd.length===13 && by.has('N' + n)){ by.set(k, by.get('N' + n)); by.delete('N' + n); }
       if(!by.has(k) && rd.length!==13){ const hit = [...by.entries()].find(([kk,w])=>w.name===n); if(hit) k = hit[0]; }
       if(!by.has(k)) by.set(k, {name:n, rec:[], rrn:'', acct:''});
-      const w = by.get(k); w.rec.push({date:ds, id:x.id, type:x.type, amt:Number(x.amt)||0, days:Math.max(1, Number(x.days)||1), needDays: Number(x.amt) > 130000 && !Number(x.days)});
+      const w = by.get(k); w.alt = w.alt || []; if(n!==w.name && !w.alt.includes(n)) w.alt.push(n);
+      w.rec.push({date:ds, id:x.id, type:x.type, amt:Number(x.amt)||0, days:Math.max(1, Number(x.days)||1), needDays: Number(x.amt) > 130000 && !Number(x.days)});
       if(x.rrn) w.rrn = x.rrn; if(x.acct) w.acct = x.acct;
     });
   });
@@ -1791,13 +1796,27 @@ function renderDailyMonth(){
   const [y,m] = dmMonth.split('-').map(Number), R = dlMonth(dmStore, dmMonth), st = STORES.find(x=>x.id===dmStore);
   document.getElementById('dmStores').innerHTML = STORES.map(s=>`<button class="${s.id===dmStore?'on':''}" onclick="dmStore='${s.id}';renderDailyMonth()">${esc(s.name)}</button>`).join('');
   document.getElementById('dmTtl').textContent = `${y}년 ${m}월`;
-  const tot = R.people.reduce((a,p)=>a+p.gross,0), md = R.people.reduce((a,p)=>a+p.n,0);
+  const tot = R.people.reduce((a,p)=>a+p.gross,0), md = R.people.reduce((a,p)=>a+p.n,0), RI = dlRrnIndex(dmMonth);
   document.getElementById('dmSum').innerHTML = `<div><span>인원</span><b>${R.people.length}명</b></div><div><span>연인원</span><b>${md}일</b></div><div><span>${esc(st.name)}점 ${m}월 합계</span><b>${won(tot)}</b></div>`;
   document.getElementById('dmPeople').innerHTML = R.people.length
     ? `<table class="dmTbl"><thead><tr><th>이름 · 등록번호</th><th>반</th><th>풀</th><th>일수</th><th>합계</th></tr></thead><tbody>` +
-      R.people.map((p,k)=>`<tr class="dmRow" onclick="dmEdit(${k})"><td><b>${esc(p.name)}</b> <span class="dmPen">✎</span>${p.noAmt?' <small style="color:#c06a00;display:inline">금액 빠짐</small>':''}<small class="${p.rrn?'':'warnTxt'}">${esc(p.rrn || '⚠ 등록번호 없음')}</small></td><td>${p.half}</td><td>${p.full}</td><td>${p.n}</td><td class="r">${won(p.gross)}</td></tr>`).join('') +
+      R.people.map((p,k)=>`<tr class="dmRow" onclick="dmEdit(${k})"><td><b>${esc(p.name)}</b> <span class="dmPen">✎</span>${p.noAmt?' <small style="color:#c06a00;display:inline">금액 빠짐</small>':''}<small class="${p.rrn?'':'warnTxt'}">${esc(p.rrn || '⚠ 등록번호 없음')}</small>${dmDupNote(p, RI)}</td><td>${p.half}</td><td>${p.full}</td><td>${p.n}</td><td class="r">${won(p.gross)}</td></tr>`).join('') +
       `</tbody><tfoot><tr><td>합계</td><td>${R.people.reduce((a,p)=>a+p.half,0)}</td><td>${R.people.reduce((a,p)=>a+p.full,0)}</td><td>${md}</td><td class="r">${won(tot)}</td></tr></tfoot></table>` + `<div class="cfgHint" style="margin-top:6px">✎ 이름을 누르면 수정 · 다른 매장 이동 · 빼기</div>`
     : `<div class="dlEmpty">${m}월 ${esc(st.name)}점 일용직 기록이 없어요</div>`;
+}
+/* 이번 달 전 매장에서 등록번호별 이름·매장 */
+function dlRrnIndex(ym){
+  const M = new Map();
+  STORES.forEach(st=>{ const D = dlAll()[st.id] || {}; Object.keys(D).filter(ds=>ds.slice(0,7)===ym).forEach(ds=>(D[ds].list||[]).forEach(x=>{
+    const rd = String(x.rrn||'').replace(/\D/g,''), n = dlNorm(x.name); if(rd.length!==13 || !n) return;
+    const a = M.get(rd) || []; if(!a.some(e=>e.n===n && e.st===st.id)) a.push({n, st:st.id, sn:st.name}); M.set(rd, a);
+  })); });
+  return M;
+}
+function dmDupNote(p, idx){
+  const rd = String(p.rrn||'').replace(/\D/g,''), a = (idx.get(rd) || []).filter(e=>!(e.st===dmStore && (e.n===p.name || (p.alt||[]).includes(e.n))));
+  const names = (p.alt||[]).map(n=>n + '(이 매장)').concat(a.map(e=>e.n + '(' + e.sn + ')'));
+  return names.length ? `<small class="warnTxt">⚠ 같은 등록번호: ${esc(names.join(', '))}</small>` : '';
 }
 function dmShowName(n){ return String(n||'').replace(/\s*\(/, ' ('); }
 function dmText(){
@@ -1815,7 +1834,7 @@ function dmEdit(k){
   document.getElementById('deName').value = p.name;
   document.getElementById('deRrn').value = p.rrn || '';
   document.getElementById('deAcct').value = p.acct || '';
-  document.getElementById('deRecs').innerHTML = p.rec.map((r,i)=>`<div class="deRec"><span>${i+1}회</span>
+  document.getElementById('deRecs').innerHTML = p.rec.map((r,i)=>`<div class="deRec"><span>${fmtD(r.date)}</span>
     <input type="number" inputmode="numeric" class="deAmt" data-i="${i}" value="${r.amt||''}" placeholder="금액" oninput="deTotal()"><em>원</em>
     <input type="number" inputmode="numeric" class="deDays" data-i="${i}" value="${r.days>1?r.days:1}" min="1" oninput="deTotal()"><em>일</em>
     <button onclick="deDelRec(${i},this)" title="빼기">✕</button></div>`).join('');
@@ -1845,6 +1864,8 @@ function dmEditSave(){
   if(newSum !== p.gross) ch.push(`금액: ${won(p.gross)} → ${won(newSum)}`);
   if(newDays !== p.n) ch.push(`일수: ${p.n}일 → ${newDays}일`);
   if(removed) ch.push(`${removed}회 기록 빼기`);
+  const dest = document.getElementById('deMoveTo').value;
+  if(dest) ch.push(`매장: ${STORES.find(x=>x.id===sid).name}점 → ${STORES.find(x=>x.id===dest).name}점`);
   if(!ch.length){ toast('바뀐 내용이 없어요'); dmEditClose(); return; }
   if(!confirm(`${p.name} 정보를 수정하시겠습니까?\n\n` + ch.join('\n'))) return;
   snap(p.name + ' 수정');
@@ -1861,8 +1882,23 @@ function dmEditSave(){
   // 인명부(등록번호·계좌 기억)도 새 이름으로
   const B = dlBook(); if(name !== p.name && B[p.name]){ B[name] = Object.assign({}, B[p.name], B[name]||{}); delete B[p.name]; }
   dlRemember({name, rrn, acct});
+  let mv = null;
+  if(dest){ const keep = p.rec.filter((r,i)=>!rows[i].classList.contains('off')); mv = dmMoveRecs(keep, sid, dest); }
   persist(); autoBackup(); dmEditClose(); renderDailyMonth(); renderCallAlert();
-  toast('수정했어요');
+  toast(mv ? `${STORES.find(x=>x.id===dest).name}점으로 ${mv.moved}건 옮겼어요` + (mv.skip ? ` · ${mv.skip}건은 같은 날 이미 있어서 남김` : '') : '수정했어요');
+}
+function dmMoveRecs(recs, src, dest){
+  const D = dlAll()[src] || {}; let moved = 0, skip = 0;
+  recs.forEach(r=>{
+    const day = D[r.date]; if(!day) return;
+    const k = day.list.findIndex(x=>x.id===r.id); if(k<0) return;
+    const x = day.list[k], dd = dlDay(dest, r.date, true);
+    if(dd.list.some(y=>dlNorm(y.name)===dlNorm(x.name))){ skip++; return; }
+    day.list.splice(k,1); day.at = Date.now();
+    if(x.auto && x.type) x.amt = dlRate(x.type, dlPrem(dest, r.date));
+    dd.list.push(x); dd.at = Date.now(); moved++;
+  });
+  return {moved, skip};
 }
 /* 다른 매장으로 옮기기 */
 function dmMovePerson(){
@@ -1874,16 +1910,7 @@ function dmMovePerson(){
   const paid = p.rec.filter(r=>D[r.date] && D[r.date].paid).length;
   if(!confirm(`${p.name} ${Number(dmMonth.slice(5))}월 기록 ${p.rec.length}건을\n${sN}점 → ${dN}점으로 옮길까요?` + (paid ? `\n\n⚠ 이 중 ${paid}건은 이미 💰 입금 기록이 있어요. 입금 기록은 그대로 남아요.` : ''))) return;
   snap(`${p.name} ${sN}→${dN} 이동`);
-  let moved = 0, skip = 0;
-  p.rec.forEach(r=>{
-    const day = D[r.date]; if(!day) return;
-    const k = day.list.findIndex(x=>x.id===r.id); if(k<0) return;
-    const x = day.list[k], dd = dlDay(dest, r.date, true);
-    if(dd.list.some(y=>dlNorm(y.name)===dlNorm(x.name))){ skip++; return; }   // 그 매장 같은 날에 이미 있음
-    day.list.splice(k,1); day.at = Date.now();
-    if(x.auto && x.type) x.amt = dlRate(x.type, dlPrem(dest, r.date));
-    dd.list.push(x); dd.at = Date.now(); moved++;
-  });
+  const {moved, skip} = dmMoveRecs(p.rec, src, dest);
   persist(); autoBackup(); dmEditClose(); renderDailyMonth(); renderCallAlert();
   toast(`${p.name} ${moved}건을 ${dN}점으로 옮겼어요` + (skip ? ` · ${skip}건은 ${dN}점 같은 날에 이미 있어서 남겨 뒀어요` : ''));
 }
@@ -1900,7 +1927,24 @@ function dmDelPerson(){
 }
 /* 한 달 리스트에서 사람 추가 */
 let daType = '';
-function daOpen(){
+let daFrom = null;
+/* 직원 카드 → 일용직: 직원 화면의 이름·등록번호·계좌를 그대로 가져와 추가 화면을 엶 */
+function staffToDaily(){
+  if(!cur) return;
+  const p = data[cur.sec][cur.i];
+  const name = dlNorm(document.getElementById('mName').value || p.name);
+  if(!name){ toast('이름을 먼저 넣어 주세요'); return; }
+  const from = {store:storeId, sec:cur.sec, id:p.id, name,
+    rrn: document.getElementById('mRrn').value.trim() || p.rrn || '',
+    acct: [document.getElementById('mBank').value.trim(), document.getElementById('mAcct').value.trim()].filter(Boolean).join(' '),
+    workDays: calWork.slice().sort()};
+  document.getElementById('memoModal').classList.remove('show'); cur = null;
+  dmStore = from.store; dmMonth = today().slice(0,7);
+  if(!document.getElementById('dmModal').classList.contains('show')) openDailyMonth();
+  daOpen(from);
+}
+function daOpen(from){
+  daFrom = from && from.id ? from : null;
   const st = STORES.find(x=>x.id===dmStore);
   document.getElementById('daTitle').textContent = '+ ' + st.name + '점 일용직 추가';
   ['daName','daRrn','daAcct','daAmt'].forEach(id=>document.getElementById(id).value = '');
@@ -1908,6 +1952,16 @@ function daOpen(){
   document.getElementById('daDate').value = t.slice(0,7)===dmMonth ? t : dmMonth + '-01';
   document.getElementById('daNames').innerHTML = Object.keys(dlBook()).sort().map(n=>`<option value="${esc(n)}">`).join('');
   daType = ''; daSetType('');
+  if(daFrom){
+    document.getElementById('daTitle').textContent = '🧾 ' + st.name + '점 일용직으로 옮기기';
+    document.getElementById('daName').value = daFrom.name; document.getElementById('daRrn').value = daFrom.rrn; document.getElementById('daAcct').value = daFrom.acct;
+    daFillName();
+    const wd = daFrom.workDays.filter(d=>d.slice(0,7)===dmMonth);
+    document.getElementById('daFrom').innerHTML = `<div class="moveBox" style="margin-bottom:12px">` +
+      (wd.length ? `<label class="taxChk" style="margin:0 0 6px!important"><input type="checkbox" id="daAllDays" checked> 달력에 체크한 ${Number(dmMonth.slice(5))}월 근무일 ${wd.length}일 모두 넣기<br>(${wd.map(fmtD).join(', ')})</label>` : '') +
+      `<label class="taxChk" style="margin:0!important"><input type="checkbox" id="daRemove" checked> 직원 명단에서는 빼기 (일용직으로만 남기기)</label><small>빼도 ↶ 되돌리기로 살릴 수 있어요</small></div>`;
+    document.getElementById('daSaveBtn').textContent = '일용직으로 옮기기';
+  } else { document.getElementById('daFrom').innerHTML = ''; document.getElementById('daSaveBtn').textContent = '추가'; }
   document.getElementById('dmAddModal').classList.add('show');
   setTimeout(()=>document.getElementById('daName').focus(), 50);
 }
@@ -1928,19 +1982,33 @@ function daSave(){
   const name = dlNorm(document.getElementById('daName').value), ds = document.getElementById('daDate').value;
   const rrn = dlFmtRrn(document.getElementById('daRrn').value), acct = document.getElementById('daAcct').value.trim();
   const amtV = document.getElementById('daAmt').value, amt = amtV==='' ? '' : Number(amtV);
+  const allEl = document.getElementById('daAllDays'), remEl = document.getElementById('daRemove');
+  const useAll = !!(daFrom && allEl && allEl.checked), remove = !!(daFrom && remEl && remEl.checked);
+  const dates = useAll ? daFrom.workDays.filter(d=>d.slice(0,7)===dmMonth) : [ds];
   if(!name){ toast('이름을 넣어 주세요'); return; }
-  if(!ds){ toast('근무한 날을 골라 주세요'); return; }
-  if(amt===''){ toast('반·풀을 누르거나 금액을 넣어 주세요'); return; }
-  const d = dlDay(dmStore, ds, true), rd = rrn.replace(/\D/g,'');
-  if(d.list.some(x=>dlNorm(x.name)===name || (rd.length===13 && String(x.rrn||'').replace(/\D/g,'')===rd))){ toast(dlDayName(ds) + '에 이미 있는 사람이에요'); return; }
-  snap(name + ' 추가');
-  const rate = dlRate(daType, dlPrem(dmStore, ds));
-  const x = {id:uid(), name, rrn, acct, type: daType || dlTypeFromAmt(amt), amt, auto: amt===rate};
-  if(amt > 130000) x.days = dlGuessDays(amt);
-  d.list.push(x); d.at = Date.now(); dlRemember(x);
+  if(!dates.length || !dates[0]){ toast('근무한 날을 골라 주세요'); return; }
+  if(!daType && amt===''){ toast('반·풀을 누르거나 금액을 넣어 주세요'); return; }
+  const rd = rrn.replace(/\D/g,'');
+  const has = d=>d.list.some(x=>dlNorm(x.name)===name || (rd.length===13 && String(x.rrn||'').replace(/\D/g,'')===rd));
+  const todo = dates.filter(dd=>{ const d = dlDay(dmStore, dd, false); return !(d && has(d)); });
+  if(!todo.length && !remove){ toast('그날 이미 있는 사람이에요'); return; }
+  snap(name + (daFrom ? ' 일용직으로 옮기기' : ' 추가'));
+  todo.forEach(dd=>{
+    const d = dlDay(dmStore, dd, true), rate = dlRate(daType, dlPrem(dmStore, dd));
+    const a = useAll && daType ? rate : amt;                 // 여러 날이면 날마다 그날 단가로
+    const x = {id:uid(), name, rrn, acct, type: daType || dlTypeFromAmt(a), amt:a, auto: a===rate};
+    if(a > 130000) x.days = dlGuessDays(a);
+    d.list.push(x); d.at = Date.now(); dlRemember(x);
+  });
+  let removed = false;
+  if(remove){
+    const arr = (allData[daFrom.store]||{})[daFrom.sec] || [], k = arr.findIndex(q=>q.id===daFrom.id);
+    if(k>=0){ allData.__del = allData.__del || {}; allData.__del[daFrom.id] = Date.now(); arr.splice(k,1); removed = true; }
+  }
   persist(); autoBackup(); daClose();
-  dmMonth = ds.slice(0,7); renderDailyMonth(); renderCallAlert();
-  toast(name + ' 추가했어요');
+  dmMonth = (todo[0] || dates[0]).slice(0,7); renderDailyMonth(); renderCallAlert(); render();
+  daFrom = null;
+  toast(name + ' ' + (todo.length ? todo.length + '일 일용직에 넣었어요' : '일용직에 이미 있어요') + (removed ? ' · 직원 명단에서 뺐어요' : ''));
 }
 function dmShare(){ shareText(dmText()); }
 async function dmExcel(){
@@ -2953,6 +3021,16 @@ async function folderLoad(){
     readImportFile(best);
   }catch(e){ toast('폴더를 열지 못했어요'); }
 }
+/* "변경사항 저장": 앱 전체 정보(직원·일용직·입금·호출·메모)를 2중 저장 + 백업 파일까지 바로 */
+function saveFullNow(){
+  clearTimeout(safeT);
+  let s = ''; try{ s = localStorage.getItem(KEY) || ''; }catch(e){}
+  if(s) idbSet('data', {at:Date.now(), s});
+  if(folderH && folderOk){ folderSave(true); return; }
+  bkDownload(new File([backupPayload()], FOLDER_NAME + '_' + today() + '.txt', {type:'text/plain'}));
+  try{ localStorage.setItem(AUTO_DAY_KEY, today()); localStorage.setItem('cwy_staff_sent_at', String(Date.now())); }catch(e){}
+  renderBackup();
+}
 /* 폰(폴더 저장이 안 되는 곳): 하루 한 번, 누른 동작과 함께 백업 파일을 다운로드 폴더에 저장 */
 function autoOn(){ try{ return localStorage.getItem(AUTO_ON_KEY) !== '0'; }catch(e){ return true; } }
 function setAutoOn(v){ try{ localStorage.setItem(AUTO_ON_KEY, v ? '1' : '0'); }catch(e){} renderSafe(); }
@@ -2992,7 +3070,10 @@ async function renderSafe(){
 })();
 /* 홈 화면 설치 · 오프라인 */
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){
-  window.addEventListener('load', ()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+  // 새 버전을 올리면 옛 화면이 남지 않게: 매번 새 sw.js 확인, 바뀌면 한 번 새로고침
+  const hadCtl = !!navigator.serviceWorker.controller; let swReloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', ()=>{ if(!hadCtl || swReloaded) return; swReloaded = true; location.reload(); });
+  window.addEventListener('load', ()=>navigator.serviceWorker.register('sw.js', {updateViaCache:'none'}).then(r=>r.update()).catch(()=>{}));
 }
 </script>
 <script>
