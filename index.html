@@ -138,6 +138,9 @@
   .legend{display:flex;gap:10px;justify-content:center;margin:2px 0 8px;font-size:11px;font-weight:800;color:var(--sub);}
   .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:3px;vertical-align:-1px;}
   .oc .more{font-size:9px;color:var(--sub);font-weight:800;}
+  .settle{margin-top:8px;padding:10px 12px;border-radius:10px;background:#fff;border:1px solid #cfe3d6;font-size:13px;line-height:1.6;color:#1c2434}.settle .sh2{font-weight:800;color:#168364;margin-bottom:4px}.settle .sr{display:grid;grid-template-columns:auto 1fr;gap:8px;padding:4px 0;border-bottom:1px dashed #e4e8f0}.settle .sr b{white-space:nowrap}.settle .sr span{color:#55627a}.settle .st{padding-top:6px}.settle .st b{font-size:15px;color:#168364}.settle small{color:#727c8e}.settle button{width:100%;margin-top:8px;padding:10px;border-radius:9px;border:1px solid #b7e0cc;background:#effaf4;color:#168364;font-family:inherit;font-size:13.5px;font-weight:700}
+  .devShare{border:0;border-radius:20px;background:#2858db;color:#fff;font-family:inherit;font-size:12.5px;font-weight:700;padding:8px 13px;min-height:36px;white-space:nowrap;box-shadow:0 2px 8px #2858db33}
+  @media(max-width:420px){.workspaceTag{display:none}}
   .calMode{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}.calMode button{padding:9px 6px;border-radius:10px;border:1.5px solid #e4e8f0;background:#fff;font-family:inherit;font-size:13.5px;font-weight:800;color:#8b96a8;line-height:1.3}.calMode button small{display:block;font-size:10.5px;font-weight:500}.calMode button.on{border-color:#168364;background:#e7f5ef;color:#168364}
   .day.wk{background:#168364;border-color:#168364;color:#fff;font-weight:900}.day.wkhalf{background:#e7f5ef;border-color:#7cc3a4;color:#168364;font-weight:900}
   .dpBtns button.dw{grid-column:1/-1}.dpBtns button.dw.on{border-color:#c06a00!important;background:#fff2e5!important;color:#ad691d!important}
@@ -382,7 +385,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
 </head>
 <body>
 
-<header><div class="headerInner"><div class="brandLine"><div class="wordmark"><span class="brandDot"></span>CHOI CEO <span style="font-weight:400;color:#9aa4b5">/ PEOPLE</span></div><span class="workspaceTag">직원 관리 · v11.16-3</span></div>
+<header><div class="headerInner"><div class="brandLine"><div class="wordmark"><span class="brandDot"></span>CHOI CEO <span style="font-weight:400;color:#9aa4b5">/ PEOPLE</span></div><span style="display:flex;align-items:center;gap:8px"><button type="button" class="devShare" onclick="exportData()">📲 다른 기기 공유</button><span class="workspaceTag">직원 관리 · v11.16-6</span></span></div>
   <div class="title" id="hTitle">구로점 직원 리스트</div>
   <div class="sub">함께 일하는 사람들, 한눈에 관리하세요.</div>
 </div></header>
@@ -986,6 +989,30 @@ function setMType(t){
   document.getElementById('memoModal').classList.toggle('isDaily', mType==='daily');
   renderCal();
 }
+/* 정산: 날짜 · 일수 · 시간 · 금액 (반타임 2번 = 하루) */
+let settleTxt = '';
+function settleInfo(L, hf, m){
+  const sd = d=>{ const x = new Date(d+'T00:00:00'); return `${x.getMonth()+1}/${x.getDate()}(${'일월화수목금토'[x.getDay()]})`; };
+  const full = L.filter(d=>!calHalf.includes(d)).sort(), half = L.filter(d=>calHalf.includes(d)).sort(), days = dayN(full.length, half.length);
+  const nm = document.getElementById('mName').value.trim() || '직원';
+  let money = '', mLine = '';
+  if(mType==='daily'){
+    const w = Number(document.getElementById('mDayWage').value)||0;
+    if(w){ const amt = Math.round(w * (full.length + half.length/2)); money = won(amt); mLine = `일당 ${won(w)} × ${days}일 = ${money}`; }
+  } else if(mPayType!=='monthly'){
+    const wage = Number(document.getElementById('mWage').value)||0, hrs = Number(document.getElementById('mDayHours').value)||0;
+    if(wage && hrs){ const H = full.length*hrs + half.length*hrs/2, amt = Math.round(wage*H); money = won(amt); mLine = `${H}시간 × 시급 ${won(wage)} = ${money}`; }
+  }
+  const rows = [['풀타임', full], ['반타임', half]].filter(([,a])=>a.length);
+  const html = rows.map(([k,a])=>`<div class="sr"><b>${k} ${a.length}번</b><span>${a.map(sd).join(', ')}</span></div>`).join('') +
+    `<div class="st">합계 <b>${days}일</b>${half.length ? ` <small>(반타임 ${half.length}번 = ${dayN(0, half.length)}일)</small>` : ''}${mLine ? `<br>${mLine}` : '<br><small>시급·하루 시간(또는 일당)을 넣으면 금액도 나와요</small>'}</div>`;
+  settleTxt = `[${nm} ${m}월 정산]\n` + rows.map(([k,a])=>`${k} ${a.length}번: ${a.map(sd).join(', ')}`).join('\n') + `\n합계 ${days}일` + (half.length ? ` (반타임 2번 = 하루)` : '') + (mLine ? `\n${mLine}` : '');
+  return {html};
+}
+async function settleCopy(){
+  try{ await navigator.clipboard.writeText(settleTxt); toast('정산 내용을 복사했어요'); }catch(e){ shareText(settleTxt); }
+}
+function dayN(full, half){ const n = full + half/2; return Number.isInteger(n) ? String(n) : n.toFixed(1); }   // 반타임 2번 = 1일
 function workMode(){ return mType==='daily' || calModeW; }
 function setCalMode(w){
   if(w && !calModeW && !calWork.some(d=>d.slice(0,7)===calMonth)){
@@ -1018,7 +1045,9 @@ function renderCal(){
   h += '</div>';
   if(W){
     const L = calWork.filter(x=>x.slice(0,7)===calMonth), hf = L.filter(x=>calHalf.includes(x)).length;
-    h += `<div class="calCount" style="color:#168364">${m}월 출근 <b>${L.length}회</b>` + (L.length ? ` · 풀 ${L.length-hf} · 반 ${hf}` : '') + `</div>`;
+    const st = settleInfo(L, hf, m);
+    h += `<div class="calCount" style="color:#168364">${m}월 출근 <b>${dayN(L.length-hf, hf)}일</b>` + (L.length ? ` <small style="font-weight:600">(풀 ${L.length-hf}번 + 반타임 ${hf}번)</small>` : '') + `</div>` +
+      (L.length ? `<div class="settle"><div class="sh2">🧾 ${m}월 정산</div>${st.html}<button type="button" onclick="settleCopy()">📋 정산 내용 복사</button></div>` : '');
   } else {
     const cnt = calOff.filter(x=>x.slice(0,7)===calMonth).length;
     const mks = Object.entries(calMark).filter(([k])=>k.slice(0,7)===calMonth && !calOff.includes(k)).map(([,v])=>v);
@@ -1133,7 +1162,7 @@ function dailyWorkers(sid, ds){
 }
 function dailyMonthCount(sid, ym){
   const [y,m] = ym.split('-').map(Number), days = new Date(y, m, 0).getDate(), by = new Map();
-  for(let d=1; d<=days; d++){ const ds = ym + '-' + String(d).padStart(2,'0'); dailyWorkers(sid, ds).forEach(w=>by.set(w.name, (by.get(w.name)||0) + 1)); }
+  for(let d=1; d<=days; d++){ const ds = ym + '-' + String(d).padStart(2,'0'); dailyWorkers(sid, ds).forEach(w=>by.set(w.name, (by.get(w.name)||0) + (w.type==='half' ? 0.5 : 1))); }
   return by;
 }
 function renderOffBoard(){
@@ -1157,8 +1186,8 @@ function renderOffBoard(){
   SECTIONS.forEach(sec=>data[sec.id].forEach(p=>{ const n = offInMonth(p, offMonth), ms = markSummary(p, offMonth); if(p.name && (n || ms.absent || ms.half)) rows.push(`${esc(p.name)} <b>${n}일</b>` + (ms.absent ? ` <span style="color:#b23b3b">결${ms.absent}</span>` : '') + (ms.half ? ` <span style="color:#1f6fb2">반${ms.half}</span>` : '')); }));
   const ML = logs().filter(x=>x.date && x.date.slice(0,7)===offMonth);
   const ioLine = `<b>${m}월 입사 ${ML.filter(x=>x.type==='join').length}명 · 퇴사 ${ML.filter(x=>x.type==='leave').length}명</b><br>`;
-  const DM = dailyMonthCount(storeId, offMonth), dTot = [...DM.values()].reduce((a,b)=>a+b,0);
-  const dLine = DM.size ? `<br><b style="color:#ad691d">${m}월 일용직 ${DM.size}명 · 연 ${dTot}일</b><br>` + [...DM.entries()].map(([n,c])=>`${esc(n)} <b style="color:#ad691d">${c}일</b>`).join(' · ') : '';
+  const DM = dailyMonthCount(storeId, offMonth), dTot = dayN([...DM.values()].reduce((a,b)=>a+b,0), 0);
+  const dLine = DM.size ? `<br><b style="color:#ad691d">${m}월 일용직 ${DM.size}명 · 연 ${dTot}일</b><br>` + [...DM.entries()].map(([n,c])=>`${esc(n)} <b style="color:#ad691d">${dayN(c,0)}일</b>`).join(' · ') : '';
   document.getElementById('offStat').innerHTML = ioLine + (rows.length ? '<b>' + m + '월 휴무 일수</b> <small>(결=결근 · 반=반타임)</small><br>' + rows.join(' · ') : m + '월 휴무가 아직 없어요.') + dLine;
   if(offSel) offPick(offSel, true);
 }
@@ -1275,9 +1304,9 @@ function monthText(sid, ym, o){
     L.forEach((p,k)=>{
       total++;
       const t = MT_TYPE[staffType(p)], extra = [];
-      if(t) extra.push(t + (staffType(p)==='daily' && DMall.get(dlNorm(p.name)) ? ' ' + DMall.get(dlNorm(p.name)) + '일 근무' : ''));
-      if(p.calMode==='work'){ const L = (p.workDays||[]).filter(d=>d.slice(0,7)===ym), hf = L.filter(d=>(p.halfDays||[]).includes(d)).length; extra.push('출근 ' + L.length + '회' + (hf ? ' (반타임 ' + hf + ')' : '')); }
-      else if(staffType(p)!=='daily' && DMall.get(dlNorm(p.name))) extra.push('하루 근무 ' + DMall.get(dlNorm(p.name)) + '일');
+      if(t) extra.push(t + (staffType(p)==='daily' && DMall.get(dlNorm(p.name)) ? ' ' + dayN(DMall.get(dlNorm(p.name)),0) + '일 근무' : ''));
+      if(p.calMode==='work'){ const L = (p.workDays||[]).filter(d=>d.slice(0,7)===ym), hf = L.filter(d=>(p.halfDays||[]).includes(d)).length; extra.push('출근 ' + dayN(L.length - hf, hf) + '일' + (hf ? ' (풀 ' + (L.length - hf) + ' · 반 ' + hf + ')' : '')); }
+      else if(staffType(p)!=='daily' && DMall.get(dlNorm(p.name))) extra.push('하루 근무 ' + dayN(DMall.get(dlNorm(p.name)),0) + '일');
       if(p.joinDate) extra.push('입사 ' + fmtYD(p.joinDate));
       if(p.leaveDate && p.leaveDate.slice(0,7)===ym){ extra.push(fmtD(p.leaveDate) + ' 퇴사'); outs.push(p.name); }
       if(p.joinDate && p.joinDate.slice(0,7)===ym) ins.push(p.name);
@@ -1291,9 +1320,9 @@ function monthText(sid, ym, o){
     const DM = DMall, staffNames = new Set(st.sections.flatMap(sec=>((allData[sid]||{})[sec.id]||[]).filter(p=>p.name && activeInMonth(p, ym)).map(p=>dlNorm(p.name))));
     const only = [...DM.entries()].filter(([n])=>!staffNames.has(n));
     if(only.length){
-      dN = only.length; dDays = only.reduce((a,[,c])=>a+c,0);
+      dN = only.length; dDays = dayN(only.reduce((a,[,c])=>a+c,0), 0);
       lines.push('', `■ 일용직 근무 (${dN}명 · 연 ${dDays}일)`);
-      only.forEach(([n,c],k)=>lines.push(`${k+1}. ${n} · ${c}일`));
+      only.forEach(([n,c],k)=>lines.push(`${k+1}. ${n} · ${dayN(c,0)}일`));
     }
   }
   if(!total && !dN) lines.push('', `${m}월 등록된 직원이 없어요`);
@@ -1411,7 +1440,7 @@ function calcPay(p, ym, offList, marks){
   let wd = workDays(p, ym, offList, marks), wh = workHours(p, ym, offList, marks, hrs);
   if(p.calMode==='work'){   // 출근일 체크: 체크한 날만, 반타임은 하루 시간의 절반
     const L = (p.workDays||[]).filter(d=>d.slice(0,7)===ym && staffActiveOn(p, d)), hf = L.filter(d=>(p.halfDays||[]).includes(d)).length;
-    wd = L.length; wh = {h: (L.length - hf) * hrs + hf * hrs / 2, half: hf, absent: 0};
+    wd = dayN(L.length - hf, hf); wh = {h: (L.length - hf) * hrs + hf * hrs / 2, half: hf, absent: 0};
   }
   let gross, monthly = 0, act = null;
   if(p.payType==='monthly'){
@@ -1438,6 +1467,7 @@ function calcDaily(p, ym, workList){
 function won(n){ return (n||0).toLocaleString('ko-KR') + '원'; }
 function updPay(){
   if(!cur) return;
+  if(workMode() && document.querySelector('#mCal .settle')){ const L = calWork.filter(x=>x.slice(0,7)===calMonth), hf = L.filter(x=>calHalf.includes(x)).length; const box = document.querySelector('#mCal .settle'); box.innerHTML = `<div class="sh2">🧾 ${Number(calMonth.slice(5))}월 정산</div>` + settleInfo(L, hf, Number(calMonth.slice(5))).html + `<button type="button" onclick="settleCopy()">📋 정산 내용 복사</button>`; }
   const p = data[cur.sec][cur.i];
   const tmp = Object.assign({}, p, {
     wage: document.getElementById('mWage').value,
