@@ -385,7 +385,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
 </head>
 <body>
 
-<header><div class="headerInner"><div class="brandLine"><div class="wordmark"><span class="brandDot"></span>CHOI CEO <span style="font-weight:400;color:#9aa4b5">/ PEOPLE</span></div><span style="display:flex;align-items:center;gap:8px"><button type="button" class="devShare" onclick="exportData()">📲 다른 기기 공유</button><span class="workspaceTag">직원 관리 · v11.16-6</span></span></div>
+<header><div class="headerInner"><div class="brandLine"><div class="wordmark"><span class="brandDot"></span>CHOI CEO <span style="font-weight:400;color:#9aa4b5">/ PEOPLE</span></div><span style="display:flex;align-items:center;gap:8px"><button type="button" class="devShare" onclick="exportData()">📲 다른 기기 공유</button><span class="workspaceTag">직원 관리 · v11.16-7</span></span></div>
   <div class="title" id="hTitle">구로점 직원 리스트</div>
   <div class="sub">함께 일하는 사람들, 한눈에 관리하세요.</div>
 </div></header>
@@ -2881,6 +2881,7 @@ function saveMemo(){
   const invalidPay=['mWage','mDayHours','mMonthly','mDayWage'].some(id=>{const v=document.getElementById(id).value;return v!==''&&(!Number.isFinite(Number(v))||Number(v)<0);});
   if(invalidPay){toast('급여와 근무 시간은 0 이상의 숫자로 입력해주세요');return;}
   const p = data[cur.sec][cur.i];
+  const calBefore = calSig(p);
   p.name = document.getElementById('mName').value.trim();
   p.role = document.getElementById('mRole').value.trim();
   const rv = document.getElementById('mRrn').value.trim();
@@ -2919,6 +2920,8 @@ function saveMemo(){
   p.marks = {}; Object.keys(calMark).filter(d=>d >= cutS).sort().forEach(d=>{ p.marks[d] = calMark[d]; });
   if(p.calMode==='work'){ p.off = []; p.marks = {}; }   // 출근일 체크 직원은 휴무·결근 표시 안 씀
   logs().forEach(x=>{ if(x.staffId===p.id) x.name = p.name; });
+  const calNow = calSig(p);
+  if(calNow !== calBefore) p.calAt = Date.now();
   p.memoAt = Date.now(); touch(p);
   const moved = moveStaffIfNeeded(p);
   if(persist()){ toast(moved ? moved + '(으)로 옮겼어요' : '저장되었습니다'); closeMemo(); render(); }
@@ -3083,6 +3086,10 @@ function showShareNote(){
     (sent ? '마지막 보냄 ' + f(sent) : '아직 보낸 적 없음') + (recv ? ' · 마지막 받음 ' + f(recv) : '');
 }
 let pendingImport = null;
+/* 달력 기록(휴무·결근·반타임·출근일)은 따로 시간 기록 → 합칠 때 달력을 더 최근에 고친 쪽 달력을 씀 */
+const CAL_FIELDS = ['off','marks','workDays','halfDays','calMode'];
+let mergeChanges = [];
+function calSig(p){ const m = p.marks||{}; return JSON.stringify([(p.off||[]).slice().sort(), Object.keys(m).sort().map(k=>[k,m[k]]), (p.workDays||[]).slice().sort(), (p.halfDays||[]).slice().sort(), p.calMode||'']); }
 function importData(input){
   const f = input.files && input.files[0];
   input.value = '';
@@ -3134,13 +3141,22 @@ function mergeData(mine, theirs){
       const usedEmpty = new Set();
       B.forEach(p=>{
         if(idx.has(p.id)){
-          const k = idx.get(p.id);
-          if(stamp2(p) > stamp2(list[k])){
-            const keepRrn = list[k].rrn;
+          const k = idx.get(p.id), mineP = list[k], before = JSON.stringify(mineP), mineSig = calSig(mineP), what = [];
+          if(stamp2(p) > stamp2(mineP)){
+            const keepRrn = mineP.rrn;
             list[k] = Object.assign({}, p);
             if(p.rrnOmitted && keepRrn) list[k].rrn = keepRrn;   // 주민번호 빼고 보낸 파일이면 이 폰 주민번호 유지
             delete list[k].rrnOmitted;
-            if(!isEmptyStaff(p)) updated++;
+            what.push('정보');
+          }
+          // 달력은 달력을 더 최근에 고친 쪽으로 (다른 칸을 이 기기에서 나중에 고쳤어도 달력 기록이 사라지지 않게)
+          const ca = Number(mineP.calAt)||0, cb = Number(p.calAt)||0;
+          const src = cb > ca ? p : (ca > cb ? mineP : null);
+          if(src){ CAL_FIELDS.forEach(f=>{ if(src[f]!==undefined) list[k][f] = JSON.parse(JSON.stringify(src[f])); else delete list[k][f]; }); list[k].calAt = Math.max(ca, cb); }
+          if(JSON.stringify(list[k]) !== before && !isEmptyStaff(list[k])){
+            updated++;
+            const calCh = calSig(list[k]) !== mineSig;
+            mergeChanges.push(`${st.name} · ${list[k].name || '이름 없음'}` + (calCh ? ' (달력' + (list[k].calMode==='work' ? ' · 출근 ' + (list[k].workDays||[]).length + '회' : '') + ')' : ''));
           }
           return;
         }
@@ -3149,7 +3165,7 @@ function mergeData(mine, theirs){
         let k = list.findIndex((q,j)=>!usedEmpty.has(j) && isEmptyStaff(q) && (q.role||'')===(p.role||''));
         if(k<0) k = list.findIndex((q,j)=>!usedEmpty.has(j) && isEmptyStaff(q) && !q.role);
         if(k>=0){ usedEmpty.add(k); list[k] = p; } else list.push(p);
-        added++;
+        added++; mergeChanges.push(`${st.name} · ${p.name || '이름 없음'} (새로 추가)`);
       });
       out[st.id][sec.id] = list.filter(p=>!(del[p.id] && del[p.id] >= stamp2(p)));
     });
@@ -3190,8 +3206,9 @@ function doImport(mode){
   const obj = pendingImport; if(!obj) return;
   let next, msg;
   if(mode==='merge'){
+    mergeChanges = [];
     const r = mergeData(allData, obj.data);
-    next = r.out; msg = `합치기 완료! 새 직원 ${r.added}명 · 바뀐 직원 ${r.updated}명 반영`;
+    next = r.out; msg = `합치기 완료! 새 직원 ${r.added}명 · 바뀐 직원 ${r.updated}명 반영` + (mergeChanges.length ? '\n\n' + mergeChanges.slice(0,20).join('\n') + (mergeChanges.length > 20 ? `\n… 외 ${mergeChanges.length-20}명` : '') : '\n\n바뀐 직원이 없어요 (이 기기가 이미 최신이에요)');
   } else {
     if(!confirm('이 폰의 직원 리스트를 받은 내용으로 통째로 바꿀까요?')) return;
     next = obj.data; msg = '받은 내용으로 바꿨어요';
