@@ -138,6 +138,10 @@
   .legend{display:flex;gap:10px;justify-content:center;margin:2px 0 8px;font-size:11px;font-weight:800;color:var(--sub);}
   .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:3px;vertical-align:-1px;}
   .oc .more{font-size:9px;color:var(--sub);font-weight:800;}
+  .oc .nm.dw{color:#ad691d;background:#fff2e5;}
+  .oc .cnt.dl{background:#fff2e5;color:#ad691d;}
+  .mtTxt{width:100%;min-height:52vh;padding:12px;border-radius:10px;border:1px solid #e4e8f0;background:#f8f9fc;font-family:inherit;font-size:14px;line-height:1.65;color:#1c2434;white-space:pre;overflow:auto;resize:vertical}
+  .mtOpt{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0;font-size:12.5px;color:#55627a}.mtOpt label{display:flex;align-items:center;gap:5px;margin:0;font-size:12.5px}.mtOpt input{width:17px;height:17px}
   .oc.today{border:2px solid var(--gold);}
   .oc.sel{outline:2px solid #6b4f9a;}
   .offDetail{margin-top:10px;padding:10px 12px;border-radius:10px;background:#f6f1fb;font-size:13.5px;font-weight:700;color:#4b3570;line-height:1.6;min-height:42px;}
@@ -375,7 +379,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
 </head>
 <body>
 
-<header><div class="headerInner"><div class="brandLine"><div class="wordmark"><span class="brandDot"></span>CHOI CEO <span style="font-weight:400;color:#9aa4b5">/ PEOPLE</span></div><span class="workspaceTag">직원 관리 · v11.11-10</span></div>
+<header><div class="headerInner"><div class="brandLine"><div class="wordmark"><span class="brandDot"></span>CHOI CEO <span style="font-weight:400;color:#9aa4b5">/ PEOPLE</span></div><span class="workspaceTag">직원 관리 · v11.16</span></div>
   <div class="title" id="hTitle">구로점 직원 리스트</div>
   <div class="sub">함께 일하는 사람들, 한눈에 관리하세요.</div>
 </div></header>
@@ -401,7 +405,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
 <div class="dateBar" id="dateBar"></div>
 <div class="summary" id="summary"></div>
 <div id="filterBar"></div>
-<div class="toolRow two"><button onclick="openOffBoard()">휴무 캘린더</button><button class="cfgBtn" onclick="openCfg()">매장·파트 설정</button></div>
+<div class="toolRow two"><button onclick="openOffBoard()">휴무·근무 캘린더</button><button class="cfgBtn" onclick="openMonthText()">📋 월별 직원 명단 (텍스트)</button><button class="cfgBtn" onclick="openCfg()">매장·파트 설정</button></div>
 <div class="listLabel"><h2>파트별 직원</h2><span>이름을 눌러 상세 정보 확인</span></div><div id="sections"></div>
 <details class="historyPanel"><summary>입·퇴사 현황과 이력</summary><div class="monthBox" id="monthBox"></div><div class="logBox" id="logBox"></div></details>
 </div></main>
@@ -660,11 +664,23 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
   <div class="modalBox">
     <h2 id="offTitle">휴무표</h2>
     <div class="calHead"><button onclick="offMove(-1)">◀</button><b id="offMonthTtl"></b><button onclick="offMove(1)">▶</button></div>
-    <div class="legend"><span><i style="background:#6b4f9a"></i>휴무</span><span><i style="background:#1f6fb2"></i>입사</span><span><i style="background:#b23b3b"></i>퇴사</span></div>
+    <div class="legend"><span><i style="background:#6b4f9a"></i>휴무</span><span><i style="background:#1f6fb2"></i>입사</span><span><i style="background:#b23b3b"></i>퇴사</span><span><i style="background:#e0a24a"></i>일용직 근무</span></div>
     <div class="offGrid" id="offGrid"></div>
     <div class="offDetail" id="offDetail">날짜를 누르면 쉬는 사람이 모두 보여요</div>
     <div class="offStat" id="offStat"></div>
     <div class="btnRow" style="margin-top:12px"><button class="bGray" onclick="document.getElementById('offModal').classList.remove('show')">닫기</button></div>
+  </div>
+</div>
+
+<!-- 월별 직원 명단 텍스트 -->
+<div class="modalOverlay" id="mtModal">
+  <div class="modalBox">
+    <h2>📋 월별 직원 명단</h2>
+    <div class="taxStores" id="mtStores"></div>
+    <div class="calHead" style="margin-top:10px"><button onclick="mtMove(-1)">◀</button><b id="mtTtl"></b><button onclick="mtMove(1)">▶</button></div>
+    <div class="mtOpt"><label><input type="checkbox" id="mtDaily" checked onchange="renderMonthText()">일용직 포함</label><label><input type="checkbox" id="mtOff" onchange="renderMonthText()">휴무 일수</label><label><input type="checkbox" id="mtPhone" onchange="renderMonthText()">연락처</label></div>
+    <textarea class="mtTxt" id="mtTxt" readonly></textarea>
+    <div class="btnRow" style="margin-top:10px"><button class="bGray" onclick="document.getElementById('mtModal').classList.remove('show')">닫기</button><button class="bGray" onclick="mtCopy()">📋 복사</button><button class="bRed" onclick="shareText(document.getElementById('mtTxt').value)">📤 공유</button></div>
   </div>
 </div>
 
@@ -1078,10 +1094,23 @@ function offPeople(ds){
   return out;
 }
 function dayEvents(ds){ return logs().filter(x=>x.date===ds); }
+/* 그날 일한 일용직: 일용직 일일 등록 기록 + 직원 카드(일용직)의 근무일 */
+function dailyWorkers(sid, ds){
+  const out = [], seen = new Set(), D = (dlAll()[sid] || {})[ds];
+  ((D && D.list) || []).forEach(x=>{ const n = dlNorm(x.name); if(!n || seen.has(n)) return; seen.add(n); out.push({name:n, type:x.type||''}); });
+  const st = STORES.find(x=>x.id===sid);
+  (st ? st.sections : []).forEach(sec=>((allData[sid]||{})[sec.id]||[]).forEach(p=>{ const n = dlNorm(p.name); if(!n || seen.has(n) || staffType(p)!=='daily' || !(p.workDays||[]).includes(ds)) return; seen.add(n); out.push({name:n, type:''}); }));
+  return out;
+}
+function dailyMonthCount(sid, ym){
+  const [y,m] = ym.split('-').map(Number), days = new Date(y, m, 0).getDate(), by = new Map();
+  for(let d=1; d<=days; d++){ const ds = ym + '-' + String(d).padStart(2,'0'); dailyWorkers(sid, ds).forEach(w=>by.set(w.name, (by.get(w.name)||0) + 1)); }
+  return by;
+}
 function renderOffBoard(){
   const st = STORES.find(x=>x.id===storeId);
   const [y,m] = offMonth.split('-').map(Number);
-  document.getElementById('offTitle').textContent = '📅 ' + st.name + '점 휴무표';
+  document.getElementById('offTitle').textContent = '📅 ' + st.name + '점 휴무·근무표';
   document.getElementById('offMonthTtl').textContent = y + '년 ' + m + '월';
   const first = new Date(y, m-1, 1).getDay(), days = new Date(y, m, 0).getDate(), t = today();
   let h = ['일','월','화','수','목','금','토'].map((w,i)=>`<div class="wd ${i===0?'sun':(i===6?'sat':'')}">${w}</div>`).join('');
@@ -1089,8 +1118,9 @@ function renderOffBoard(){
   for(let d=1; d<=days; d++){
     const ds = offMonth + '-' + String(d).padStart(2,'0'), ppl = offPeople(ds), ev = dayEvents(ds);
     const evH = ev.map(x=>`<span class="ev ${x.type}">${x.type==='join'?'입':'퇴'}${esc((x.name||'?').slice(0,2))}</span>`).join('');
-    const room = Math.max(0, 3 - ev.length);
-    h += `<button class="oc ${ds===t?'today':''} ${ds===offSel?'sel':''}" onclick="offPick('${ds}')"><span class="top"><span class="dn">${d}</span>${ppl.length?`<span class="cnt">휴${ppl.length}</span>`:''}${(()=>{ let a=0,hh=0; SECTIONS.forEach(sec=>data[sec.id].forEach(p=>{ const mk=(p.marks||{})[ds]; if(mk && p.name && !(p.off||[]).includes(ds)){ if(mk.t==='absent') a++; else hh++; } })); return (a?`<span class="cnt ab">결${a}</span>`:'') + (hh?`<span class="cnt hf">반${hh}</span>`:''); })()}</span>${evH}${ppl.slice(0,room).map(x=>`<span class="nm">${esc((x.p.name||'?').slice(0,4))}</span>`).join('')}${ppl.length>room && ppl.length?`<span class="more">+${ppl.length-room}</span>`:''}</button>`;
+    const dw = dailyWorkers(storeId, ds);
+    const room = Math.max(0, 3 - ev.length), offShow = Math.min(ppl.length, room), dwShow = Math.min(dw.length, Math.max(0, room - offShow)), more = (ppl.length - offShow) + (dw.length - dwShow);
+    h += `<button class="oc ${ds===t?'today':''} ${ds===offSel?'sel':''}" onclick="offPick('${ds}')"><span class="top"><span class="dn">${d}</span>${ppl.length?`<span class="cnt">휴${ppl.length}</span>`:''}${dw.length?`<span class="cnt dl">일${dw.length}</span>`:''}${(()=>{ let a=0,hh=0; SECTIONS.forEach(sec=>data[sec.id].forEach(p=>{ const mk=(p.marks||{})[ds]; if(mk && p.name && !(p.off||[]).includes(ds)){ if(mk.t==='absent') a++; else hh++; } })); return (a?`<span class="cnt ab">결${a}</span>`:'') + (hh?`<span class="cnt hf">반${hh}</span>`:''); })()}</span>${evH}${ppl.slice(0,offShow).map(x=>`<span class="nm">${esc((x.p.name||'?').slice(0,4))}</span>`).join('')}${dw.slice(0,dwShow).map(x=>`<span class="nm dw">${esc(x.name.slice(0,4))}</span>`).join('')}${more>0?`<span class="more">+${more}</span>`:''}</button>`;
   }
   document.getElementById('offGrid').innerHTML = h;
   // 직원별 이번 달 휴무 일수
@@ -1098,7 +1128,9 @@ function renderOffBoard(){
   SECTIONS.forEach(sec=>data[sec.id].forEach(p=>{ const n = offInMonth(p, offMonth), ms = markSummary(p, offMonth); if(p.name && (n || ms.absent || ms.half)) rows.push(`${esc(p.name)} <b>${n}일</b>` + (ms.absent ? ` <span style="color:#b23b3b">결${ms.absent}</span>` : '') + (ms.half ? ` <span style="color:#1f6fb2">반${ms.half}</span>` : '')); }));
   const ML = logs().filter(x=>x.date && x.date.slice(0,7)===offMonth);
   const ioLine = `<b>${m}월 입사 ${ML.filter(x=>x.type==='join').length}명 · 퇴사 ${ML.filter(x=>x.type==='leave').length}명</b><br>`;
-  document.getElementById('offStat').innerHTML = ioLine + (rows.length ? '<b>' + m + '월 휴무 일수</b> <small>(결=결근 · 반=반타임)</small><br>' + rows.join(' · ') : m + '월 휴무가 아직 없어요.');
+  const DM = dailyMonthCount(storeId, offMonth), dTot = [...DM.values()].reduce((a,b)=>a+b,0);
+  const dLine = DM.size ? `<br><b style="color:#ad691d">${m}월 일용직 ${DM.size}명 · 연 ${dTot}일</b><br>` + [...DM.entries()].map(([n,c])=>`${esc(n)} <b style="color:#ad691d">${c}일</b>`).join(' · ') : '';
+  document.getElementById('offStat').innerHTML = ioLine + (rows.length ? '<b>' + m + '월 휴무 일수</b> <small>(결=결근 · 반=반타임)</small><br>' + rows.join(' · ') : m + '월 휴무가 아직 없어요.') + dLine;
   if(offSel) offPick(offSel, true);
 }
 function offPick(ds, keep){
@@ -1106,8 +1138,10 @@ function offPick(ds, keep){
   const ppl = offPeople(ds), d = new Date(ds+'T00:00:00'), ev = dayEvents(ds);
   const jn = ev.filter(x=>x.type==='join'), lv = ev.filter(x=>x.type==='leave');
   // 그날 일하는 인원 = 그날 재직 중 - 휴무
-  let working = 0; SECTIONS.forEach(sec=>data[sec.id].forEach(p=>{ if(p.name && staffActiveOn(p, ds) && !(p.off||[]).includes(ds) && !((p.marks||{})[ds] && p.marks[ds].t==='absent')) working++; }));
-  document.getElementById('offDetail').innerHTML = `<b>${d.getMonth()+1}/${d.getDate()} (${'일월화수목금토'[d.getDay()]})</b> · 근무 ${working}명 · 휴무 ${ppl.length}명` +
+  let working = 0; SECTIONS.forEach(sec=>data[sec.id].forEach(p=>{ if(p.name && staffType(p)!=='daily' && staffActiveOn(p, ds) && !(p.off||[]).includes(ds) && !((p.marks||{})[ds] && p.marks[ds].t==='absent')) working++; }));
+  const dw = dailyWorkers(storeId, ds);
+  document.getElementById('offDetail').innerHTML = `<b>${d.getMonth()+1}/${d.getDate()} (${'일월화수목금토'[d.getDay()]})</b> · 근무 ${working}명${dw.length ? ` + 일용직 ${dw.length}명` : ''} · 휴무 ${ppl.length}명` +
+    (dw.length ? '<br><span style="color:#ad691d">🧾 일용직: ' + dw.map(x=>esc(x.name) + (x.type ? ` <small>(${DL_NAME[x.type]})</small>` : '')).join(', ') + '</span>' : '') +
     (ppl.length ? '<br>💤 휴무: ' + ppl.map(x=>`${esc(x.p.name||'이름 없음')} <small>(${x.sec.name})</small>`).join(', ') : '') +
     (()=>{ const ab = [], hf = []; SECTIONS.forEach(sec=>data[sec.id].forEach(p=>{ const mk = (p.marks||{})[ds]; if(!mk || !p.name || (p.off||[]).includes(ds) || !staffActiveOn(p, ds)) return; if(mk.t==='absent') ab.push(esc(p.name)); else hf.push(`${esc(p.name)} <small>(${mk.t==='am'?'오전':'오후'}${mk.h?' '+mk.h+'시간':''}${mk.time?' '+esc(mk.time):''})</small>`); }));
       return (ab.length ? '<br><span style="color:#b23b3b">🚫 결근: ' + ab.join(', ') + '</span>' : '') + (hf.length ? '<br><span style="color:#1f6fb2">🌓 반타임: ' + hf.join(', ') + '</span>' : ''); })() +
@@ -1195,6 +1229,57 @@ function ioDo(type, date){
   lastAction = date ? `${nm} ${word} ${fmtD(date)}` : `${nm} ${word} 기록 취소`;
   if(persist()) toast(lastAction + ' 저장됨');
   closeIo(); render();
+}
+/* ---------- 월별 직원 명단 (텍스트만) ---------- */
+let mtStore = '', mtMonth = '';
+const MT_TYPE = {ins:'4대보험', ins2:'2대보험', tax:'3.3%', daily:'일용직', none:''};
+function openMonthText(){ mtStore = storeId; mtMonth = viewMonth; renderMonthText(); document.getElementById('mtModal').classList.add('show'); }
+function mtMove(n){ let [y,m] = mtMonth.split('-').map(Number); m += n; if(m<1){m=12;y--;} if(m>12){m=1;y++;} mtMonth = y+'-'+String(m).padStart(2,'0'); renderMonthText(); }
+function monthText(sid, ym, o){
+  const [y,m] = ym.split('-').map(Number), st = STORES.find(x=>x.id===sid);
+  const lines = [`[${st.name}점 ${y}년 ${m}월 직원 명단]`];
+  let total = 0; const ins = [], outs = [], DMall = dailyMonthCount(sid, ym);
+  st.sections.forEach(sec=>{
+    const L = ((allData[sid]||{})[sec.id]||[]).filter(p=>p.name && activeInMonth(p, ym) && (o.daily || staffType(p)!=='daily'));
+    if(!L.length) return;
+    lines.push('', `■ ${sec.name} (${L.length}명)`);
+    L.forEach((p,k)=>{
+      total++;
+      const t = MT_TYPE[staffType(p)], extra = [];
+      if(t) extra.push(t + (staffType(p)==='daily' && DMall.get(dlNorm(p.name)) ? ' ' + DMall.get(dlNorm(p.name)) + '일 근무' : ''));
+      if(p.joinDate) extra.push('입사 ' + fmtYD(p.joinDate));
+      if(p.leaveDate && p.leaveDate.slice(0,7)===ym){ extra.push(fmtD(p.leaveDate) + ' 퇴사'); outs.push(p.name); }
+      if(p.joinDate && p.joinDate.slice(0,7)===ym) ins.push(p.name);
+      if(o.off){ const n = offInMonth(p, ym); if(n) extra.push('휴무 ' + n + '일'); }
+      if(o.phone && p.phone) extra.push(p.phone);
+      lines.push(`${k+1}. ${p.role ? p.role + ' ' : ''}${p.name}` + (extra.length ? ' · ' + extra.join(' · ') : ''));
+    });
+  });
+  let dN = 0, dDays = 0;
+  if(o.daily){
+    const DM = DMall, staffNames = new Set(st.sections.flatMap(sec=>((allData[sid]||{})[sec.id]||[]).filter(p=>p.name && activeInMonth(p, ym)).map(p=>dlNorm(p.name))));
+    const only = [...DM.entries()].filter(([n])=>!staffNames.has(n));
+    if(only.length){
+      dN = only.length; dDays = only.reduce((a,[,c])=>a+c,0);
+      lines.push('', `■ 일용직 근무 (${dN}명 · 연 ${dDays}일)`);
+      only.forEach(([n,c],k)=>lines.push(`${k+1}. ${n} · ${c}일`));
+    }
+  }
+  if(!total && !dN) lines.push('', `${m}월 등록된 직원이 없어요`);
+  lines.push('', `합계: 직원 ${total}명` + (dN ? ` · 일용직 ${dN}명` : '') + (ins.length ? `\n입사 ${ins.length}명 (${ins.join(', ')})` : '') + (outs.length ? `\n퇴사 ${outs.length}명 (${outs.join(', ')})` : ''));
+  return lines.join('\n');
+}
+function renderMonthText(){
+  const [y,m] = mtMonth.split('-').map(Number);
+  document.getElementById('mtStores').innerHTML = [['','전체']].concat(STORES.map(x=>[x.id, x.name])).map(([id,nm])=>`<button class="${id===mtStore?'on':''}" onclick="mtStore='${id}';renderMonthText()">${esc(nm)}</button>`).join('');
+  document.getElementById('mtTtl').textContent = `${y}년 ${m}월`;
+  const o = {daily: document.getElementById('mtDaily').checked, off: document.getElementById('mtOff').checked, phone: document.getElementById('mtPhone').checked};
+  document.getElementById('mtTxt').value = storeList(mtStore).map(st=>monthText(st.id, mtMonth, o)).join('\n\n────────────\n\n');
+}
+async function mtCopy(){
+  const t = document.getElementById('mtTxt').value;
+  try{ await navigator.clipboard.writeText(t); toast('복사했어요 · 카톡·메모에 붙여넣으세요'); }
+  catch(e){ const el = document.getElementById('mtTxt'); el.removeAttribute('readonly'); el.select(); try{ document.execCommand('copy'); toast('복사했어요'); }catch(_){ toast('길게 눌러 복사하세요'); } el.setAttribute('readonly',''); }
 }
 /* ---------- 매장·파트 설정 ---------- */
 let cfgDraft = null;
