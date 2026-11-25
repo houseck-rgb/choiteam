@@ -415,7 +415,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
 </head>
 <body>
 
-<header><div class="headerInner"><div class="brandLine"><div class="wordmark"><span class="brandDot"></span>CHOI CEO <span style="font-weight:400;color:#9aa4b5">/ PEOPLE</span></div><span style="display:flex;align-items:center;gap:8px"><button type="button" class="devShare" onclick="exportData()">📲 다른 기기 공유</button><span class="workspaceTag">직원 관리 · v11.25-2</span><a class="helperLink" href="https://helperpay.vercel.app/" target="_blank" rel="noopener">🤝 헬퍼앱</a></span></div>
+<header><div class="headerInner"><div class="brandLine"><div class="wordmark"><span class="brandDot"></span>CHOI CEO <span style="font-weight:400;color:#9aa4b5">/ PEOPLE</span></div><span style="display:flex;align-items:center;gap:8px"><button type="button" class="devShare" onclick="exportData()">📲 다른 기기 공유</button><span class="workspaceTag">직원 관리 · v11.25-3</span><a class="helperLink" href="https://helperpay.vercel.app/" target="_blank" rel="noopener">🤝 헬퍼앱</a></span></div>
   <div class="title" id="hTitle">구로점 직원 리스트</div>
   <div class="sub">함께 일하는 사람들, 한눈에 관리하세요.</div>
 </div></header>
@@ -511,7 +511,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
       <div class="docBusy" id="mDocBusy"></div>
       <div class="docBtns">
         <button type="button" class="wide" onclick="docPickMany()">🖼 사진첩에서 여러 장 한 번에<small>찍은 순서대로 빈 칸에 들어가요</small></button>
-        <button type="button" onclick="docShare()">📤 사진 공유<small>카톡 등으로 보내기</small></button>
+        <button type="button" id="docShareBtn" onclick="docShare()">📤 사진 공유<small>카톡 등으로 보내기</small></button>
         <button type="button" onclick="docSaveFiles()">📁 사진 파일 저장<small>폴더 골라 저장</small></button>
         <button type="button" class="wide" onclick="exportStaff()">📦 저장하고 이 직원만 다른 기기로 보내기<small>받은 기기에서 파일 불러오기 → 사진까지 그대로</small></button>
       </div>
@@ -809,10 +809,12 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
     <div class="btnRow" style="margin-top:10px"><button class="bGray" onclick="closeXlPrev()">닫기</button><button class="bRed" onclick="saveXlPrev()">엑셀 저장 · 공유</button></div>
   </div>
 </div>
-<div class="docView" id="docView"><div class="bar"><span id="dvTitle"></span><button type="button" onclick="docViewShare()">📤 공유</button><button type="button" onclick="docViewClose()">닫기</button></div><div class="wrap" id="dvWrap" onclick="this.classList.toggle('zoom')"><img id="dvImg" alt=""></div><div class="hint">사진을 누르면 크게 · 다시 누르면 원래대로</div></div>
+<div class="docView" id="docView"><div class="bar"><span id="dvTitle"></span><button type="button" id="dvShareBtn" onclick="docViewShare()">📤 공유</button><button type="button" onclick="docViewClose()">닫기</button></div><div class="wrap" id="dvWrap" onclick="this.classList.toggle('zoom')"><img id="dvImg" alt=""></div><div class="hint">사진을 누르면 크게 · 다시 누르면 원래대로</div></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
+/* 폰이면 공유 창, 컴퓨터면 파일로 저장 (윈도우 공유 창에서 멈추지 않게) */
+var IS_MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
 
 function setPeopleView(overview){
  document.querySelector('.appMain').classList.toggle('overviewMode',overview);
@@ -1981,7 +1983,7 @@ function payDel(id){
   persist(); renderPay();
 }
 async function shareText(t){
-  try{ if(navigator.share){ await navigator.share({text:t}); return; } }catch(e){ if(e && e.name==='AbortError') return; }
+  try{ if(IS_MOBILE && navigator.share){ await navigator.share({text:t}); return; } }catch(e){ if(e && e.name==='AbortError') return; }
   try{ await navigator.clipboard.writeText(t); toast('복사했어요. 카톡에 붙여넣으세요'); }catch(e){ toast('공유가 안 되는 환경이에요'); }
 }
 
@@ -2690,7 +2692,7 @@ function makeTaxBook(ym, sid, withRrn){
 }
 async function shareFiles(files, msg){
   try{
-    if(navigator.canShare && navigator.canShare({files})){ await navigator.share({files, title: files.length===1 ? files[0].name : files.length + '개 엑셀'}); return; }
+    if(IS_MOBILE && navigator.canShare && navigator.canShare({files})){ await navigator.share({files, title: files.length===1 ? files[0].name : files.length + '개 엑셀'}); return; }
   }catch(e){ if(e && e.name==='AbortError') return; }
   let n = 0;
   for(const file of files){ if(await saveFile(file)) n++; }
@@ -3040,7 +3042,7 @@ async function exportData(){
   const name = '직원리스트_' + stamp() + '.txt';
   const file = new File([text], name, {type:'text/plain'});
   try{
-    if(navigator.canShare && navigator.canShare({files:[file]})){
+    if(IS_MOBILE && navigator.canShare && navigator.canShare({files:[file]})){
       await navigator.share({files:[file], title:'직원 리스트', text:'직원 리스트 저장 파일입니다. 앱에서 파일 불러오기로 열어주세요.'});
       markSent(); return;
     }
@@ -3090,7 +3092,7 @@ async function mailBackup(){
   const to = document.getElementById('bkMail').value.trim(), file = backupFile(), M = bkMailText(file);
   // 폰: 공유 창에서 Gmail·네이버 메일 앱을 고르면 백업 파일이 첨부된 채로 열림
   try{
-    if(navigator.canShare && navigator.canShare({files:[file]})){
+    if(IS_MOBILE && navigator.canShare && navigator.canShare({files:[file]})){
       await navigator.share({files:[file], title:M.subject, text:(to ? '받는 사람: ' + to + '\n\n' : '') + M.body});
       markSent(); bkShowSent(file, true); return;
     }
@@ -3539,6 +3541,10 @@ function renderDocs(){
   el.innerHTML = DOC_SLOTS.map(([k, lb])=>docLive(D[k])
     ? `<div class="docSlot has"><img src="${D[k].d}" alt="${lb}" onclick="docView('${k}')"><span class="lb">${lb} <small>${kb(D[k].size||0)}</small></span><div class="docAct"><button type="button" onclick="docPick('${k}')">다시 찍기</button><button type="button" class="del" onclick="docDel('${k}')">삭제</button></div></div>`
     : `<button type="button" class="docSlot" onclick="docPick('${k}')"><span class="pl">📷</span><span class="lb">${lb}</span><small>찍기 · 사진첩에서 고르기</small></button>`).join('');
+  if(!IS_MOBILE){
+    const b1 = document.getElementById('docShareBtn'); if(b1) b1.innerHTML = '💾 이미지 저장<small>이 직원 사진 모두 · 폴더 골라 저장</small>';
+    const b2 = document.getElementById('dvShareBtn'); if(b2) b2.textContent = '💾 이미지 저장';
+  }
   document.getElementById('mDocBusy').textContent = docCount(p.id) ? `${docCount(p.id)}장 저장됨 · 백업·공유 파일에 함께 들어가요` : '';
 }
 function docPick(slot){ docSlotPick = slot; document.getElementById('docIn').click(); }
@@ -3596,11 +3602,11 @@ function docFiles(only){
   return DOC_SLOTS.filter(([k])=>docLive(D[k]) && (!only || only===k)).map(([k, lb])=>new File([dataUrlBlob(D[k].d)], `${safeName(p.name)}_${lb.replace(/\s+/g,'')}.jpg`, {type:'image/jpeg'}));
 }
 async function shareOrSave(files, title){
-  try{ if(navigator.canShare && navigator.canShare({files})){ await navigator.share({files, title}); return; } }
+  try{ if(IS_MOBILE && navigator.canShare && navigator.canShare({files})){ await navigator.share({files, title}); return; } }
   catch(e){ if(e && e.name==='AbortError') return; }
   for(const f of files) await saveFile(f);
 }
-function docShare(){ const fs = docFiles(); if(!fs.length){ toast('저장된 사진이 없어요'); return; } shareOrSave(fs, (curStaff().name||'직원') + ' 서류 사진'); }
+function docShare(){ const fs = docFiles(); if(!fs.length){ toast('저장된 사진이 없어요'); return; } if(!IS_MOBILE){ docSaveFiles(); return; } shareOrSave(fs, (curStaff().name||'직원') + ' 서류 사진'); }
 function docViewShare(){ const fs = docFiles(dvSlot); if(fs.length) shareOrSave(fs, fs[0].name); }
 async function docSaveFiles(){
   const files = docFiles(); if(!files.length){ toast('저장된 사진이 없어요'); return; }
@@ -3626,7 +3632,7 @@ async function exportStaff(){
   d.__log[loc.st.id] = ((allData.__log||{})[loc.st.id]||[]).filter(x=>x.staffId===p.id);
   const payload = {app:FILE_TAG, ver:2, kind:'staff', exportedAt:Date.now(), data:d, docs: docCount(p.id) ? {[p.id]: docsOf(p.id)} : {}};
   const file = new File([JSON.stringify(payload)], `직원_${safeName(p.name)}_${stamp()}.txt`, {type:'text/plain'});
-  try{ if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:(p.name||'직원') + ' 정보', text:(p.name||'직원') + ' 정보 파일입니다. 직원관리 앱에서 파일 불러오기 → 합치기로 열어 주세요.'}); return; } }
+  try{ if(IS_MOBILE && navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:(p.name||'직원') + ' 정보', text:(p.name||'직원') + ' 정보 파일입니다. 직원관리 앱에서 파일 불러오기 → 합치기로 열어 주세요.'}); return; } }
   catch(e){ if(e && e.name==='AbortError') return; }
   await saveFile(file);
 }
