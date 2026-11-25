@@ -378,6 +378,35 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
 @media(max-width:350px){.peopleGrid{grid-template-columns:1fr}.dailyBar{grid-template-columns:1fr}.dailyBar button,.dailyBar button.pay{min-height:58px}.overviewMetrics .metric{padding:9px}.metric span{font-size:11px}}
 
 
+/* 등록증 · 워킹퍼밋 사진 */
+.docGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.docSlot{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:124px;border:1.5px dashed #b9c9f7;border-radius:12px;background:#f6f8ff;font-family:inherit;color:#2545ca;padding:6px;overflow:hidden;width:100%}
+.docSlot .pl{font-size:26px;line-height:1}.docSlot .lb{font-size:13.5px;font-weight:700}.docSlot small{font-size:11px;color:#7d8fc9;font-weight:500}
+.docSlot.has{border:1px solid #dfe4ec;background:#fff;padding:0;justify-content:flex-start}
+.docSlot.has img{width:100%;height:98px;object-fit:cover;display:block;cursor:zoom-in;background:#eef1f6}
+.docSlot.has .lb{color:#1c2434;font-size:12.5px;padding:5px 4px 0;text-align:center}.docSlot.has .lb small{color:#8a95a7}
+.docAct{display:flex;width:100%;gap:4px;padding:5px}
+.docAct button{flex:1;min-height:38px;border:1px solid #e4e8f0;background:#fafbfd;border-radius:8px;font-family:inherit;font-size:12.5px;font-weight:600;color:#55627a}
+.docAct button.del{color:#b23b3b}
+.docBtns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.docBtns button{min-height:46px;padding:8px 6px;border-radius:10px;border:1px solid #d6def3;background:#fff;font-family:inherit;font-size:13px;font-weight:700;color:#2545ca;line-height:1.3}
+.docBtns button small{display:block;font-size:10.5px;font-weight:500;color:#7d8fc9}
+.docBtns button.wide{grid-column:1/-1;background:#f6f8ff}
+.docBusy{margin-top:6px;font-size:12px;color:#2545ca;font-weight:600;min-height:16px}
+.docTag{flex-shrink:0;font-size:10px;font-weight:800;color:#2545ca;background:#eaf0ff;border-radius:5px;padding:2px 5px}
+.docView{position:fixed;inset:0;z-index:150;background:#0d1320;display:none;flex-direction:column}
+.docView.show{display:flex}
+.docView .bar{display:flex;align-items:center;gap:8px;padding:calc(10px + env(safe-area-inset-top)) 12px 10px;color:#fff;font-weight:700;font-size:15px}
+.docView .bar span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.docView .bar button{min-height:44px;padding:0 14px;border-radius:10px;border:0;background:#ffffff26;color:#fff;font-family:inherit;font-weight:700;font-size:14px}
+.docView .wrap{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;-webkit-overflow-scrolling:touch}
+.docView .wrap.zoom{display:block}
+.docView img{max-width:100%;max-height:100%;display:block}
+.docView .wrap.zoom img{max-width:none;max-height:none;width:230%}
+.docView .hint{color:#9fb0cc;font-size:12px;text-align:center;padding:8px 12px calc(10px + env(safe-area-inset-bottom))}
+.saveOpt{display:flex!important;align-items:center;gap:8px;margin:8px 0 2px!important;font-size:13px!important;color:#1c2434!important}.saveOpt input{width:18px;height:18px;flex-shrink:0}
+.dlMv{width:100%;margin-top:4px;min-height:40px;padding:8px;border-radius:8px;border:1px dashed #a9c2ff;background:#f7f9ff;color:#2545ca;font-family:inherit;font-size:13px!important;font-weight:600}
+.dlMvAll{margin:10px 0 4px;padding:10px;border-radius:11px;border:1px dashed #a9c2ff;background:#f7f9ff}.dlMvAll small{display:block;font-size:11.5px;color:#697b9d;margin-top:5px;line-height:1.5}.dlMvAll select{width:100%;min-height:46px;padding:10px;border-radius:9px;border:1px solid #c7d7ff;background:#fff;font-family:inherit;font-size:14.5px;font-weight:700;color:#2545ca}
 /* Soft blue outlines for store cards */
 .peopleCard,.section{border:2px solid #b5cefa!important}
 .peopleCardTop,.secHead{border-bottom-color:#d6e5fc!important}
@@ -386,7 +415,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
 </head>
 <body>
 
-<header><div class="headerInner"><div class="brandLine"><div class="wordmark"><span class="brandDot"></span>CHOI CEO <span style="font-weight:400;color:#9aa4b5">/ PEOPLE</span></div><span style="display:flex;align-items:center;gap:8px"><button type="button" class="devShare" onclick="exportData()">📲 다른 기기 공유</button><span class="workspaceTag">직원 관리 · v11.16-7</span><a class="helperLink" href="https://helperpay.vercel.app/" target="_blank" rel="noopener">🤝 헬퍼앱</a></span></div>
+<header><div class="headerInner"><div class="brandLine"><div class="wordmark"><span class="brandDot"></span>CHOI CEO <span style="font-weight:400;color:#9aa4b5">/ PEOPLE</span></div><span style="display:flex;align-items:center;gap:8px"><button type="button" class="devShare" onclick="exportData()">📲 다른 기기 공유</button><span class="workspaceTag">직원 관리 · v11.25-2</span><a class="helperLink" href="https://helperpay.vercel.app/" target="_blank" rel="noopener">🤝 헬퍼앱</a></span></div>
   <div class="title" id="hTitle">구로점 직원 리스트</div>
   <div class="sub">함께 일하는 사람들, 한눈에 관리하세요.</div>
 </div></header>
@@ -476,6 +505,19 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
       <input type="date" id="mPermitExp" onchange="updDday()">
       <div class="dday" id="mDday"></div>
     </div>
+    <div class="field">
+      <label>🪪 등록증 · 워킹퍼밋 사진 <small style="font-weight:500;color:#8a95a7">— 글씨가 보이게 선명하게, 용량은 작게 저장돼요</small></label>
+      <div class="docGrid" id="mDocs"></div>
+      <div class="docBusy" id="mDocBusy"></div>
+      <div class="docBtns">
+        <button type="button" class="wide" onclick="docPickMany()">🖼 사진첩에서 여러 장 한 번에<small>찍은 순서대로 빈 칸에 들어가요</small></button>
+        <button type="button" onclick="docShare()">📤 사진 공유<small>카톡 등으로 보내기</small></button>
+        <button type="button" onclick="docSaveFiles()">📁 사진 파일 저장<small>폴더 골라 저장</small></button>
+        <button type="button" class="wide" onclick="exportStaff()">📦 저장하고 이 직원만 다른 기기로 보내기<small>받은 기기에서 파일 불러오기 → 사진까지 그대로</small></button>
+      </div>
+      <input type="file" id="docIn" accept="image/*" hidden onchange="docPicked(this)">
+      <input type="file" id="docInMany" accept="image/*" multiple hidden onchange="docPickedMany(this)">
+    </div>
     <div class="field dailyOnly"><label>일당 (원)</label><input type="number" id="mDayWage" inputmode="numeric" placeholder="예) 130000" oninput="updPay()"></div>
     <div class="field notDaily">
       <label>급여 방식</label>
@@ -540,7 +582,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
     <div class="field"><label>백업 받을 메일 주소</label><input type="email" id="bkMail" style="width:100%;padding:12px;border:1px solid #dfe4ec;border-radius:10px;font-size:15px;font-family:inherit;box-sizing:border-box" placeholder="예) myname@naver.com" autocomplete="email" onchange="saveBkMail()"></div>
     <button class="bkBtn mail" onclick="mailBackup()">📧 메일로 백업 보내기<small>직원·주민번호·메모·휴무·입퇴사·일용직 기록 전부</small></button>
     <div class="bkSent" id="bkSent" style="display:none"></div>
-    <button class="bkBtn" onclick="downloadBackup()">⬇ 백업 파일만 저장하기</button>
+    <button class="bkBtn" onclick="downloadBackup()">📁 백업 파일 저장하기<small>저장 위치(폴더)를 골라 저장 · 같은 이름 파일이 있으면 합쳐서 저장</small></button>
     <button class="bkBtn load" onclick="document.getElementById('importFile').click()">📂 백업 파일 불러오기<small>다른 폰·컴퓨터에서 받은 백업 열기</small></button>
     <div class="bkHow">
       <b>폰 ↔ 컴퓨터, 어느 쪽에서든 이어서 하려면</b>
@@ -642,6 +684,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
     <div id="dlList"></div>
     <div class="dlTotal" id="dlTotal"></div>
     <div class="dlBtns"><button onclick="dlAdd()">+ 한 명 추가</button><button onclick="dlCopyPrev()">↺ 지난 명단 그대로</button></div>
+    <div id="dlMoveAll"></div>
     <details class="dlManual"><summary>직접 붙여넣기 칸 열기</summary>
       <textarea id="dlPasteBox" style="min-height:100px" placeholder="여기에 길게 눌러 붙여넣으면 바로 들어가요&#10;예) 710424-5860015 ZHANG LINHU (장림호)&#10;홍길동 900101-1234567 풀&#10;Tamang Bishal 950505-5123456 국민 123-45-678901" onpaste="setTimeout(dlPaste,60)"></textarea>
       <button class="smallBtn" style="width:100%;margin-top:6px" onclick="dlPaste()">⬇ 넣기</button>
@@ -766,6 +809,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
     <div class="btnRow" style="margin-top:10px"><button class="bGray" onclick="closeXlPrev()">닫기</button><button class="bRed" onclick="saveXlPrev()">엑셀 저장 · 공유</button></div>
   </div>
 </div>
+<div class="docView" id="docView"><div class="bar"><span id="dvTitle"></span><button type="button" onclick="docViewShare()">📤 공유</button><button type="button" onclick="docViewClose()">닫기</button></div><div class="wrap" id="dvWrap" onclick="this.classList.toggle('zoom')"><img id="dvImg" alt=""></div><div class="hint">사진을 누르면 크게 · 다시 누르면 원래대로</div></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -1704,9 +1748,11 @@ function renderDaily(){
       <div class="dlRow2">
         <input type="text" class="${String(x.rrn||'').replace(/\D/g,'').length===13?'':'need'}" value="${esc(x.rrn||'')}" placeholder="등록번호 (주민·외국인)" inputmode="numeric" autocomplete="off" onchange="dlSetField(${k},'rrn',this)">
         <input type="text" value="${esc(x.acct||'')}" placeholder="은행 계좌 (입금용)" autocomplete="off" onchange="dlSetField(${k},'acct',this)">
-      </div>${Number(x.amt) > 130000 ? `<div class="dlDays ${x.days?'':'need'}">여러 날 몫이면 근무 일수 <input type="number" inputmode="numeric" min="1" value="${x.days||''}" placeholder="?" onchange="dlSetDays(${k},this)"> 일${x.days ? ` · 하루 ${won(Math.round(x.amt/x.days))}` : ' <b>← 세금 계산에 필요해요</b>'}</div>` : ''}${x.note ? `<div class="dlNote">붙여넣은 금액: ${esc(x.note)}</div>` : ''}
+      </div>${dlNorm(x.name) && STORES.length > 1 ? `<select class="dlMv" onchange="dlMoveOne(${k},this)"><option value="">↪ 잘못 올렸으면 다른 매장으로 옮기기</option>${STORES.filter(s2=>s2.id!==dlStore).map(s2=>`<option value="${s2.id}">${esc(s2.name)}점으로 옮기기</option>`).join('')}</select>` : ''}${Number(x.amt) > 130000 ? `<div class="dlDays ${x.days?'':'need'}">여러 날 몫이면 근무 일수 <input type="number" inputmode="numeric" min="1" value="${x.days||''}" placeholder="?" onchange="dlSetDays(${k},this)"> 일${x.days ? ` · 하루 ${won(Math.round(x.amt/x.days))}` : ' <b>← 세금 계산에 필요해요</b>'}</div>` : ''}${x.note ? `<div class="dlNote">붙여넣은 금액: ${esc(x.note)}</div>` : ''}
     </div>`).join('')
     : '<div class="dlEmpty">아직 등록된 일용직이 없어요.<br>카톡 명단(이름·등록번호)을 아래에 붙여넣거나 "+ 한 명 추가"를 누르세요.</div>';
+  const nNamed = list.filter(x=>dlNorm(x.name)).length;
+  document.getElementById('dlMoveAll').innerHTML = nNamed && STORES.length > 1 ? `<div class="dlMvAll"><select id="dlMoveAllSel" onchange="dlMoveAll(this)"><option value="">↪ 이 날 명단 ${nNamed}명 전체를 다른 매장으로</option>${STORES.filter(s2=>s2.id!==dlStore).map(s2=>`<option value="${s2.id}">${esc(s2.name)}점으로 모두 옮기기</option>`).join('')}</select><small>명단을 다른 매장에 붙여넣었을 때 · 반·풀 금액은 옮긴 매장 단가로 다시 맞춰요 · ↶ 되돌리기 가능</small></div>` : '';
   dlTotal();
 }
 function dlTotal(){
@@ -1993,7 +2039,7 @@ function renderDailyMonth(){
       <div class="dmDayCard">
         <div class="dmDayHead"><b class="d">${dlDayName(d.ds)}</b><em class="${d.paid?'ok':'no'}">${d.paid ? '✓ 입금 ' + dmPaidTime(d) : '입금 전'}</em><span class="t">${d.list.length}명 · <b>${won(d.sum)}</b></span></div>
         <table class="dmTbl"><tbody>${d.list.map(x=>`<tr class="dmRow" onclick="openDaily('${dmStore}','${d.ds}')"><td><b>${esc(dmShowName(x.name))}</b>${x.monthly ? ' <small style="display:inline;color:#2545ca">월 등록</small>' : ''}<small class="${x.rrn?'':'warnTxt'}">${esc(x.rrn || '⚠ 등록번호 없음')}</small></td><td class="r">${x.amt!=='' ? won(Number(x.amt)) : '<span class="warnTxt">금액 없음</span>'}</td></tr>`).join('')}</tbody></table>
-        <div class="payBtns"><button onclick="openDaily('${dmStore}','${d.ds}')">✎ 이 날 고치기</button><button onclick="daOpen(null,'${d.ds}')">+ 사람 추가</button><button onclick="shareText(dmDayText('${d.ds}'))">📤 공유</button></div>
+        <div class="payBtns"><button onclick="openDaily('${dmStore}','${d.ds}')">✎ 이 날 고치기</button><button onclick="daOpen(null,'${d.ds}')">+ 사람 추가</button><button onclick="shareText(dmDayText('${d.ds}'))">📤 공유</button><button onclick="dlMoveOpen('${dmStore}','${d.ds}')">↪ 매장 이동</button></div>
       </div>`).join('') : `<div class="dlEmpty">${m}월 ${esc(st.name)}점 입금 기록이 없어요.<br>위 버튼으로 오늘 명단을 넣어 주세요.</div>`);
     return;
   }
@@ -2646,12 +2692,9 @@ async function shareFiles(files, msg){
   try{
     if(navigator.canShare && navigator.canShare({files})){ await navigator.share({files, title: files.length===1 ? files[0].name : files.length + '개 엑셀'}); return; }
   }catch(e){ if(e && e.name==='AbortError') return; }
-  for(const file of files){
-    const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name;
-    document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 3000);
-    await new Promise(r=>setTimeout(r, 400));
-  }
-  toast(msg);
+  let n = 0;
+  for(const file of files){ if(await saveFile(file)) n++; }
+  if(n > 1) toast(msg);
 }
 async function exportExcel(){
   const ym = taxMonth || viewMonth, withRrn = document.getElementById('taxRrn').checked;
@@ -2798,7 +2841,7 @@ function render(){
           ${isOffToday(p) ? `<button class="att offday" disabled>휴무</button>` : `<button class="att ${isIn(p)?'on':''}" ${isLeft(p)?'disabled':''} onclick="toggleAtt('${s.id}',${i})">${isIn(p)?'✓<br>출근':'출근'}</button>`}
           <button class="nameBtn" onclick="openMemo('${s.id}',${i})">
             ${p.role && !(p.daily && p.role==='일용') ? `<span class="role">${esc(p.role)}</span>` : ''}<span class="nm ${p.name?'':'empty'} ${permitNotReady(p)?'noPermit':''}">${p.name ? esc(p.name) : '이름'}</span>
-            ${permitTag(p)}${p.leaveDate && p.leaveDate > today() ? '<span class="tag out">예정</span>' : ''}
+            ${permitTag(p)}${(typeof docCount==='function' && docCount(p.id)) ? '<span class="docTag">🪪' + docCount(p.id) + '</span>' : ''}${p.leaveDate && p.leaveDate > today() ? '<span class="tag out">예정</span>' : ''}
             ${p.memo ? '<span class="memoTag">📝</span>' : ''}
           </button>
           <div class="checks">
@@ -2872,6 +2915,7 @@ function openMemo(sec, i){
   setPayType(p.payType==='monthly' ? 'monthly' : 'hourly');
   updPay();
   document.getElementById('mSaved').textContent = p.memoAt ? '마지막 저장: ' + new Date(p.memoAt).toLocaleString('ko-KR') : '';
+  if(typeof renderDocs==='function') renderDocs();
   document.getElementById('memoModal').classList.add('show');
 }
 function closeMemo(){ document.getElementById('memoModal').classList.remove('show'); cur = null; taxReopen(); }
@@ -2925,7 +2969,9 @@ function saveMemo(){
   if(calNow !== calBefore) p.calAt = Date.now();
   p.memoAt = Date.now(); touch(p);
   const moved = moveStaffIfNeeded(p);
-  if(persist()){ toast(moved ? moved + '(으)로 옮겼어요' : '저장되었습니다'); closeMemo(); render(); }
+  const merged = (typeof mergeSameName==='function') ? mergeSameName(p) : '';
+  if(persist()){ toast(merged || (moved ? moved + '(으)로 옮겼어요' : '저장되었습니다')); closeMemo(); render(); return p; }
+  return null;
 }
 /* 위치 이동: 새 자리로 옮기고, 원래 자리는 빈 칸으로 둠 */
 function moveStaffIfNeeded(p){
@@ -2939,6 +2985,7 @@ function moveStaffIfNeeded(p){
   const oldId = p.id;
   allData.__del = allData.__del || {}; allData.__del[oldId] = Date.now();
   p.id = uid(); touch(p);
+  if(typeof docsAbsorb==='function') docsAbsorb(oldId, p.id);
   const arr = allData[dst][dsec] = allData[dst][dsec] || [];
   let k = arr.findIndex(q=>isEmptyStaff(q) && (q.role||'')===(p.role||''));
   if(k < 0) k = arr.findIndex(q=>isEmptyStaff(q) && !q.role);
@@ -2958,6 +3005,7 @@ function deleteStaff(){
   const p = data[cur.sec][cur.i];
   if(!confirm((p.name || '이 직원') + ' 칸을 삭제할까요?\n메모와 체크는 지워지고, 입·퇴사 기록은 남습니다.')) return;
   allData.__del = allData.__del || {}; allData.__del[p.id] = Date.now();
+  if(typeof docsRemove==='function') docsRemove(p.id);
   data[cur.sec].splice(cur.i, 1);
   persist(); closeMemo(); render();
   toast('삭제되었습니다');
@@ -2977,9 +3025,11 @@ const FILE_TAG = 'cwy-staff-list';
 function stamp(){ const d=new Date(); return d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'_'+String(d.getHours()).padStart(2,'0')+String(d.getMinutes()).padStart(2,'0'); }
 async function exportData(){
   persist();
-  const hasRrn = STORES.some(st=>st.sections.some(sec=>(allData[st.id][sec.id]||[]).some(p=>p.rrn)));
-  const withRrn = hasRrn ? confirm('보내는 파일에 주민등록번호도 넣을까요?\n\n[확인] 넣기\n[취소] 주민번호만 빼고 보내기') : false;
+  const nDocs = (typeof docsAllCount==='function') ? docsAllCount() : 0;
+  const hasRrn = nDocs > 0 || STORES.some(st=>st.sections.some(sec=>(allData[st.id][sec.id]||[]).some(p=>p.rrn)));
+  const withRrn = hasRrn ? confirm('보내는 파일에 주민등록번호' + (nDocs ? '와 등록증·워킹퍼밋 사진 ' + nDocs + '장' : '') + '도 넣을까요?\n\n[확인] 넣기\n[취소] 주민번호' + (nDocs ? '·사진' : '') + '만 빼고 보내기') : false;
   const payload = {app:FILE_TAG, ver:2, exportedAt:Date.now(), data:allData};
+  if(withRrn && nDocs) payload.docs = docsExport();
   delete payload.data.__att;
   let text = JSON.stringify(payload);
   if(hasRrn && !withRrn){
@@ -2995,13 +3045,8 @@ async function exportData(){
       markSent(); return;
     }
   }catch(e){ if(e && e.name==='AbortError') return; }
-  // 공유가 안 되는 폰: 파일로 내려받기
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(file); a.download = name;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(a.href), 3000);
-  markSent();
-  toast('파일을 내려받았어요. 카톡으로 보내주세요');
+  // 공유가 안 되는 기기: 저장 위치를 골라 파일로 저장
+  if(await saveFile(file)) markSent();
 }
 /* ---------- 전체 백업 (메일 보내기 · 다른 기기 불러오기) ---------- */
 const BK_MAIL_KEY = 'cwy_staff_backup_mail';
@@ -3009,12 +3054,12 @@ function bkStats(){
   let staff = 0, rrn = 0, dl = 0;
   STORES.forEach(st=>st.sections.forEach(sec=>(allData[st.id][sec.id]||[]).forEach(p=>{ if(p.name){ staff++; if(p.rrn) rrn++; } })));
   Object.values(allData.__daily||{}).forEach(D=>Object.values(D).forEach(d=>{ dl += (d.list||[]).filter(x=>dlNorm(x.name)).length; }));
-  return {staff, rrn, dl};
+  return {staff, rrn, dl, docs: (typeof docsAllCount==='function') ? docsAllCount() : 0};
 }
 function openBackup(){
   const sEl = document.getElementById('bkSent'); if(sEl){ sEl.style.display = 'none'; sEl.innerHTML = ''; }
   const S = bkStats(); let sent = 0; try{ sent = Number(localStorage.getItem('cwy_staff_sent_at'))||0; }catch(e){}
-  document.getElementById('bkInfo').innerHTML = `직원 <b>${S.staff}명</b> · 일용직 기록 <b>${S.dl}건</b> · 매장 ${STORES.length}곳<br><small>마지막 백업: ${sent ? new Date(sent).toLocaleString('ko-KR') : '없음'}</small>`;
+  document.getElementById('bkInfo').innerHTML = `직원 <b>${S.staff}명</b> · 일용직 기록 <b>${S.dl}건</b> · 서류 사진 <b>${S.docs}장</b> · 매장 ${STORES.length}곳<br><small>마지막 백업: ${sent ? new Date(sent).toLocaleString('ko-KR') : '없음'}</small>`;
   try{ document.getElementById('bkMail').value = localStorage.getItem(BK_MAIL_KEY) || ''; }catch(e){}
   renderSafe();
   document.getElementById('bkModal').classList.add('show');
@@ -3024,6 +3069,7 @@ function backupFile(){
   persist();
   const payload = {app:FILE_TAG, ver:2, kind:'full-backup', exportedAt:Date.now(), data:JSON.parse(JSON.stringify(allData))};
   delete payload.data.__att;
+  if(typeof docsExport==='function') payload.docs = docsExport();
   // 안드로이드 공유창은 .json 파일을 메일 앱에 넘기지 못해서 .txt(text/plain)로 만듦 — 불러오기는 그대로 됨
   const name = FOLDER_NAME + '_백업_' + stamp() + '.txt';
   return new File([JSON.stringify(payload)], name, {type:'text/plain'});
@@ -3063,7 +3109,7 @@ function bkShowSent(file, shared){
        <div class="bkMailBtns"><a href="https://mail.naver.com/" target="_blank" rel="noopener">네이버 메일 열기</a><a href="${gmail}" target="_blank" rel="noopener">Gmail 쓰기</a><a href="${mailto}">기본 메일 앱</a></div>`;
   document.getElementById('bkSent').style.display = 'block';
 }
-function downloadBackup(){ const f = backupFile(); bkDownload(f); markSent(); toast('백업 파일을 저장했어요'); }
+async function downloadBackup(){ const f = backupFile(); if(await saveFile(f, {ask:true})) markSent(); }
 function markSent(){
   try{ localStorage.setItem('cwy_staff_sent_at', String(Date.now())); }catch(e){}
   showShareNote(); renderBackup();
@@ -3104,7 +3150,12 @@ function readImportFile(f){
     try{ obj = JSON.parse(r.result); }catch(e){ toast('직원 리스트 파일이 아니에요'); return; }
     if(!obj || obj.app!==FILE_TAG || !obj.data){ toast('직원 리스트 파일이 아니에요'); return; }
     pendingImport = obj;
-    document.getElementById('impWhen').textContent = new Date(obj.exportedAt).toLocaleString('ko-KR') + ' 에 보낸 파일';
+    const nD = Object.values(obj.docs||{}).reduce((a,o)=>a+Object.values(o||{}).filter(v=>v && v.d).length, 0);
+    const one = obj.kind==='staff';
+    let who = '';
+    if(one){ Object.keys(obj.data).forEach(k=>{ if(k.startsWith('__')) return; Object.values(obj.data[k]||{}).forEach(arr=>Array.isArray(arr) && arr.forEach(q=>{ if(q.name) who = q.name; })); }); }
+    document.getElementById('impWhen').textContent = new Date(obj.exportedAt).toLocaleString('ko-KR') + ' 에 보낸 파일' + (one ? ' · 직원 1명(' + who + ')' : '') + (nD ? ' · 서류 사진 ' + nD + '장' : '');
+    document.querySelector('#impModal .ioBig.leave').style.display = one ? 'none' : '';
     document.getElementById('impModal').classList.add('show');
   };
   r.onerror = ()=>toast('파일을 열 수 없어요');
@@ -3133,11 +3184,20 @@ function mergeData(mine, theirs){
   cfg.stores = cfg.stores.filter(st=>!cfg.removed.includes(st.id));
   out.__cfg = cfg;
   let added = 0, updated = 0;
+  const idMap = {};
   cfg.stores.forEach(st=>{
     out[st.id] = out[st.id] || {};
     st.sections.forEach(sec=>{
-      const A = (mine[st.id]||{})[sec.id] || [], B = (theirs[st.id]||{})[sec.id] || [];
+      const A = (out[st.id]||{})[sec.id] || [], B = (theirs[st.id]||{})[sec.id] || [];
       const list = A.map(p=>Object.assign({}, p));
+      // 같은 이름 찾기: 지금 만드는 파트는 list에서, 다른 파트는 out에서 (등록번호가 서로 다르면 다른 사람)
+      const sameName = p=>{
+        const nk = nameKey(p.name); if(!nk) return null;
+        const ok = q=>q && q.id!==p.id && nameKey(q.name)===nk && !(del[q.id] && del[q.id] >= stamp2(q)) && !(rrnDigits(q).length===13 && rrnDigits(p).length===13 && rrnDigits(q)!==rrnDigits(p));
+        let hit = list.find(ok); if(hit) return hit;
+        for(const s2 of cfg.stores) for(const c2 of s2.sections){ if(s2.id===st.id && c2.id===sec.id) continue; const arr = (out[s2.id]||{})[c2.id] || []; hit = arr.find(ok); if(hit) return hit; }
+        return null;
+      };
       const idx = new Map(list.map((p,k)=>[p.id,k]));
       const usedEmpty = new Set();
       B.forEach(p=>{
@@ -3162,6 +3222,9 @@ function mergeData(mine, theirs){
           return;
         }
         if(isEmptyStaff(p)) return;                 // 빈 칸은 가져오지 않음
+        if(del[p.id] && del[p.id] >= stamp2(p)) return;
+        const same = sameName(p);
+        if(same){ mergeInto(same, p, !(stamp2(p) > stamp2(same))); idMap[p.id] = same.id; updated++; mergeChanges.push(`${st.name} · ${p.name} (같은 이름이라 합침)`); return; }
         // 같은 직급의 빈 칸이 있으면 그 자리에, 없으면 뒤에 추가
         let k = list.findIndex((q,j)=>!usedEmpty.has(j) && isEmptyStaff(q) && (q.role||'')===(p.role||''));
         if(k<0) k = list.findIndex((q,j)=>!usedEmpty.has(j) && isEmptyStaff(q) && !q.role);
@@ -3169,6 +3232,24 @@ function mergeData(mine, theirs){
         added++; mergeChanges.push(`${st.name} · ${p.name || '이름 없음'} (새로 추가)`);
       });
       out[st.id][sec.id] = list.filter(p=>!(del[p.id] && del[p.id] >= stamp2(p)));
+    });
+  });
+  // 같은 이름 마무리: 받은 쪽 카드와 이 기기 카드가 이름이 같으면 하나로 (등록번호가 서로 다르면 따로 둠)
+  const theirIds = new Set(); cfg.stores.forEach(st=>st.sections.forEach(sec=>(((theirs[st.id]||{})[sec.id])||[]).forEach(p=>theirIds.add(p.id))));
+  const absorb = [], gone = new Set(), all = [];
+  cfg.stores.forEach(st=>st.sections.forEach(sec=>(out[st.id][sec.id]||[]).forEach(p=>{ if(p.name) all.push({st, sec, p}); })));
+  all.forEach((a, i)=>{
+    if(gone.has(a.p.id)) return;
+    all.slice(i+1).forEach(b2=>{
+      if(gone.has(b2.p.id) || gone.has(a.p.id)) return;
+      const x = a.p, y = b2.p;
+      if(nameKey(x.name)!==nameKey(y.name) || theirIds.has(x.id)===theirIds.has(y.id)) return;
+      if(rrnDigits(x).length===13 && rrnDigits(y).length===13 && rrnDigits(x)!==rrnDigits(y)) return;
+      const keep = stamp2(x) >= stamp2(y) ? a : b2, drop = keep===a ? b2 : a;
+      mergeInto(keep.p, drop.p, true);
+      const arr = out[drop.st.id][drop.sec.id], k = arr.indexOf(drop.p); if(k >= 0) arr.splice(k, 1);
+      del[drop.p.id] = Date.now(); gone.add(drop.p.id); absorb.push([drop.p.id, keep.p.id]); idMap[drop.p.id] = keep.p.id;
+      updated++; mergeChanges.push(`${keep.st.name} · ${keep.p.name} (같은 이름이라 합침)`);
     });
   });
   // 입·퇴사 기록: 직원 정보 기준으로 다시 맞추고, 삭제된 직원 기록은 둘 다 합침
@@ -3187,7 +3268,7 @@ function mergeData(mine, theirs){
       });
     });
     const seen = new Set();
-    oldLogs.filter(x=>!live.has(x.staffId)).forEach(x=>{ const k = x.staffId+x.type; if(!seen.has(k)){ seen.add(k); L.push(x); } });
+    oldLogs.filter(x=>!live.has(x.staffId) && !gone.has(x.staffId)).forEach(x=>{ const k = x.staffId+x.type; if(!seen.has(k)){ seen.add(k); L.push(x); } });
     out.__log[st.id] = L;
   });
   // 일용직 일일 기록: 매장·날짜별로 더 최근에 고친 쪽
@@ -3201,14 +3282,15 @@ function mergeData(mine, theirs){
   const cm = new Map(); [...(mine.__calls||[]), ...(theirs.__calls||[])].forEach(c=>{ const o = cm.get(c.id); if(!o || (c.at||0) > (o.at||0)) cm.set(c.id, c); });
   out.__calls = [...cm.values()];
   out.__mig = Object.assign({}, theirs.__mig||{}, mine.__mig||{});
-  return {out, added, updated};
+  return {out, added, updated, idMap, absorb};
 }
-function doImport(mode){
+async function doImport(mode){
   const obj = pendingImport; if(!obj) return;
-  let next, msg;
+  if(mode==='replace' && obj.kind==='staff') mode = 'merge';
+  let next, msg, idMap = {}, absorbList = [];
   if(mode==='merge'){
     mergeChanges = [];
-    const r = mergeData(allData, obj.data);
+    const r = mergeData(allData, obj.data); idMap = r.idMap || {}; absorbList = r.absorb || [];
     next = r.out; msg = `합치기 완료! 새 직원 ${r.added}명 · 바뀐 직원 ${r.updated}명 반영` + (mergeChanges.length ? '\n\n' + mergeChanges.slice(0,20).join('\n') + (mergeChanges.length > 20 ? `\n… 외 ${mergeChanges.length-20}명` : '') : '\n\n바뀐 직원이 없어요 (이 기기가 이미 최신이에요)');
   } else {
     if(!confirm('이 폰의 직원 리스트를 받은 내용으로 통째로 바꿀까요?')) return;
@@ -3222,7 +3304,11 @@ function doImport(mode){
     localStorage.setItem(SAVED_AT_KEY, String(Date.now()));
   }catch(e){ toast('저장 공간이 부족해요'); return; }
   closeImp();
-  alert(msg);
+  let nDoc = 0;
+  try{
+    if(typeof docsImport==='function'){ await docsReady; (absorbList||[]).forEach(([a,b])=>docsAbsorb(a, b)); nDoc = await docsImport(obj.docs || {}, mode, idMap); await new Promise(r=>setTimeout(r, 300)); }
+  }catch(e){}
+  alert(msg + (nDoc ? '\n\n서류 사진 ' + nDoc + '장 받음' : ''));
   location.reload();
 }
 showShareNote();
@@ -3255,7 +3341,7 @@ function safeAfterSave(){
   clearTimeout(safeT);
   safeT = setTimeout(()=>{ let s = ''; try{ s = localStorage.getItem(KEY) || ''; }catch(e){} if(s) idbSet('data', {at:Date.now(), s}); folderSave(false); }, 1200);
 }
-function backupPayload(){ const payload = {app:FILE_TAG, ver:2, kind:'full-backup', exportedAt:Date.now(), data:JSON.parse(JSON.stringify(allData))}; delete payload.data.__att; return JSON.stringify(payload); }
+function backupPayload(){ const payload = {app:FILE_TAG, ver:2, kind:'full-backup', exportedAt:Date.now(), data:JSON.parse(JSON.stringify(allData))}; delete payload.data.__att; if(typeof docsExport==='function') payload.docs = docsExport(); return JSON.stringify(payload); }
 /* 되돌리기: 빼기·이동·수정·불러오기 바로 전 상태를 하나 보관 */
 function snap(label){ try{ localStorage.setItem(UNDO_KEY, JSON.stringify({at:Date.now(), label, data:allData})); }catch(e){ try{ localStorage.removeItem(UNDO_KEY); }catch(_){} } }
 function undoInfo(){ try{ const u = JSON.parse(localStorage.getItem(UNDO_KEY) || 'null'); return u && u.data ? u : null; }catch(e){ return null; } }
@@ -3318,9 +3404,11 @@ function saveFullNow(){
   let s = ''; try{ s = localStorage.getItem(KEY) || ''; }catch(e){}
   if(s) idbSet('data', {at:Date.now(), s});
   if(folderH && folderOk){ folderSave(true); return; }
-  bkDownload(new File([backupPayload()], FOLDER_NAME + '_' + today() + '.txt', {type:'text/plain'}));
-  try{ localStorage.setItem(AUTO_DAY_KEY, today()); localStorage.setItem('cwy_staff_sent_at', String(Date.now())); }catch(e){}
-  renderBackup();
+  saveFile(new File([backupPayload()], FOLDER_NAME + '_' + today() + '.txt', {type:'text/plain'})).then(ok=>{
+    if(!ok) return;
+    try{ localStorage.setItem(AUTO_DAY_KEY, today()); localStorage.setItem('cwy_staff_sent_at', String(Date.now())); }catch(e){}
+    renderBackup();
+  });
 }
 /* 폰(폴더 저장이 안 되는 곳): 하루 한 번, 누른 동작과 함께 백업 파일을 다운로드 폴더에 저장 */
 function autoOn(){ try{ return localStorage.getItem(AUTO_ON_KEY) !== '0'; }catch(e){ return true; } }
@@ -3366,6 +3454,350 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
   navigator.serviceWorker.addEventListener('controllerchange', ()=>{ if(!hadCtl || swReloaded) return; swReloaded = true; location.reload(); });
   window.addEventListener('load', ()=>navigator.serviceWorker.register('sw.js', {updateViaCache:'none'}).then(r=>r.update()).catch(()=>{}));
 }
+</script>
+<script>
+/* ================= 등록증 · 워킹퍼밋 사진 / 같은 이름 합치기 / 저장 위치 고르기 ================= */
+const DOC_SLOTS = [['idFront','등록증 앞'],['idBack','등록증 뒤'],['permit1','워킹퍼밋'],['permit2','워킹퍼밋 2장째']];
+const DOC_LABEL = Object.fromEntries(DOC_SLOTS);
+let docsCache = {};          // 직원 id → {slot: {at, d(dataURL), size, w, h} 또는 {at, del:true}}
+let docSlotPick = '';
+function docDb(){ return new Promise((res, rej)=>{ const r = indexedDB.open('cwy_staff_docs', 1); r.onupgradeneeded = ()=>r.result.createObjectStore('docs'); r.onsuccess = ()=>res(r.result); r.onerror = ()=>rej(r.error); }); }
+const docsReady = (async()=>{
+  try{
+    const db = await docDb();
+    docsCache = await new Promise(res=>{ const out = {}; const r = db.transaction('docs').objectStore('docs').openCursor(); r.onsuccess = ()=>{ const c = r.result; if(c){ out[c.key] = c.value; c.continue(); } else res(out); }; r.onerror = ()=>res(out); });
+  }catch(e){}
+  try{ render(); }catch(e){}
+})();
+async function docPut(id){
+  try{
+    const db = await docDb(), v = docsCache[id];
+    await new Promise((res, rej)=>{ const t = db.transaction('docs','readwrite'), s = t.objectStore('docs'); if(v && Object.keys(v).length) s.put(v, id); else s.delete(id); t.oncomplete = res; t.onerror = ()=>rej(t.error); });
+    return true;
+  }catch(e){ toast('사진을 저장하지 못했어요 · 저장 공간을 확인해 주세요'); return false; }
+}
+async function docClearAll(){ try{ const db = await docDb(); await new Promise(res=>{ const t = db.transaction('docs','readwrite'); t.objectStore('docs').clear(); t.oncomplete = res; t.onerror = res; }); }catch(e){} }
+function docsOf(id){ return docsCache[id] || {}; }
+function docLive(v){ return v && v.d && !v.del; }
+function docCount(id){ return Object.values(docsOf(id)).filter(docLive).length; }
+function liveIds(){ const S = new Set(); STORES.forEach(st=>st.sections.forEach(sec=>(allData[st.id][sec.id]||[]).forEach(p=>S.add(p.id)))); return S; }
+function docsAllCount(){ const L = liveIds(); return Object.keys(docsCache).filter(id=>L.has(id)).reduce((a,id)=>a+docCount(id), 0); }
+function docsExport(){ const L = liveIds(), o = {}; Object.keys(docsCache).forEach(id=>{ if(L.has(id) && Object.keys(docsCache[id]).length) o[id] = docsCache[id]; }); return o; }
+function docsMergeObj(a, b, idMap){
+  const o = JSON.parse(JSON.stringify(a || {}));
+  Object.entries(b || {}).forEach(([id0, slots])=>{
+    const id = (idMap && idMap[id0]) || id0, c = o[id] = o[id] || {};
+    Object.entries(slots || {}).forEach(([k, v])=>{ if(v && (v.d || v.del) && (!c[k] || (v.at||0) > (c[k].at||0))) c[k] = v; });
+  });
+  return o;
+}
+async function docsImport(obj, mode, idMap){
+  await docsReady;
+  if(mode==='replace' && obj && Object.keys(obj).length){ docsCache = {}; await docClearAll(); }
+  let n = 0;
+  for(const [id0, slots] of Object.entries(obj || {})){
+    const id = (idMap && idMap[id0]) || id0, c = docsCache[id] = docsCache[id] || {};
+    let ch = false;
+    Object.entries(slots || {}).forEach(([k, v])=>{ if(v && (v.d || v.del) && (!c[k] || (v.at||0) > (c[k].at||0))){ c[k] = v; ch = true; if(docLive(v)) n++; } });
+    if(ch) await docPut(id);
+  }
+  return n;
+}
+/* 직원 번호가 바뀌거나(위치 이동) 같은 이름 카드를 합칠 때: 사진도 함께 */
+function docsAbsorb(fromId, toId){
+  if(!fromId || !toId || fromId===toId || !docsCache[fromId]) return;
+  const c = docsCache[toId] = docsCache[toId] || {};
+  Object.entries(docsCache[fromId]).forEach(([k, v])=>{ if(!c[k] || (!docLive(c[k]) && docLive(v)) || (docLive(v) && (v.at||0) > (c[k].at||0))) c[k] = v; });
+  docPut(toId);
+}
+function docsRemove(id){ if(docsCache[id]){ delete docsCache[id]; docPut(id); } }
+
+/* 선명하면서 작게: 긴 변 1600px부터 줄여 가며 280KB 안으로 (주민번호·사진 글씨가 읽히는 크기) */
+async function docCompress(file){
+  let src;
+  try{ src = await createImageBitmap(file, {imageOrientation:'from-image'}); }
+  catch(e){ src = await new Promise((res, rej)=>{ const u = URL.createObjectURL(file), im = new Image(); im.onload = ()=>{ res(im); setTimeout(()=>URL.revokeObjectURL(u), 1000); }; im.onerror = rej; im.src = u; }); }
+  const W0 = src.width, H0 = src.height;
+  let best = null;
+  for(const [mx, q] of [[1600, .82], [1400, .78], [1200, .74], [1000, .7]]){
+    const k = Math.min(1, mx / Math.max(W0, H0)), w = Math.round(W0 * k), h = Math.round(H0 * k);
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const g = c.getContext('2d'); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+    g.fillStyle = '#fff'; g.fillRect(0, 0, w, h); g.drawImage(src, 0, 0, w, h);
+    const d = c.toDataURL('image/jpeg', q);
+    best = {d, w, h, size: Math.round((d.length - 23) * 3 / 4)};
+    if(best.size <= 280 * 1024) break;
+  }
+  if(src.close) src.close();
+  return best;
+}
+function curStaff(){ return cur ? data[cur.sec][cur.i] : null; }
+function kb(n){ return n >= 1024 * 1024 ? (n / 1048576).toFixed(1) + 'MB' : Math.max(1, Math.round(n / 1024)) + 'KB'; }
+function renderDocs(){
+  const p = curStaff(), el = document.getElementById('mDocs'); if(!p || !el) return;
+  const D = docsOf(p.id);
+  el.innerHTML = DOC_SLOTS.map(([k, lb])=>docLive(D[k])
+    ? `<div class="docSlot has"><img src="${D[k].d}" alt="${lb}" onclick="docView('${k}')"><span class="lb">${lb} <small>${kb(D[k].size||0)}</small></span><div class="docAct"><button type="button" onclick="docPick('${k}')">다시 찍기</button><button type="button" class="del" onclick="docDel('${k}')">삭제</button></div></div>`
+    : `<button type="button" class="docSlot" onclick="docPick('${k}')"><span class="pl">📷</span><span class="lb">${lb}</span><small>찍기 · 사진첩에서 고르기</small></button>`).join('');
+  document.getElementById('mDocBusy').textContent = docCount(p.id) ? `${docCount(p.id)}장 저장됨 · 백업·공유 파일에 함께 들어가요` : '';
+}
+function docPick(slot){ docSlotPick = slot; document.getElementById('docIn').click(); }
+function docPickMany(){ document.getElementById('docInMany').click(); }
+async function docSaveSlots(pairs){
+  const p = curStaff(); if(!p) return;
+  const busy = document.getElementById('mDocBusy'); busy.textContent = '사진을 선명하게 줄이는 중…';
+  const c = docsCache[p.id] = docsCache[p.id] || {};
+  let total = 0;
+  for(const [slot, file] of pairs){
+    try{ const r = await docCompress(file); c[slot] = {at:Date.now(), d:r.d, size:r.size, w:r.w, h:r.h}; total += r.size; }
+    catch(e){ toast('사진을 열 수 없어요: ' + (file.name||'')); }
+  }
+  if(await docPut(p.id)){
+    p.docAt = Date.now(); touch(p); persist();
+    toast(`${pairs.length}장 저장 · ${kb(total)} (원본 ${kb(pairs.reduce((a,[,f])=>a+f.size,0))})`);
+  }
+  renderDocs(); render();
+}
+function docPicked(input){
+  const f = input.files && input.files[0]; input.value = '';
+  if(f && docSlotPick) docSaveSlots([[docSlotPick, f]]);
+}
+function docPickedMany(input){
+  const files = [...(input.files||[])].sort((a,b)=>a.lastModified - b.lastModified); input.value = '';
+  const p = curStaff(); if(!p || !files.length) return;
+  const D = docsOf(p.id), empty = DOC_SLOTS.map(x=>x[0]).filter(k=>!docLive(D[k]));
+  if(!empty.length){ toast('빈 칸이 없어요 · 바꿀 칸의 "다시 찍기"를 누르세요'); return; }
+  const pairs = empty.slice(0, files.length).map((k, i)=>[k, files[i]]);
+  if(files.length > empty.length) toast(`빈 칸이 ${empty.length}개라 앞의 ${empty.length}장만 넣어요`);
+  docSaveSlots(pairs);
+}
+function docDel(slot){
+  const p = curStaff(); if(!p) return;
+  if(!confirm(DOC_LABEL[slot] + ' 사진을 지울까요?')) return;
+  const c = docsCache[p.id] = docsCache[p.id] || {};
+  c[slot] = {at:Date.now(), del:true};       // 다른 기기와 합칠 때도 지운 상태가 이기도록 지운 시각을 남김
+  docPut(p.id); p.docAt = Date.now(); touch(p); persist(); renderDocs(); render();
+}
+let dvSlot = '';
+function docView(slot){
+  const p = curStaff(), v = p && docsOf(p.id)[slot]; if(!docLive(v)) return;
+  dvSlot = slot;
+  document.getElementById('dvTitle').textContent = (p.name || '직원') + ' · ' + DOC_LABEL[slot];
+  document.getElementById('dvImg').src = v.d;
+  document.getElementById('dvWrap').classList.remove('zoom');
+  document.getElementById('docView').classList.add('show');
+}
+function docViewClose(){ document.getElementById('docView').classList.remove('show'); document.getElementById('dvImg').src = ''; }
+function safeName(s){ return String(s||'직원').replace(/[\\/:*?"<>|\s]+/g, '_').slice(0, 40) || '직원'; }
+function dataUrlBlob(d){ const [h, b] = d.split(','), m = (h.match(/data:([^;]+)/)||[])[1] || 'image/jpeg', bin = atob(b), u = new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) u[i] = bin.charCodeAt(i); return new Blob([u], {type:m}); }
+function docFiles(only){
+  const p = curStaff(); if(!p) return [];
+  const D = docsOf(p.id);
+  return DOC_SLOTS.filter(([k])=>docLive(D[k]) && (!only || only===k)).map(([k, lb])=>new File([dataUrlBlob(D[k].d)], `${safeName(p.name)}_${lb.replace(/\s+/g,'')}.jpg`, {type:'image/jpeg'}));
+}
+async function shareOrSave(files, title){
+  try{ if(navigator.canShare && navigator.canShare({files})){ await navigator.share({files, title}); return; } }
+  catch(e){ if(e && e.name==='AbortError') return; }
+  for(const f of files) await saveFile(f);
+}
+function docShare(){ const fs = docFiles(); if(!fs.length){ toast('저장된 사진이 없어요'); return; } shareOrSave(fs, (curStaff().name||'직원') + ' 서류 사진'); }
+function docViewShare(){ const fs = docFiles(dvSlot); if(fs.length) shareOrSave(fs, fs[0].name); }
+async function docSaveFiles(){
+  const files = docFiles(); if(!files.length){ toast('저장된 사진이 없어요'); return; }
+  if(typeof window.showDirectoryPicker==='function'){
+    try{
+      const dir = await window.showDirectoryPicker({id:'cwy-docs', mode:'readwrite', startIn: (folderH && folderOk) ? folderH : 'pictures'});
+      for(const f of files){ const h = await dir.getFileHandle(f.name, {create:true}), w = await h.createWritable(); await w.write(f); await w.close(); }
+      toast(`📁 ${dir.name} 폴더에 ${files.length}장 저장 (같은 이름은 새 사진으로 바꿈)`); return;
+    }catch(e){ if(e && e.name==='AbortError') return; }
+  }
+  for(const f of files){ await saveFile(f); await new Promise(r=>setTimeout(r, 300)); }
+}
+/* 이 직원만 다른 기기로: 받은 기기에서 [파일 불러오기] → 합치기 */
+async function exportStaff(){
+  if(!cur) return;
+  const p = saveMemo(); if(!p) return;
+  await docsReady;
+  let loc = null;
+  STORES.forEach(st=>st.sections.forEach(sec=>{ if((allData[st.id][sec.id]||[]).includes(p)) loc = {st, sec}; }));
+  if(!loc){ toast('직원을 찾지 못했어요'); return; }
+  const d = {__cfg: JSON.parse(JSON.stringify(allData.__cfg)), __log:{}, __mig: Object.assign({}, allData.__mig||{})};
+  d[loc.st.id] = {[loc.sec.id]: [JSON.parse(JSON.stringify(p))]};
+  d.__log[loc.st.id] = ((allData.__log||{})[loc.st.id]||[]).filter(x=>x.staffId===p.id);
+  const payload = {app:FILE_TAG, ver:2, kind:'staff', exportedAt:Date.now(), data:d, docs: docCount(p.id) ? {[p.id]: docsOf(p.id)} : {}};
+  const file = new File([JSON.stringify(payload)], `직원_${safeName(p.name)}_${stamp()}.txt`, {type:'text/plain'});
+  try{ if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:(p.name||'직원') + ' 정보', text:(p.name||'직원') + ' 정보 파일입니다. 직원관리 앱에서 파일 불러오기 → 합치기로 열어 주세요.'}); return; } }
+  catch(e){ if(e && e.name==='AbortError') return; }
+  await saveFile(file);
+}
+
+/* ---------- 일용직 매장 이동 (잘못 올린 매장에서 바른 매장으로, 같은 날짜 그대로) ---------- */
+function stName(id){ return (STORES.find(x=>x.id===id)||{name:id}).name; }
+function dlMoveIds(src, ds, ids, dest){
+  const day = dlDay(src, ds, false); if(!day) return {moved:[], skip:[]};
+  const dd = dlDay(dest, ds, true), moved = [], skip = [];
+  ids.forEach(id=>{
+    const k = day.list.findIndex(x=>x.id===id); if(k < 0) return;
+    const x = day.list[k];
+    if(dd.list.some(y=>dlNorm(y.name)===dlNorm(x.name))){ skip.push(x.name); return; }
+    day.list.splice(k, 1);
+    if(x.auto && x.type) x.amt = dlRate(x.type, dlPrem(dest, ds));   // 반·풀 금액은 옮긴 매장 단가로
+    dd.list.push(x); moved.push(x.name);
+  });
+  day.at = Date.now(); dd.at = Date.now();
+  return {moved, skip};
+}
+function dlAfterMove(){
+  persist(); autoBackup(); renderDaily(); renderCallAlert();
+  if(document.getElementById('dmModal').classList.contains('show')) renderDailyMonth();
+  if(document.getElementById('payModal').classList.contains('show')) renderPay();
+}
+function dlMoveOne(k, sel){
+  const dest = sel.value; sel.value = ''; if(!dest) return;
+  const day = dlDay(dlStore, dlDate, false), x = day && day.list[k]; if(!x) return;
+  if(!confirm(`${x.name}\n${dlDayName(dlDate)} 기록을\n${stName(dlStore)}점 → ${stName(dest)}점으로 옮길까요?` + (day.paid ? '\n\n⚠ 이 날은 이미 💰 입금 기록이 있어요. 입금 기록은 그대로 남아요.' : ''))) return;
+  snap(`${x.name} ${stName(dlStore)}→${stName(dest)} 이동`);
+  if(!x.id) x.id = uid();
+  const r = dlMoveIds(dlStore, dlDate, [x.id], dest);
+  dlAfterMove();
+  toast(r.moved.length ? `${x.name} → ${stName(dest)}점으로 옮겼어요 · ↶ 되돌리기 가능` : `${stName(dest)}점 같은 날에 ${x.name}이(가) 이미 있어서 옮기지 않았어요`);
+}
+function dlMoveAll(sel){
+  const dest = sel.value; sel.value = ''; if(!dest) return;
+  const day = dlDay(dlStore, dlDate, false); if(!day) return;
+  const L = day.list.filter(x=>dlNorm(x.name)); if(!L.length) return;
+  if(!confirm(`${dlDayName(dlDate)} ${stName(dlStore)}점 명단 ${L.length}명을\n모두 ${stName(dest)}점으로 옮길까요?\n\n` + L.map(x=>'· ' + x.name).join('\n') + (day.paid ? '\n\n💰 입금 기록도 ' + stName(dest) + '점으로 함께 옮겨요.' : ''))) return;
+  snap(`${dlDayName(dlDate)} 명단 ${stName(dlStore)}→${stName(dest)} 이동`);
+  L.forEach(x=>{ if(!x.id) x.id = uid(); });
+  const src = dlStore, r = dlMoveIds(src, dlDate, L.map(x=>x.id), dest);
+  // 모두 옮겼으면 입금 기록도 옮긴 매장으로
+  let payMoved = false;
+  if(day.paid && !r.skip.length){
+    const dd = dlDay(dest, dlDate, true), rec = payAll().find(x=>x.id===day.paid.id);
+    if(rec){ rec.store = dest; rec.edited = Date.now(); }
+    if(!dd.paid){ dd.paid = day.paid; payMoved = true; }
+    delete day.paid;
+  }
+  day.list = day.list.filter(x=>dlNorm(x.name));
+  dlStore = dest;                // 옮긴 매장 화면으로 바로 이동
+  dlAfterMove();
+  toast(`${r.moved.length}명을 ${stName(dest)}점으로 옮겼어요` + (payMoved ? ' · 입금 기록도 함께' : '') + (r.skip.length ? ` · ${r.skip.length}명은 그 매장 같은 날에 이미 있어서 남겨 뒀어요(${r.skip.join(', ')})` : '') + ' · ↶ 되돌리기 가능');
+}
+function dlMoveOpen(sid, ds){
+  openDaily(sid, ds);
+  setTimeout(()=>{ const el = document.getElementById('dlMoveAll'); if(el && el.firstChild){ el.scrollIntoView({block:'center', behavior:'smooth'}); toast('한 명만 옮기려면 그 사람 칸 아래 "↪ 다른 매장으로", 모두 옮기려면 이 칸에서 매장을 고르세요'); } }, 250);
+}
+
+/* ---------- 같은 이름 합치기 ---------- */
+function nameKey(n){ return String(n||'').replace(/\(.*?\)/g,'').replace(/\s+/g,'').toLowerCase(); }
+const NO_MERGE = new Set(['id','updatedAt','memoAt','rrnOmitted','ins','ins2','tax','daily','permit','local']);
+function blankV(v){ return v===undefined || v===null || v==='' || v===false || (Array.isArray(v) && !v.length) || (typeof v==='object' && !Array.isArray(v) && !Object.keys(v).length); }
+/* q에 p를 합침 (q의 번호 유지). qWins: 둘 다 값이 있으면 q 쪽을 남김 */
+function mergeInto(q, p, qWins){
+  Object.keys(p).forEach(k=>{
+    if(NO_MERGE.has(k)) return;
+    const a = q[k], b = p[k];
+    if(blankV(b)) return;
+    if(k==='leaveDate'){ if(!qWins) q[k] = b; return; }          // 퇴사일은 함부로 옮기지 않음
+    if(blankV(a)){ q[k] = JSON.parse(JSON.stringify(b)); return; }
+    if(Array.isArray(a) && Array.isArray(b)){ q[k] = [...new Set([...a, ...b])].sort(); return; }
+    if(k==='marks'){ q[k] = qWins ? Object.assign({}, b, a) : Object.assign({}, a, b); return; }
+    if(k==='memo'){ if(a!==b && !a.includes(b)) q.memo = b.includes(a) ? b : a + '\n' + b; return; }
+    if(!qWins) q[k] = JSON.parse(JSON.stringify(b));
+  });
+  if(staffType(p)!=='none' && (staffType(q)==='none' || !qWins)) TYPES.forEach(t=>{ q[t] = !!p[t]; });
+  if(!qWins || (!q.permit && !q.local)){ q.permit = !!p.permit; q.local = !!p.local; }
+  q.memoAt = Math.max(Number(q.memoAt)||0, Number(p.memoAt)||0);
+  q.updatedAt = Math.max(stamp2(q), stamp2(p));
+}
+function relinkLogs(oldId, p){
+  const LL = allData.__log || {};
+  Object.keys(LL).forEach(sid=>{
+    LL[sid].forEach(x=>{ if(x.staffId===oldId){ x.staffId = p.id; x.name = p.name; } });
+    const seen = new Set();
+    LL[sid] = LL[sid].filter(x=>{ if(x.staffId!==p.id) return true; const k = sid + x.type; if(seen.has(k)) return false; seen.add(k); return true; });
+  });
+}
+/* 직원 저장할 때: 다른 카드에 같은 이름이 있으면 하나로 합칠지 물어봄 */
+function mergeSameName(p){
+  const nk = nameKey(p.name); if(!nk) return '';
+  const hits = [];
+  STORES.forEach(st=>st.sections.forEach(sec=>(allData[st.id][sec.id]||[]).forEach(q=>{ if(q!==p && q.id!==p.id && nameKey(q.name)===nk) hits.push({st, sec, q}); })));
+  if(!hits.length) return '';
+  const rd = rrnDigits(p), diff = hits.some(h=>rrnDigits(h.q).length===13 && rd.length===13 && rrnDigits(h.q)!==rd);
+  const msg = `같은 이름 "${p.name}"이(가) 이미 있어요\n` + hits.map(h=>`· ${h.st.name}점 ${h.sec.name}${h.q.role ? ' ' + h.q.role : ''}${isLeft(h.q) ? ' (퇴사)' : ''}${docCount(h.q.id) ? ' · 사진 ' + docCount(h.q.id) + '장' : ''}`).join('\n') +
+    (diff ? '\n\n⚠ 등록번호가 서로 달라요. 다른 사람일 수 있어요.' : '') +
+    '\n\n[확인] 하나로 합쳐서 저장\n지금 카드에 빈칸·사진·휴무·근무 기록을 모으고, 다른 카드는 지워요\n\n[취소] 따로 저장';
+  if(!confirm(msg)) return '';
+  snap(p.name + ' 같은 이름 합치기');
+  hits.forEach(h=>{
+    mergeInto(p, h.q, true);
+    const arr = allData[h.st.id][h.sec.id], k = arr.indexOf(h.q); if(k >= 0) arr.splice(k, 1);
+    allData.__del = allData.__del || {}; allData.__del[h.q.id] = Date.now();
+    relinkLogs(h.q.id, p); docsAbsorb(h.q.id, p.id);
+  });
+  touch(p);
+  return `${p.name} 카드 ${hits.length + 1}개를 하나로 합쳐 저장했어요 · ↶ 되돌리기 가능`;
+}
+
+/* ---------- 저장 위치 고르기 · 같은 이름 파일은 합쳐서 저장 ---------- */
+const canPick = typeof window.showSaveFilePicker === 'function';
+function askOn(){ try{ return localStorage.getItem('cwy_save_ask') !== '0'; }catch(e){ return true; } }
+function setAskOn(v){ try{ localStorage.setItem('cwy_save_ask', v ? '1' : '0'); }catch(e){} renderSafe(); }
+async function writeHandle(h, file){
+  let blob = file, note = '';
+  if(/\.(txt|json)$/i.test(file.name)){
+    try{
+      const old = await h.getFile();
+      if(old && old.size){
+        const o = JSON.parse(await old.text()), m = JSON.parse(await file.text());
+        if(o && o.app===FILE_TAG && o.data && m && m.app===FILE_TAG && m.data){
+          mergeChanges = [];
+          const r = mergeData(m.data, o.data);
+          m.data = r.out;
+          if(o.docs || m.docs) m.docs = docsMergeObj(m.docs || {}, o.docs || {}, r.idMap);
+          m.exportedAt = Date.now();
+          blob = new Blob([JSON.stringify(m)], {type:'text/plain'});
+          note = `같은 이름 파일이 있어 합쳐서 저장했어요 (그 파일에만 있던 직원 ${r.added}명 · 합친 직원 ${r.updated}명)`;
+        }
+      }
+    }catch(e){}
+  }
+  const w = await h.createWritable(); await w.write(blob); await w.close();
+  return note;
+}
+function mimeOf(file){ return file.type || 'application/octet-stream'; }
+async function saveFile(file, opt){
+  opt = opt || {};
+  const ext = ((file.name.match(/\.[^.]+$/)||[''])[0] || '.txt').toLowerCase();
+  if(folderH && folderOk && !opt.ask){
+    try{ const h = await folderH.getFileHandle(file.name, {create:true}); const note = await writeHandle(h, file); toast(note || ('📁 ' + folderH.name + ' 폴더에 저장했어요')); return true; }
+    catch(e){ folderOk = false; renderBackup(); }
+  }
+  if(canPick && (askOn() || opt.ask)){
+    try{
+      const h = await window.showSaveFilePicker({id:'cwy-save', suggestedName:file.name, startIn: (folderH && folderOk) ? folderH : 'downloads', types:[{description:'파일', accept:{[mimeOf(file)]:[ext]}}]});
+      const note = await writeHandle(h, file);
+      toast(note || ('고른 위치에 저장했어요 · ' + h.name));
+      return true;
+    }catch(e){ if(e && e.name==='AbortError') return false; }
+  }
+  bkDownload(file);
+  let n = 0; try{ n = Number(localStorage.getItem('cwy_dl_hint')) || 0; localStorage.setItem('cwy_dl_hint', String(n + 1)); }catch(e){}
+  toast(n < 3 && !canPick ? '다운로드 폴더에 저장했어요 · 폴더를 매번 고르려면 크롬 설정 → 다운로드 → "다운로드 위치 묻기"를 켜세요' : '다운로드 폴더에 저장했어요');
+  return true;
+}
+/* 백업 화면 안전 보관 칸에 저장 위치 설정 추가 */
+const _renderSafe0 = renderSafe;
+renderSafe = async function(){
+  await _renderSafe0();
+  const el = document.getElementById('bkSafe'); if(!el) return;
+  const box = document.createElement('div');
+  box.innerHTML = canPick
+    ? `<label class="saveOpt"><input type="checkbox" ${askOn() ? 'checked' : ''} onchange="setAskOn(this.checked)"> 파일 저장할 때마다 저장 위치(폴더) 고르기</label><div class="cfgHint" style="margin:0">같은 이름 파일을 고르면 두 파일 내용을 <b>합쳐서</b> 저장해요 (사진 포함)</div>`
+    : `<div class="cfgHint" style="margin:8px 0 0">📁 <b>저장 폴더 고르기</b>: 폰 크롬은 앱이 폴더를 직접 고를 수 없어요. 크롬 <b>설정 → 다운로드 → "다운로드 위치 묻기"</b>를 켜면 저장할 때마다 폴더를 고를 수 있어요.</div>`;
+  el.appendChild(box);
+};
 </script>
 <script>
 (()=>{
