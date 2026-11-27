@@ -67,11 +67,12 @@
   .monthHead{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(201,162,74,.12);}
   .monthHead button{border:0;background:#fff;border:1px solid var(--line);border-radius:8px;width:36px;height:32px;font-size:15px;font-weight:900;color:var(--red);}
   .monthHead .ttl{font-size:15px;font-weight:900;color:var(--red);}
-  .monthBody{display:grid;grid-template-columns:1fr 1fr;}
+  .monthBody{display:grid;grid-template-columns:1fr 1fr 1fr;}
   .monthCol{padding:10px 12px;font-size:13px;}
   .monthCol + .monthCol{border-left:1px solid var(--line);}
   .monthCol h4{margin:0 0 6px;font-size:13px;font-weight:900;}
-  .monthCol.in h4{color:#1f6fb2;} .monthCol.out h4{color:#b23b3b;}
+  .monthCol.in h4{color:#1f6fb2;} .monthCol.out h4{color:#b23b3b;} .monthCol.dl h4{color:#ad691d;}
+  @media(max-width:540px){.monthBody{grid-template-columns:1fr}.monthCol + .monthCol{border-left:0;border-top:1px solid var(--line)}}  /* 폰: 입사·퇴사·일용직 전환을 위아래로 — 이름·주민번호가 잘리지 않게 */
   .monthCol .it{padding:3px 0;font-weight:700;line-height:1.35;}
   .monthCol .it small{display:block;color:var(--sub);font-weight:500;font-size:11px;}
   .monthCol .none{color:#b0a794;font-size:12px;}
@@ -90,7 +91,7 @@
   .logHead button{border:0;background:none;font-family:inherit;font-size:12px;font-weight:800;color:var(--sub);}
   .logItem{display:flex;align-items:center;gap:8px;padding:9px 12px;border-top:1px solid var(--line);font-size:13.5px;}
   .logItem .tp{flex-shrink:0;font-size:11px;font-weight:900;border-radius:6px;padding:3px 7px;color:#fff;}
-  .logItem .tp.join{background:#1f6fb2;} .logItem .tp.leave{background:#b23b3b;}
+  .logItem .tp.join{background:#1f6fb2;} .logItem .tp.leave{background:#b23b3b;} .logItem .tp.todaily{background:#c06a00;} .oc .ev.todaily{background:#c06a00;}
   .logItem .nm{flex:1;font-weight:800;}
   .logItem .dt{font-size:12px;color:var(--sub);font-weight:700;text-align:right;}
   .tag.off{background:rgba(120,90,160,.14);color:#6b4f9a;}
@@ -415,7 +416,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
 </head>
 <body>
 
-<header><div class="headerInner"><div class="brandLine"><div class="wordmark"><span class="brandDot"></span>CHOI CEO <span style="font-weight:400;color:#9aa4b5">/ PEOPLE</span></div><span style="display:flex;align-items:center;gap:8px"><button type="button" class="devShare" onclick="exportData()">📲 다른 기기 공유</button><span class="workspaceTag">직원 관리 · v11.25-3</span><a class="helperLink" href="https://helperpay.vercel.app/" target="_blank" rel="noopener">🤝 헬퍼앱</a></span></div>
+<header><div class="headerInner"><div class="brandLine"><div class="wordmark"><span class="brandDot"></span>CHOI CEO <span style="font-weight:400;color:#9aa4b5">/ PEOPLE</span></div><span style="display:flex;align-items:center;gap:8px"><button type="button" class="devShare" onclick="exportData()">📲 다른 기기 공유</button><span class="workspaceTag">직원 관리 · v11.27-5</span><a class="helperLink" href="https://helperpay.vercel.app/" target="_blank" rel="noopener">🤝 헬퍼앱</a></span></div>
   <div class="title" id="hTitle">구로점 직원 리스트</div>
   <div class="sub">함께 일하는 사람들, 한눈에 관리하세요.</div>
 </div></header>
@@ -443,7 +444,7 @@ header{padding:24px 24px 26px;background:linear-gradient(120deg,#fff,#edf3ff)}
 <div id="filterBar"></div>
 <div class="toolRow two"><button onclick="openOffBoard()">휴무·근무 캘린더</button><button class="cfgBtn" onclick="openMonthText()">📋 월별 직원 명단 (텍스트)</button><button class="cfgBtn" onclick="openCfg()">매장·파트 설정</button></div>
 <div class="listLabel"><h2>파트별 직원</h2><span>이름을 눌러 상세 정보 확인</span></div><div id="sections"></div>
-<details class="historyPanel"><summary>입·퇴사 현황과 이력</summary><div class="monthBox" id="monthBox"></div><div class="logBox" id="logBox"></div></details>
+<details class="historyPanel"><summary>입·퇴사 · 일용직 전환 현황과 이력</summary><div class="monthBox" id="monthBox"></div><div class="logBox" id="logBox"></div></details>
 </div></main>
 
 <!-- 직원 메모 -->
@@ -978,7 +979,7 @@ function saveAll(){
   if(persist()){
     saveFullNow();
     const m = today().slice(0,7), L = logs().filter(x=>x.date && x.date.slice(0,7)===m);
-    toast(`전체 저장 완료 · 백업 파일도 저장 · 이번 달 입사 ${L.filter(x=>x.type==='join').length}명 · 퇴사 ${L.filter(x=>x.type==='leave').length}명`);
+    toast(`전체 저장 완료 · ${IS_MOBILE && !(folderH && folderOk) ? '앱 안 2중 저장' : '백업 파일도 저장'} · 이번 달 입사 ${L.filter(x=>x.type==='join').length}명 · 퇴사 ${L.filter(x=>x.type==='leave').length}명`);
   }
 }
 function persist(){
@@ -1012,11 +1013,17 @@ function logs(){
   }
   return allData.__log[storeId];
 }
+const LOG_NAME = {join:'입사', leave:'퇴사', todaily:'일용직 전환'}, LOG_SHORT = {join:'입', leave:'퇴', todaily:'일'};
+function logRrn(x){
+  for(const st of STORES) for(const sec of st.sections){ const q = ((allData[st.id]||{})[sec.id]||[]).find(q=>q.id===x.staffId); if(q && q.rrn) return q.rrn; }
+  if(x.rrn) return x.rrn;
+  const o = (allData.__dlp||{})[dlNorm(x.name)]; return (o && o.rrn) || '';
+}
 function setLog(p, secName, type, date){
   const L = logs();
   const idx = L.findIndex(x=>x.staffId===p.id && x.type===type);
   if(!date){ if(idx>=0) L.splice(idx,1); return; }
-  const e = {staffId:p.id, name:p.name, sec:secName, type, date, at:Date.now()};
+  const e = {staffId:p.id, name:p.name, rrn:p.rrn||'', sec:secName, type, date, at:Date.now()};
   if(idx>=0) L[idx] = e; else L.push(e);
 }
 let lastAction = '';
@@ -1222,7 +1229,7 @@ function renderOffBoard(){
   for(let i=0;i<first;i++) h += '<div></div>';
   for(let d=1; d<=days; d++){
     const ds = offMonth + '-' + String(d).padStart(2,'0'), ppl = offPeople(ds), ev = dayEvents(ds);
-    const evH = ev.map(x=>`<span class="ev ${x.type}">${x.type==='join'?'입':'퇴'}${esc((x.name||'?').slice(0,2))}</span>`).join('');
+    const evH = ev.map(x=>`<span class="ev ${x.type}">${LOG_SHORT[x.type]||'?'}${esc((x.name||'?').slice(0,2))}</span>`).join('');
     const dw = dailyWorkers(storeId, ds);
     const room = Math.max(0, 3 - ev.length), offShow = Math.min(ppl.length, room), dwShow = Math.min(dw.length, Math.max(0, room - offShow)), more = (ppl.length - offShow) + (dw.length - dwShow);
     h += `<button class="oc ${ds===t?'today':''} ${ds===offSel?'sel':''}" onclick="offPick('${ds}')"><span class="top"><span class="dn">${d}</span>${ppl.length?`<span class="cnt">휴${ppl.length}</span>`:''}${dw.length?`<span class="cnt dl">일${dw.length}</span>`:''}${(()=>{ let a=0,hh=0; SECTIONS.forEach(sec=>data[sec.id].forEach(p=>{ const mk=(p.marks||{})[ds]; if(mk && p.name && !(p.off||[]).includes(ds)){ if(mk.t==='absent') a++; else hh++; } })); return (a?`<span class="cnt ab">결${a}</span>`:'') + (hh?`<span class="cnt hf">반${hh}</span>`:''); })()}</span>${evH}${ppl.slice(0,offShow).map(x=>`<span class="nm">${esc((x.p.name||'?').slice(0,4))}</span>`).join('')}${dw.slice(0,dwShow).map(x=>`<span class="nm dw">${esc(x.name.slice(0,4))}</span>`).join('')}${more>0?`<span class="more">+${more}</span>`:''}</button>`;
@@ -1288,24 +1295,25 @@ function renderLog(){
   const show = logOpen ? L : L.slice(0,3);
   const mm = Number(viewMonth.slice(5,7));
   document.getElementById('logBox').innerHTML = `
-    <div class="logHead">📋 ${mm}월 입·퇴사 저장 기록 (${L.length}건)${L.length>3 ? `<button onclick="logOpen=!logOpen;renderLog()">${logOpen?'접기':'전체 보기'}</button>`:''}</div>
-    ${show.length ? show.map(x=>`<div class="logItem"><span class="tp ${x.type}">${x.type==='join'?'입사':'퇴사'}</span><span class="nm">${esc(x.name||'이름 없음')} <small style="color:var(--sub);font-weight:600">${x.sec}</small></span><span class="dt">${x.date}<br>저장 ${new Date(x.at).toLocaleDateString('ko-KR',{month:'numeric',day:'numeric'})}</span></div>`).join('')
+    <div class="logHead">📋 ${mm}월 입·퇴사·일용직 전환 기록 (${L.length}건)${L.length>3 ? `<button onclick="logOpen=!logOpen;renderLog()">${logOpen?'접기':'전체 보기'}</button>`:''}</div>
+    ${show.length ? show.map(x=>`<div class="logItem"><span class="tp ${x.type}">${LOG_NAME[x.type]||x.type}</span><span class="nm">${esc(x.name||'이름 없음')} <small style="color:var(--sub);font-weight:600">${x.sec}</small><br><small style="color:var(--sub);font-weight:600">${esc(logRrn(x)||'주민번호 없음')}</small></span><span class="dt">${x.date}<br>저장 ${new Date(x.at).toLocaleDateString('ko-KR',{month:'numeric',day:'numeric'})}</span></div>`).join('')
       : `<div class="logItem" style="color:#b0a794">${mm}월 기록이 아직 없어요</div>`}`;
 }
 function renderMonth(){
   const L = logs().filter(x=>x.date && x.date.slice(0,7)===viewMonth);
-  const ins = L.filter(x=>x.type==='join'), outs = L.filter(x=>x.type==='leave');
-  const list = (arr)=> arr.length ? arr.sort((a,b)=>a.date<b.date?-1:1).map(x=>`<div class="it">${esc(x.name||'이름 없음')}<small>${fmtD(x.date)} · ${x.sec}</small></div>`).join('') : '<div class="none">없음</div>';
+  const ins = L.filter(x=>x.type==='join'), outs = L.filter(x=>x.type==='leave'), dls = L.filter(x=>x.type==='todaily');
+  const list = (arr)=> arr.length ? arr.sort((a,b)=>a.date<b.date?-1:1).map(x=>`<div class="it">${esc(x.name||'이름 없음')}<small>${esc(logRrn(x)||'주민번호 없음')}</small><small>${fmtD(x.date)} · ${x.sec}</small></div>`).join('') : '<div class="none">없음</div>';
   const [y,m] = viewMonth.split('-');
   document.getElementById('monthBox').innerHTML = `
     <div class="monthHead">
       <button onclick="moveMonth(-1)">◀</button>
-      <span class="ttl">${y}년 ${Number(m)}월 입·퇴사${viewMonth!==today().slice(0,7) ? ` <button style="width:auto;padding:0 8px;font-size:11px;margin-left:4px" onclick="goThisMonth()">이번 달</button>` : ''}</span>
+      <span class="ttl">${y}년 ${Number(m)}월 입·퇴사·일용직${viewMonth!==today().slice(0,7) ? ` <button style="width:auto;padding:0 8px;font-size:11px;margin-left:4px" onclick="goThisMonth()">이번 달</button>` : ''}</span>
       <button onclick="moveMonth(1)">▶</button>
     </div>
     <div class="monthBody">
       <div class="monthCol in"><h4>입사 ${ins.length}명</h4>${list(ins)}</div>
       <div class="monthCol out"><h4>퇴사 ${outs.length}명</h4>${list(outs)}</div>
+      <div class="monthCol dl"><h4>일용직 전환 ${dls.length}명</h4>${list(dls)}</div>
     </div>`;
 }
 let ioCur = null;
@@ -2098,7 +2106,7 @@ function dmPasteSave(){
 function dmSavedLine(){
   let t = 0; try{ t = Number(localStorage.getItem(SAVED_AT_KEY)) || 0; }catch(e){}
   const el = document.getElementById('dmSaveBtn'); if(!el) return;
-  el.innerHTML = `💾 저장하기 <small>${t ? '마지막 저장 ' + new Date(t).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) + ' · ' : ''}고칠 때마다 자동 저장돼요 · 누르면 백업 파일까지 저장</small>`;
+  el.innerHTML = `💾 저장하기 <small>${t ? '마지막 저장 ' + new Date(t).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) + ' · ' : ''}고칠 때마다 자동 저장돼요${IS_MOBILE ? '' : ' · 누르면 백업 파일까지 저장'}</small>`;
 }
 function dmSaveNow(){ saveAll(); dmSavedLine(); }
 function dmDayText(ds){
@@ -2317,6 +2325,12 @@ function daSave(){
   if(remove){
     const arr = (allData[daFrom.store]||{})[daFrom.sec] || [], k = arr.findIndex(q=>q.id===daFrom.id);
     if(k>=0){ allData.__del = allData.__del || {}; allData.__del[daFrom.id] = Date.now(); arr.splice(k,1); removed = true; }
+  }
+  if(daFrom){   // 직원 → 일용직으로 넘어간 기록을 입·퇴사 이력에 함께 남김
+    const st0 = STORES.find(x=>x.id===daFrom.store), sec0 = st0 && st0.sections.find(x=>x.id===daFrom.sec);
+    allData.__log = allData.__log || {}; const LL = allData.__log[daFrom.store] = allData.__log[daFrom.store] || [];
+    const e = {staffId:daFrom.id, name, rrn:daFrom.rrn||'', sec:(sec0 ? sec0.name : '') + (removed ? ' → 일용직 명단' : ''), type:'todaily', date:today(), at:Date.now()};
+    const j = LL.findIndex(x=>x.staffId===daFrom.id && x.type==='todaily'); if(j>=0) LL[j] = e; else LL.push(e);
   }
   persist(); autoBackup(); daClose();
   dmMonth = (todo[0] || dates[0]).slice(0,7); renderDailyMonth(); renderCallAlert(); render();
@@ -2859,12 +2873,20 @@ function render(){
 
 function toggle(sec, i, key){
   const p = data[sec][i];
+  const wasDaily = staffType(p)==='daily';
   p[key] = !p[key];
   if(p[key] && TYPES.includes(key)) TYPES.forEach(t=>{ if(t!==key) p[t] = false; });   // 하나만 선택
+  logDailySwitch(p, sec, wasDaily);
   touch(p);
   const c = CHECKS.find(x=>x.id===key);
   if(persist()) toast(p[key] ? (key==='daily' ? '일용직으로 바꿨어요 · 이름을 눌러 🧾 일용직 명단으로 옮기기에서 근무한 날을 넣어 주세요' : TYPES.includes(key) ? TYPE_NAME[key] + '에 넣었어요' : c.full + ' 체크됨') : c.full + ' 체크 해제');
   render();
+}
+/* 일용직으로 바뀌면 이력에 '일용직 전환' 기록, 다시 다른 구분으로 바꾸면 그 기록을 지움 */
+function logDailySwitch(p, secId, wasDaily){
+  const now = staffType(p)==='daily', sec = SECTIONS.find(x=>x.id===secId);
+  if(now && !wasDaily) setLog(p, sec ? sec.name : '', 'todaily', today());
+  else if(!now && wasDaily) setLog(p, sec ? sec.name : '', 'todaily', '');
 }
 function setFilter(f){ listFilter = (listFilter===f ? '' : f); render(); window.scrollTo({top: document.getElementById('sections').offsetTop - 70, behavior:'smooth'}); }
 function addStaff(sec, kind){
@@ -2948,7 +2970,9 @@ function saveMemo(){
   p.monthly = document.getElementById('mMonthly').value;
   p.payType = mPayType;
   p.dayWage = document.getElementById('mDayWage').value;
+  const wasDailyM = staffType(p)==='daily';
   TYPES.forEach(t=>{ p[t] = (mType===t); });
+  logDailySwitch(p, cur.sec, wasDailyM);
   if(mType==='daily' && !p.role) p.role = '일용';
   const cutW = new Date(); cutW.setFullYear(cutW.getFullYear()-2);
   p.workDays = calWork.filter(d=>d >= cutW.toISOString().slice(0,10)).sort();
@@ -3125,7 +3149,23 @@ function renderBackup(){
   const days = sent ? Math.floor((Date.now()-sent)/86400000) : null;
   const need = hasData && (sent ? (days >= 7 && saved > sent) : true);
   const fw = (canFolder && folderH && !folderOk) ? `<div class="backupBar"><span>📁 ${FOLDER_NAME} 폴더 자동 저장이 멈췄어요<br><small style="font-weight:600">한 번 눌러 다시 연결하면 계속 저장돼요</small></span><button onclick="folderConnect()">다시 연결</button></div>` : '';
+  // 폰: 폴더 안내 대신 늘 보이는 "백업 파일 저장" 버튼 (공유 창 → 내 파일·드라이브·카톡·메일로 저장)
+  if(!canFolder && IS_MOBILE){
+    el.innerHTML = `<div class="backupBar"><span>💾 ${need ? (sent ? days + '일째 백업을 안 했어요' : '아직 백업을 한 번도 안 했어요') : '백업 파일 저장'}<br><small style="font-weight:600">${sent ? '마지막 백업 ' + shortTime(sent) : '눌러서 내 파일·드라이브·카톡에 저장하세요'}</small></span><button onclick="mobileBackupSave()">백업 저장</button></div>`;
+    return;
+  }
   el.innerHTML = fw + (need ? `<div class="backupBar"><span>💾 ${sent ? days + '일째 백업을 안 했어요' : '아직 백업을 한 번도 안 했어요'}<br><small style="font-weight:600">폰을 바꾸거나 앱이 지워지면 기록이 사라질 수 있어요</small></span><button onclick="openBackup()">지금 백업</button></div>` : '');
+}
+/* 폰 백업 저장: 전체 백업 파일을 공유 창으로 (안 되면 다운로드 폴더에) */
+async function mobileBackupSave(){
+  const file = backupFile();
+  try{
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], title:file.name, text:'직원관리 전체 백업 파일입니다. 앱에서 파일 불러오기로 열어 주세요.'});
+      markSent(); toast('백업 파일을 저장했어요'); return;
+    }
+  }catch(e){ if(e && e.name==='AbortError') return; }
+  bkDownload(file); markSent(); toast('다운로드 폴더에 백업 파일을 저장했어요');
 }
 function showShareNote(){
   let sent = 0, recv = 0;
@@ -3270,6 +3310,7 @@ function mergeData(mine, theirs){
       });
     });
     const seen = new Set();
+    oldLogs.filter(x=>live.has(x.staffId) && x.type==='todaily').sort((a,b)=>b.at-a.at).forEach(x=>{ const k = x.staffId+x.type; if(!seen.has(k)){ seen.add(k); L.push(x); } });
     oldLogs.filter(x=>!live.has(x.staffId) && !gone.has(x.staffId)).forEach(x=>{ const k = x.staffId+x.type; if(!seen.has(k)){ seen.add(k); L.push(x); } });
     out.__log[st.id] = L;
   });
@@ -3333,7 +3374,9 @@ document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) checkNe
 /* ---------- 안전 보관: 지움 방지 · 2중 저장 · 폴더 자동 백업 · 되돌리기 ---------- */
 var FOLDER_NAME = '최우영씨푸드그룹인력';
 var AUTO_DAY_KEY = 'cwy_auto_bk_day', AUTO_ON_KEY = 'cwy_auto_bk_on', UNDO_KEY = 'cwy_staff_undo';
-var canFolder = typeof window.showDirectoryPicker === 'function';
+/* 폴더 자동 저장은 컴퓨터(크롬·엣지)에서만: 폰 크롬은 폴더 권한이 앱을 다시 열 때마다 풀려서 "다시 연결"이 계속 실패함
+   → 폰은 폴더 대신 하루 한 번 다운로드 폴더 백업 + 공유로 저장 */
+var canFolder = typeof window.showDirectoryPicker === 'function' && !IS_MOBILE;
 var folderH = null, folderOk = false, safeT = 0;
 function idbOpen(){ return new Promise((res, rej)=>{ const r = indexedDB.open('cwy_staff_safe', 1); r.onupgradeneeded = ()=>r.result.createObjectStore('kv'); r.onsuccess = ()=>res(r.result); r.onerror = ()=>rej(r.error); }); }
 async function idbSet(k, v){ try{ const db = await idbOpen(); await new Promise((res, rej)=>{ const t = db.transaction('kv','readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = res; t.onerror = ()=>rej(t.error); }); }catch(e){} }
@@ -3366,16 +3409,27 @@ async function folderInit(){
   renderBackup();
 }
 async function folderConnect(){
-  try{
-    if(folderH && !folderOk){
+  if(!canFolder){ toast('이 기기는 폴더 자동 저장을 지원하지 않아요 · 하루 한 번 다운로드 폴더에 백업돼요'); renderBackup(); return; }
+  // 1) 예전에 연결한 폴더 권한 다시 받기 — 실패하거나 폴더가 없어졌으면 2)로 넘어감
+  if(folderH && !folderOk){
+    try{
       folderOk = (await folderH.requestPermission({mode:'readwrite'})) === 'granted';
-      if(folderOk){ await folderSave(true); toast(FOLDER_NAME + ' 폴더 저장을 다시 켰어요'); renderSafe(); renderBackup(); return; }
-    }
+      if(folderOk && await folderSave(true)){ toast(FOLDER_NAME + ' 폴더 저장을 다시 켰어요'); renderSafe(); renderBackup(); return; }
+    }catch(e){ folderOk = false; }
+  }
+  // 2) 폴더를 새로 고르기
+  try{
     const parent = await window.showDirectoryPicker({id:'cwy-staff', mode:'readwrite'});
     folderH = parent.name === FOLDER_NAME ? parent : await parent.getDirectoryHandle(FOLDER_NAME, {create:true});
     await idbSet('folder', folderH); folderOk = true;
     await folderSave(true); toast(FOLDER_NAME + ' 폴더에 저장했어요'); renderSafe(); renderBackup();
-  }catch(e){ if(e && e.name==='AbortError') return; toast('폴더를 연결하지 못했어요'); }
+  }catch(e){
+    if(e && e.name==='AbortError') return;
+    // 계속 실패하면 끊긴 연결을 지우고 다운로드 백업으로 돌아감 (안내 칸이 계속 뜨지 않게)
+    folderH = null; folderOk = false; await idbSet('folder', null);
+    toast('폴더를 연결하지 못했어요 · 대신 다운로드 폴더에 백업할게요');
+    renderSafe(); renderBackup();
+  }
 }
 async function folderSave(show){
   if(!folderH || !folderOk) return false;
@@ -3406,6 +3460,7 @@ function saveFullNow(){
   let s = ''; try{ s = localStorage.getItem(KEY) || ''; }catch(e){}
   if(s) idbSet('data', {at:Date.now(), s});
   if(folderH && folderOk){ folderSave(true); return; }
+  if(IS_MOBILE) return;   // 폰: 누를 때마다 다운로드 폴더에 파일이 쌓이지 않게 — 앱 안 2중 저장만, 파일은 "백업 저장" 버튼으로
   saveFile(new File([backupPayload()], FOLDER_NAME + '_' + today() + '.txt', {type:'text/plain'})).then(ok=>{
     if(!ok) return;
     try{ localStorage.setItem(AUTO_DAY_KEY, today()); localStorage.setItem('cwy_staff_sent_at', String(Date.now())); }catch(e){}
